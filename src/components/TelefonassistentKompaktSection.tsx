@@ -116,7 +116,7 @@ export function TelefonassistentKompaktSection({ city }: { city: string }) {
                 >
                   <span
                     aria-hidden="true"
-                    className="absolute left-0 top-[0.7em] w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"
+                    className="absolute left-0 top-[0.7em] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400"
                   />
                   {punkt}
                 </li>
@@ -125,7 +125,7 @@ export function TelefonassistentKompaktSection({ city }: { city: string }) {
             <Mehr {...KOMPAKT_SAEULEN.mehr} />
           </Block>
 
-          {/* M10 · Planbare Kosten — die Deckelungsaussage, sonst nichts. */}
+          {/* M10 · Planbare Kosten — die Abrechnungsregel, sonst nichts. */}
           <Block id="kompakt-kosten" headline={KOMPAKT_KOSTEN.headline}>
             <p className="text-[17px] leading-relaxed text-gray-700 dark:text-gray-300">
               {KOMPAKT_KOSTEN.text}
@@ -163,7 +163,7 @@ export function TelefonassistentKompaktSection({ city }: { city: string }) {
                 >
                   <span
                     aria-hidden="true"
-                    className="absolute left-0 top-[0.7em] w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"
+                    className="absolute left-0 top-[0.7em] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400"
                   />
                   {punkt}
                 </li>

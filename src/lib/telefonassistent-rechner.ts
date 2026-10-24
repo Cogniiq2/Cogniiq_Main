@@ -7,62 +7,57 @@
 // getestet wird, ist nicht geprüft, sondern bloß einmal beobachtet worden.
 //
 // ZAHLENHERKUNFT. Jede Zahl kommt aus `telefonassistent-copy.ts`: `TARIFE`
-// (Minutenkontingent, Monatspreis, angegebene Obergrenze), `SPRACHEN_PREISE`.
-// In dieser Datei steht KEIN Betrag als Literal.
+// (Inklusivminuten, Monatspreis), `FAKTEN.mehrpreisProMinuteEur`,
+// `EINRICHTUNG.eur`, `SPRACHEN_PREISE`, `TARIF_ENTERPRISE_AB_EUR`. In dieser
+// Datei steht KEIN Betrag als Literal.
+//
+// PREISMODELL (verbindliche Inhaber-Preisstruktur vom 24.10.2026):
+//   Monatspreis je Tarif  = Grundgebühr + Mehrminuten × 0,50 €
+//   Mehrminuten           = max(0, abrechenbare Minuten − Inklusivminuten)
+//   Kein Preisdeckel, keine Obergrenze — die Summe wächst linear.
+//   Einrichtung           = 990 € einmalig, für alle Tarife gleich; nie Teil
+//                           des Monatspreises.
+//   Empfehlung            = der Tarif mit dem niedrigsten Monatspreis für das
+//                           eingegebene Volumen; bei Gleichstand der mit
+//                           weniger Mehrminuten (mehr Puffer, gleicher Preis).
+//
+// RUNDUNG. Der Rechner rechnet mit der eingegebenen Minutenzahl, ohne Rundung.
+// Wie die Abrechnung Gesprächssekunden in Minuten umrechnet, ist nicht
+// festgelegt (OWNER-INPUT J15) und wird hier nicht erfunden; die Oberfläche
+// sagt das am Ergebnis.
 //
 // WAS HIER NICHT GERECHNET WIRD — und warum das Absicht ist:
 //
-//   • Minuten ÜBER dem Kontingent und die Obergrenze (Inhaber-Entscheidung
-//     24.10.2026). Bis dahin rechnete der Kern Mehrminuten × 0,39 € und
-//     deckelte auf die Obergrenze — eine Vertragsformel, die nicht bestätigt
-//     ist (OWNER-INPUT J1–J8). Jetzt gilt: Ein Tarif „passt", wenn sein
-//     Kontingent das Aufkommen trägt; was darüber liegt, ist `OFFEN` und steht
-//     im Angebot. Die Obergrenze wird als ANGEGEBENER Wert durchgereicht,
-//     nie als Rechengröße.
-//
-//   • Die Einrichtung. Sie ist bei allen Tarifen derselbe Standardaufwand,
-//     ihr Betrag ist nicht freigegeben (`EINRICHTUNG.betragOffen`). Deshalb
-//     gibt es keine Erstjahreskosten und keine Amortisation — beides bräuchte
-//     einen Einmalbetrag, den es nicht gibt.
-//
 //   • Der 20-%-Aufschlag für monatliche Kündbarkeit (`FAKTEN.laufzeit`). Die
-//     Quelle sagt nicht, worauf er sich bemisst: Grundpreis, Mehrverbrauch,
-//     Obergrenze, Sprachaufschlag, Einrichtung. Fünf Lesarten, fünf Ergebnisse.
-//     Der Aufschlag wird deshalb als Regel angezeigt, nicht als Rechenweg.
+//     Quelle sagt nicht, worauf er sich bemisst. Er wird deshalb als Regel
+//     angezeigt, nicht als Rechenweg.
 //
-//   • Ob der Sprachaufschlag INNERHALB der Tarif-Obergrenze liegt oder daneben.
-//     Die Quelle sagt es nicht. Solange Telefonie + Aufschlag UNTER der
-//     Obergrenze bleiben, ergeben beide Lesarten dieselbe Summe, und die wird
-//     genannt. Darüber steht die Summe als Spanne zwischen Obergrenze und
-//     Telefonie + Aufschlag — nicht als eine Zahl (siehe `monatlichSpanne`).
+//   • Steuern. Ob die Preise netto oder brutto gelten, ist nicht bestätigt
+//     (OWNER-INPUT J8); der Rechner nennt Beträge wie die Preisliste.
 //
-//   • Kosten einer kundenspezifischen Anbindung, inklusive Gebühren Dritter.
-//     Die stehen erst nach der technischen Prüfung fest. Sie erscheinen als
-//     `unbekannt`, NIE als 0 — eine unbekannte Position als Null zu zeigen
-//     wäre die eine Unehrlichkeit, die ein Preisrechner nicht überlebt.
-//
-//   • Die TARIFZUORDNUNG als Vertragsregel. `waehleSzenario` nennt den
-//     kleinsten Tarif, dessen Kontingent das eingegebene Aufkommen trägt. Ob
-//     ein Kunde jeden Tarif nutzen darf und was bei dauerhaft höherem
-//     Aufkommen passiert, ist nicht bestätigt; der Kern liefert deshalb auch
-//     den Vergleich aller Listentarife (`tarifVergleich`), und die Oberfläche
-//     verspricht keinen „günstigsten Tarif", sondern zeigt die Passung.
+//   • Kosten einer kundenspezifischen Anbindung oder Sonderlösung, inklusive
+//     Gebühren Dritter. Sie stehen erst nach der technischen Prüfung fest und
+//     erscheinen als `unbekannt`, NIE als 0.
 // ─────────────────────────────────────────────────────────────────────────────
-import { EINRICHTUNG, SPRACHEN_PREISE, TARIFE, type Tarif } from "@/lib/telefonassistent-copy";
+import {
+  EINRICHTUNG,
+  FAKTEN,
+  SPRACHEN_PREISE,
+  TARIF_ENTERPRISE_AB_EUR,
+  TARIFE,
+  type Tarif,
+} from "@/lib/telefonassistent-copy";
 
 /** Minuten pro Stunde — benannt, damit die Formeln lesbar bleiben. */
 const MINUTEN_PRO_STUNDE = 60;
 
 /*
   Wochen je Monat und Monate je Jahr stehen seit dem 12.09.2026 in
-  `src/lib/zeitrechnung.ts` — einem Modul ohne Abhängigkeiten, das auch der
-  Automatisierungs-Rechner liest, ohne dafür das Preismodell des
-  Telefonassistenten mitzuladen. Hier unverändert weiterexportiert, damit für
-  bestehende Aufrufer und Tests nichts umzuschreiben ist; die Zahl selbst steht
-  weiterhin an genau einer Stelle.
+  `src/lib/zeitrechnung.ts`. Hier weiterexportiert, damit für bestehende
+  Aufrufer nichts umzuschreiben ist.
 */
 export { WOCHEN_PRO_MONAT } from "@/lib/zeitrechnung";
-import { WOCHEN_PRO_MONAT } from "@/lib/zeitrechnung";
+import { MONATE_PRO_JAHR, WOCHEN_PRO_MONAT } from "@/lib/zeitrechnung";
 
 /** Wochenaufkommen in Monatsaufkommen. Ein Ort, eine Umrechnung. */
 export function anrufeProMonatAusWoche(anrufeProWoche: number): number {
@@ -80,8 +75,7 @@ export interface VolumenEingabe {
 
 /**
  * Zusatzsprachen NEBEN Deutsch. Deutsch ist enthalten, zählt hier also nicht
- * mit. `3` bedeutet „drei oder mehr" und löst den Paketpreis aus — die Quelle
- * beziffert oberhalb des Pakets keinen weiteren Sprung.
+ * mit. `3` bedeutet „drei oder mehr".
  */
 export type Zusatzsprachen = 0 | 1 | 2 | 3;
 
@@ -91,65 +85,47 @@ export type Zusatzsprachen = 0 | 1 | 2 | 3;
 export const UNBEKANNT = "unbekannt" as const;
 export type Betrag = number | typeof UNBEKANNT;
 
-/*
-  Ein Ergebnis, das NICHT „null" und NICHT „negativ" ist, sondern „noch nicht
-  vollständig gerechnet". Solange ein Pflichtfeld eines AKTIVEN Bausteins
-  fehlt, gibt es für Saldo, Jahreswert und Amortisation KEINE Zahl — weder
-  eine negative noch eine positive. Die Oberfläche kann daraus nichts anderes
-  machen als einen neutralen Hinweis.
-*/
+/** „Noch nicht vollständig gerechnet" — weder null noch negativ. */
 export const UNVOLLSTAENDIG = "unvollstaendig" as const;
 export type Wirtschaftsbetrag = number | typeof UNBEKANNT | typeof UNVOLLSTAENDIG;
 
-/*
-  Ein Preis, den die Quelle nicht eindeutig festlegt.
-
-  Unterschied zu UNBEKANNT: UNBEKANNT steht für etwas, das erst nach einer
-  Prüfung feststeht (die Systemanbindung). OFFEN steht für etwas, das
-  feststeht — aber in unserer eigenen Preisliste zwei Lesarten zulässt. Beides
-  darf nie als 0 erscheinen, und beides gehört benannt statt geraten.
-*/
+/** Ein Preis, den unsere eigene Preisliste nicht eindeutig festlegt. */
 export const OFFEN = "offen" as const;
 export type Preisbetrag = number | typeof OFFEN;
 
 export interface TarifSzenario {
   tarif: Tarif;
+  /** Inklusivminuten des Tarifs (Kopie zur bequemen Anzeige). */
+  inklusivMinuten: number;
   /** Minuten über dem Kontingent; 0, wenn das Kontingent reicht. */
-  mehrverbrauchMinuten: number;
-  /** true, wenn das Kontingent das Aufkommen trägt. Nur dann ist der
-   *  Monatspreis dieses Tarifs eine bekannte Zahl. */
-  passt: boolean;
-  /** Monatspreis des Tarifs, wenn er passt; `OFFEN`, wenn Minuten über dem
-   *  Kontingent liegen — deren Berechnung steht im Angebot. */
-  telefonieMonatlichEur: Preisbetrag;
+  mehrminuten: number;
+  /** Mehrminuten × Mehrminutensatz. */
+  mehrminutenEur: number;
+  /** Grundgebühr + Mehrminutenbetrag. Kein Deckel. */
+  monatlichEur: number;
 }
 
 export interface PreisErgebnis {
-  /** 'standard' = ein Tarif aus TARIFE trägt das Aufkommen nach der
-   *  veröffentlichten Zuordnungsregel.
-   *  'individuell' = auch der größte Tarif liefe dauerhaft am Deckel; dann gilt
-   *  kein Listenpreis mehr, sondern ein individuelles Kontingent. */
-  modus: "standard" | "individuell";
   minutenProMonat: number;
-  /** Tarif nach der veröffentlichten Zuordnungsregel. Nur bei
-   *  modus === 'standard' gesetzt. */
-  szenario: TarifSzenario | null;
-  /** Alle Listentarife bei diesem Aufkommen — der offengelegte Rechenweg,
-   *  aus dem die Zuordnung folgt. Immer gesetzt, auch im individuellen Modus. */
+  /** Alle Listentarife bei diesem Volumen, in Listenreihenfolge. */
   vergleich: TarifSzenario[];
+  /** Der Tarif mit dem niedrigsten Monatspreis für dieses Volumen. */
+  empfehlung: TarifSzenario;
   /** Aufschlag für Zusatzsprachen, monatlich. 0 bei „nur Deutsch",
-   *  `OFFEN`, wo die Preisliste zwei Lesarten zulässt (siehe
-   *  `sprachenAufschlagEur`). */
+   *  `OFFEN` ab zwei Zusatzsprachen (OWNER-INPUT H3). */
   sprachenMonatlichEur: Preisbetrag;
-  /** true, wenn der Aufschlag nicht eindeutig ableitbar ist und im Angebot
-   *  ausgewiesen wird. Dann ist auch `monatlichGesamtEur` nicht bezifferbar. */
   sprachenOffen: boolean;
-  /** Einmalige Standard-Einrichtung: Betrag nicht freigegeben, steht im
-   *  Angebot (`EINRICHTUNG.betragOffen`). Immer `OFFEN`. */
-  einrichtungEur: typeof OFFEN;
-  /** Wiederkehrend je Monat = Monatspreis + Zusatzsprachen. 'unbekannt' im
-   *  individuellen Modus und bei offenem Sprachaufschlag. */
+  /** Empfohlener Tarif + Zusatzsprachen. `UNBEKANNT`, solange der
+   *  Sprachaufschlag offen ist. */
   monatlichGesamtEur: Betrag;
+  /** Einmalige Standard-Einrichtung — für alle Tarife gleich. */
+  einrichtungEur: number;
+  /** 12 × Monatsbetrag + Einrichtung, nur aus bekannten Positionen.
+   *  `UNBEKANNT`, solange der Monatsbetrag offen ist. Anbindung nie enthalten. */
+  ersteJahrBekannteKostenEur: Betrag;
+  /** true, wenn der günstigste Listentarif die Enterprise-Untergrenze
+   *  erreicht — dann ist ein individuelles Kontingent zu besprechen. */
+  individuellPruefen: boolean;
   /** Steht immer erst nach der technischen Prüfung fest. */
   anbindungEur: typeof UNBEKANNT;
 }
@@ -158,9 +134,8 @@ export interface PreisErgebnis {
 
 /**
  * Minutenbedarf aus Anrufen und Dauer. Negative oder unsinnige Eingaben werden
- * auf 0 geklemmt, damit ein leeres Feld keine negative Rechnung erzeugt. Ob
- * ein Feld überhaupt ausgefüllt ist, entscheidet die Oberfläche VOR diesem
- * Aufruf — ein leeres Anruffeld ist kein Aufkommen von null.
+ * auf 0 geklemmt. Ob ein Feld überhaupt ausgefüllt ist, entscheidet die
+ * Oberfläche VOR diesem Aufruf — ein leeres Feld ist kein Aufkommen von null.
  */
 export function minutenProMonat({ anrufeProMonat, minutenProAnruf }: VolumenEingabe): number {
   const anrufe = Math.max(0, anrufeProMonat || 0);
@@ -168,54 +143,43 @@ export function minutenProMonat({ anrufeProMonat, minutenProAnruf }: VolumenEing
   return anrufe * dauer;
 }
 
-function szenarioFuer(tarif: Tarif, minuten: number): TarifSzenario {
-  const mehrverbrauchMinuten = Math.max(0, minuten - tarif.minuten);
-  const passt = mehrverbrauchMinuten === 0;
+/** Monatspreis eines Tarifs bei `minuten` abrechenbaren Minuten. */
+export function tarifPreis(tarif: Tarif, minuten: number): TarifSzenario {
+  const m = Math.max(0, Number.isFinite(minuten) ? minuten : 0);
+  const mehrminuten = Math.max(0, m - tarif.minuten);
+  const mehrminutenEur = mehrminuten * FAKTEN.mehrpreisProMinuteEur;
   return {
     tarif,
-    mehrverbrauchMinuten,
-    passt,
-    telefonieMonatlichEur: passt ? tarif.monatlichEur : OFFEN,
+    inklusivMinuten: tarif.minuten,
+    mehrminuten,
+    mehrminutenEur,
+    monatlichEur: tarif.monatlichEur + mehrminutenEur,
   };
 }
 
-/** Status der Standard-Einrichtung — durchgereicht, damit Flächen nicht raten. */
-export const EINRICHTUNG_OFFEN = EINRICHTUNG.betragOffen;
-
-/** Jeder Listentarif bei diesem Aufkommen, in Listenreihenfolge. */
+/** Jeder Listentarif bei diesem Volumen, in Listenreihenfolge. */
 export function tarifVergleich(minuten: number): TarifSzenario[] {
-  return TARIFE.map((t) => szenarioFuer(t, minuten));
+  return TARIFE.map((t) => tarifPreis(t, minuten));
 }
 
 /**
- * Der kleinste Listentarif, dessen Kontingent das Aufkommen trägt.
- *
- * Nicht mehr und nicht weniger: Es gibt keine Mehrminutenformel und keine
- * Deckelung im Kern, weil beides vertraglich nicht bestätigt ist. Liegt das
- * Aufkommen über dem größten Kontingent, gibt der Rechner bewusst KEINE Zahl
- * aus — der Enterprise-Einstieg ist eine Untergrenze („ab …"), kein
- * berechenbarer Preis. Ob ein Kunde den so bestimmten Tarif auch vertraglich
- * erhält, legt das Angebot fest; die Oberfläche sagt das dazu.
+ * Der günstigste Tarif für dieses Volumen — inklusive Mehrminuten. Bei
+ * Gleichstand gewinnt der Tarif mit weniger Mehrminuten: gleicher Preis,
+ * mehr Puffer im Kontingent.
  */
-export function waehleSzenario(minuten: number): TarifSzenario | null {
-  return tarifVergleich(minuten).find((k) => k.passt) ?? null;
+export function waehleSzenario(minuten: number): TarifSzenario {
+  const kandidaten = tarifVergleich(minuten);
+  return kandidaten.reduce((best, k) => {
+    const diff = k.monatlichEur - best.monatlichEur;
+    if (Math.abs(diff) < 1e-9) return k.mehrminuten < best.mehrminuten ? k : best;
+    return diff < 0 ? k : best;
+  });
 }
 
 /**
- * Monatlicher Sprachaufschlag — und die Stelle, an der der Rechner bewusst
- * AUFHÖRT zu rechnen.
- *
- * Eindeutig ist die Quelle nur an zwei Punkten:
- *   • Deutsch ist enthalten und kostet nichts extra.
- *   • „Jede weitere Sprache kostet 79 € im Monat."
- *
- * Nicht eindeutig ist der Paketpreis. „Ab drei Sprachen sind es 230 € im Monat
- * für bis zu fünf Sprachen gleichzeitig" lässt offen, ob „drei Sprachen"
- * DEUTSCH MITZÄHLT (also zwei Zusatzsprachen die Schwelle wären) oder drei
- * ZUSATZsprachen meint — und dieselbe Frage stellt sich bei der Obergrenze
- * „bis zu fünf". Deshalb: unterhalb der Paketfrage wird gerechnet, ab der
- * Paketfrage steht `OFFEN` — sichtbar als eigene Position, niemals als 0.
- * Offen bleibt es, bis OWNER-INPUT H3 beantwortet ist.
+ * Monatlicher Sprachaufschlag. Eindeutig sind nur „Deutsch inklusive" und
+ * „eine weitere Sprache 79 €"; ab zwei Zusatzsprachen ist die Paketregel
+ * offen (OWNER-INPUT H3) und steht als `OFFEN`, nie als 0.
  */
 export function sprachenAufschlagEur(zusatzsprachen: Zusatzsprachen): {
   betrag: Preisbetrag;
@@ -223,9 +187,6 @@ export function sprachenAufschlagEur(zusatzsprachen: Zusatzsprachen): {
 } {
   const n = Math.max(0, Math.min(SPRACHEN_PREISE.paketAbZusatzsprachen, zusatzsprachen));
   if (n === 0) return { betrag: 0, offen: false };
-  // Eine Zusatzsprache liegt unter jeder Lesart der Paketschwelle. Erst ab
-  // zwei greift die Mehrdeutigkeit: Zählt Deutsch mit, wäre hier bereits das
-  // Paket fällig; zählt es nicht mit, sind es 2 × der Einzelpreis.
   if (n === 1) return { betrag: SPRACHEN_PREISE.proSpracheEur, offen: false };
   return { betrag: OFFEN, offen: true };
 }
@@ -236,39 +197,22 @@ export function berechnePreis(
 ): PreisErgebnis {
   const minuten = minutenProMonat(volumen);
   const vergleich = tarifVergleich(minuten);
-  const szenario = waehleSzenario(minuten);
+  const empfehlung = waehleSzenario(minuten);
   const sprachen = sprachenAufschlagEur(zusatzsprachen);
-
-  if (!szenario) {
-    return {
-      modus: "individuell",
-      minutenProMonat: minuten,
-      szenario: null,
-      vergleich,
-      sprachenMonatlichEur: sprachen.betrag,
-      sprachenOffen: sprachen.offen,
-      einrichtungEur: OFFEN,
-      monatlichGesamtEur: UNBEKANNT,
-      anbindungEur: UNBEKANNT,
-    };
-  }
-
-  /*
-    Innerhalb des Kontingents ist der Monatspreis eine Zahl, der Aufschlag für
-    EINE Zusatzsprache ebenfalls. Die Summe steht nur, wenn beides steht.
-  */
-  const monatspreis = szenario.telefonieMonatlichEur as number;
-  const gesamt: Betrag = sprachen.betrag === OFFEN ? UNBEKANNT : monatspreis + sprachen.betrag;
+  const gesamt: Betrag =
+    sprachen.betrag === OFFEN ? UNBEKANNT : empfehlung.monatlichEur + sprachen.betrag;
 
   return {
-    modus: "standard",
     minutenProMonat: minuten,
-    szenario,
     vergleich,
+    empfehlung,
     sprachenMonatlichEur: sprachen.betrag,
     sprachenOffen: sprachen.offen,
-    einrichtungEur: OFFEN,
     monatlichGesamtEur: gesamt,
+    einrichtungEur: EINRICHTUNG.eur,
+    ersteJahrBekannteKostenEur:
+      gesamt === UNBEKANNT ? UNBEKANNT : gesamt * MONATE_PRO_JAHR + EINRICHTUNG.eur,
+    individuellPruefen: empfehlung.monatlichEur >= TARIF_ENTERPRISE_AB_EUR,
     anbindungEur: UNBEKANNT,
   };
 }
@@ -305,11 +249,12 @@ export function berechnePreis(
 
   Geldsaldo je Monat = B + C(realisierbar) − bekannte laufende Kosten.
 
-  KEIN Erstjahressaldo, KEINE Amortisation: Beides bräuchte den Einmalbetrag
-  der Einrichtung, und der ist nicht freigegeben (`EINRICHTUNG.betragOffen`).
-  Offene Kosten (Einrichtung, Anbindung, Drittanbieter) sind NICHT in den
-  „bekannten laufenden Kosten" und machen keine Summe vollständig; die
-  Oberfläche beschriftet den Saldo entsprechend.
+  KEINE Amortisationsdauer: Eine Monatszahl bis „Einrichtung hereingeholt"
+  hinge an der offenen Anbindung und an Steuerfragen (OWNER-INPUT J8), und
+  sie würde Nutzenannahmen wie Kassenstände behandeln. Der Rechner zeigt
+  stattdessen die bekannten Erstjahreskosten im Preisblock. Offene Kosten
+  (Anbindung, Drittanbieter) sind in keiner Summe und machen jede Summe zu
+  einer Teilsumme; die Oberfläche beschriftet das.
 */
 
 export interface ZeitEingabe {
@@ -410,16 +355,15 @@ export interface CashErgebnis {
   /** Cogniiq, wiederkehrend und bekannt. `UNBEKANNT` im individuellen
    *  Preismodus und bei offenem Sprachaufschlag. */
   bekannteKostenProMonatEur: Betrag;
-  /** Standard-Einrichtung: immer `OFFEN`, solange der Betrag nicht
-   *  freigegeben ist. */
-  einmaligeKostenEur: typeof OFFEN;
+  /** Standard-Einrichtung, einmalig — nie Teil des Monatssaldos. */
+  einmaligeKostenEur: number;
   /** B + C(realisierbar) − bekannte laufende Kosten. `UNBEKANNT` ohne Preis,
    *  `UNVOLLSTAENDIG`, solange ein aktiver Geldbaustein unvollständig ist oder
    *  kein Baustein aktiv ist. */
   saldoProMonatEur: Wirtschaftsbetrag;
   /** Positionen, die in keiner Summe stehen und deshalb jede Summe zu einer
    *  Teilsumme machen. */
-  offeneKosten: readonly ["einrichtung", "anbindung"];
+  offeneKosten: readonly ["anbindung"];
   /** true, wenn Kostenersparnis UND realisierbare Zusatztermine zugleich
    *  positiv sind — die entfallende Besetzung kann die neue Kapazität nicht
    *  betreuen; der Besucher muss das selbst prüfen. */
@@ -539,8 +483,8 @@ export function berechneNutzen(preis: PreisErgebnis, eingabe: NutzenEingabe): Nu
   const basis = {
     umfang,
     bekannteKostenProMonatEur: laufend,
-    einmaligeKostenEur: OFFEN,
-    offeneKosten: ["einrichtung", "anbindung"] as const,
+    einmaligeKostenEur: preis.einrichtungEur,
+    offeneKosten: ["anbindung"] as const,
   };
 
   /*

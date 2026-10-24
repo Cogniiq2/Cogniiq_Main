@@ -32,12 +32,12 @@ function rechner(variante: 'voll' | 'kompakt') {
 describe('Rechner — kompakt zeigt den Preis, voll zeigt alles', () => {
   it('rechnet in beiden Fassungen denselben Tarif und denselben Monatsbetrag aus denselben Startwerten', () => {
     const { unmount } = rechner('voll');
-    const tarifVoll = screen.getByText('Passender Tarif nach Kontingent').closest('div')?.parentElement?.textContent ?? '';
+    const tarifVoll = screen.getByText('Günstigster Tarif bei diesem Aufkommen').closest('div')?.parentElement?.textContent ?? '';
     const betragVoll = screen.getAllByText(/300,00/)[0]?.textContent;
     unmount();
 
     rechner('kompakt');
-    const tarifKompakt = screen.getByText('Passender Tarif nach Kontingent').closest('div')?.parentElement?.textContent ?? '';
+    const tarifKompakt = screen.getByText('Günstigster Tarif bei diesem Aufkommen').closest('div')?.parentElement?.textContent ?? '';
     const betragKompakt = screen.getAllByText(/300,00/)[0]?.textContent;
 
     expect(tarifKompakt).toContain('Basis');
@@ -77,9 +77,10 @@ describe('Rechner — kompakt zeigt den Preis, voll zeigt alles', () => {
 
   it('zeigt die einmalige Einrichtung kompakt genau einmal — nicht als Zahl und Zeile doppelt', () => {
     rechner('kompakt');
-    // Die Einrichtung ist ein Standardaufwand mit offenem Betrag (24.10.2026):
-    // genau eine Zeile, keine Zahl, keine alte Staffel.
-    expect(screen.getAllByText(/Betrag im Angebot/)).toHaveLength(1);
+    // Standard-Einrichtung 990 € einmalig in allen Tarifen (24.10.2026):
+    // genau eine Zeile, getrennt vom Monatsbetrag, keine alte Staffel.
+    expect(screen.getAllByText('Einmalige Einrichtung')).toHaveLength(1);
+    expect(screen.getAllByText(/^990\s€$/)).toHaveLength(1);
     expect(screen.queryByText(/1\.490|2\.490|3\.490/)).toBeNull();
   });
 });

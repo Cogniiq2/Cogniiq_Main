@@ -42,6 +42,7 @@ import {
   FAKTEN,
   GRENZEN,
   TEAM_BLOCK,
+  EINRICHTUNG,
 } from "@/lib/telefonassistent-copy";
 
 const PFAD = "/ki-telefonassistent-arzt";
@@ -172,7 +173,8 @@ const FAQ: Array<{ question: string; answer: string }> = [
   },
 ];
 
-const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+const H2 =
+  "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6 before:block before:w-8 before:h-1 before:rounded-full before:bg-pub-accent dark:before:bg-blue-400 before:mb-4";
 const PROSE = "text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]";
 const LINK = "text-pub-accent-ink underline underline-offset-4 decoration-pub-accent-line hover:no-underline";
 const STRONG = "font-semibold text-gray-900 dark:text-gray-100";
@@ -217,11 +219,11 @@ export function KiTelefonassistentArzt() {
             aria-label="Breadcrumb"
             className="flex items-center gap-1.5 text-[14px] text-gray-500 dark:text-gray-500 mb-10"
           >
-            <Link to="/" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+            <Link to="/" className="hover:text-pub-accent dark:hover:text-blue-400 transition-colors">
               Startseite
             </Link>
             <ChevronRight size={13} aria-hidden="true" />
-            <Link to="/praxen" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+            <Link to="/praxen" className="hover:text-pub-accent dark:hover:text-blue-400 transition-colors">
               Für Praxen
             </Link>
             <ChevronRight size={13} aria-hidden="true" />
@@ -259,16 +261,16 @@ export function KiTelefonassistentArzt() {
             </Link>
             <Link
               to="/kosten-ki-telefonassistent"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-6 py-3.5 text-[16px] font-semibold text-gray-900 dark:text-gray-100 min-h-[44px]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-6 py-3.5 text-[16px] font-semibold text-gray-900 dark:text-gray-100 min-h-[44px] hover:border-pub-signal/45 hover:text-pub-signal-ink transition-colors"
             >
               Was es für eine Praxis kostet
             </Link>
           </div>
 
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-7 text-[15px] text-gray-600 dark:text-gray-400">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-7 text-[15px] text-gray-600 dark:text-gray-400 [&>li]:inline-flex [&>li]:items-center [&>li]:gap-2 [&>li]:before:content-[''] [&>li]:before:w-1.5 [&>li]:before:h-1.5 [&>li]:before:rounded-full [&>li]:before:bg-pub-accent dark:[&>li]:before:bg-blue-400">
             <li>Übergabe in {FAKTEN.einrichtungsfrist}</li>
             <li>Keine Gesprächsaufzeichnung</li>
-            <li>{FAKTEN.deckelungKurz}</li>
+            <li>{FAKTEN.abrechnungKurz}</li>
             <li>Abrechnung pro Praxis, nicht pro Behandler</li>
           </ul>
         </div>
@@ -381,7 +383,7 @@ export function KiTelefonassistentArzt() {
               Entscheidungen ohne Approbation. Der Assistent von Cogniiq tut das nicht – zu keinem
               Zeitpunkt, in keiner Konfiguration. Was er stattdessen tut, ist dreierlei:
             </p>
-            <ol className="space-y-3 list-decimal pl-6">
+            <ol className="space-y-3 list-decimal pl-6 marker:text-pub-accent marker:font-semibold dark:marker:text-blue-400">
               <li>
                 <span className={STRONG}>Er erkennt das Anliegen.</span> Signalwörter und
                 Formulierungen, die Sie festlegen – „heute noch“, „Schmerzen“, „Notfall“ –, lösen
@@ -454,7 +456,7 @@ export function KiTelefonassistentArzt() {
               die es gern selbst führt. Drei Muster kommen als Ausgangspunkt infrage; welches passt,
               hängt an Ihrer Besetzung.
             </p>
-            <ol className="space-y-3 list-decimal pl-6">
+            <ol className="space-y-3 list-decimal pl-6 marker:text-pub-accent marker:font-semibold dark:marker:text-blue-400">
               <li>
                 <span className={STRONG}>Überlauf.</span> Die Anmeldung nimmt ab, solange sie kann.
                 Erst wenn besetzt ist oder niemand abnimmt, übernimmt der Assistent. Der
@@ -489,7 +491,7 @@ export function KiTelefonassistentArzt() {
               <p key={absatz.slice(0, 40)}>{absatz}</p>
             ))}
             <p className={STRONG}>So läuft die Prüfung vor dem Angebot:</p>
-            <ol className="space-y-2 list-decimal pl-6">
+            <ol className="space-y-2 list-decimal pl-6 marker:text-pub-accent marker:font-semibold dark:marker:text-blue-400">
               {ANBINDUNG.pruefen.schritte.map((schritt) => (
                 <li key={schritt}>{schritt}</li>
               ))}
@@ -511,7 +513,7 @@ export function KiTelefonassistentArzt() {
                 key={punkt.slice(0, 40)}
                 className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] pl-5 relative"
               >
-                <span aria-hidden="true" className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400" />
+                <span aria-hidden="true" className="absolute left-0 top-[0.62em] w-2 h-0.5 rounded-full bg-pub-accent-soft dark:bg-blue-400" />
                 {punkt}
               </li>
             ))}
@@ -532,7 +534,7 @@ export function KiTelefonassistentArzt() {
                 key={punkt.slice(0, 40)}
                 className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] pl-5 relative"
               >
-                <span aria-hidden="true" className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400" />
+                <span aria-hidden="true" className="absolute left-0 top-[0.62em] w-2 h-0.5 rounded-full bg-pub-accent-soft dark:bg-blue-400" />
                 {punkt}
               </li>
             ))}
@@ -558,7 +560,7 @@ export function KiTelefonassistentArzt() {
                 key={punkt.slice(0, 40)}
                 className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] pl-5 relative"
               >
-                <span aria-hidden="true" className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400" />
+                <span aria-hidden="true" className="absolute left-0 top-[0.62em] w-2 h-0.5 rounded-full bg-pub-accent-soft dark:bg-blue-400" />
                 {punkt}
               </li>
             ))}
@@ -576,14 +578,13 @@ export function KiTelefonassistentArzt() {
       <section className={SECTION_ALT} aria-labelledby="kosten-heading">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <h2 id="kosten-heading" className={H2}>
-            Was es kostet: ein Kontingent, ein Preis, eine Obergrenze
+            Was es kostet: Kontingent, Mehrminuten, einmalige Einrichtung
           </h2>
           <div className={`${PROSE} space-y-5`}>
-            <p>Jeder Tarif enthält ein festes Minutenkontingent. {FAKTEN.deckelung}</p>
-            <p>{FAKTEN.deckelungGeltung}</p>
+            <p>{FAKTEN.abrechnung}</p>
+            <p>{FAKTEN.abrechnungGeltung}</p>
             <p>
-              {FAKTEN.nichtProBehandler} {FAKTEN.preisgarantie} Einmalig kommt die Einrichtung dazu; sie
-              steht vor Vertragsschluss im Angebot.
+              {FAKTEN.nichtProBehandler} {FAKTEN.preisgarantie} {EINRICHTUNG.standard}
             </p>
             <p>
               <Link to="/kosten-ki-telefonassistent" className={`${LINK} ${STRONG}`}>
@@ -595,7 +596,7 @@ export function KiTelefonassistentArzt() {
             <RechnerCta
               ankertext="Was es bei Ihrem Anrufaufkommen kostet"
               kontext="arztpraxis"
-              einleitung="Anrufe pro Monat und Minuten pro Anruf eingeben – der Rechner zeigt den Tarif nach Kontingent und den Monatsbetrag; Einrichtung und Anbindung stehen als offene Positionen dabei."
+              einleitung="Anrufe pro Monat und Minuten pro Anruf eingeben – der Rechner zeigt den günstigsten Tarif, Grundgebühr und Mehrminuten getrennt sowie die einmalige Einrichtung; die Anbindung steht als offene Position dabei."
             />
           </div>
         </div>
@@ -710,7 +711,7 @@ export function KiTelefonassistentArzt() {
             </li>
           </ul>
 
-          <div className="mt-12 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
+          <div className="mt-12 rounded-2xl border border-pub-accent-line dark:border-blue-500/30 bg-pub-accent-wash/60 dark:bg-blue-500/5 p-8">
             <p className={PROSE}>
               Wenn Sie die Liste für Ihre Praxis durchgehen möchten: Wir nehmen Ihre Anrufanlässe
               auf und sagen Ihnen, was davon trägt und was nicht – auch dann, wenn die Antwort gegen
@@ -725,7 +726,7 @@ export function KiTelefonassistentArzt() {
               </Link>
               <Link
                 to="/ki-telefonassistent/demo"
-                className="inline-flex items-center justify-center rounded-xl border border-gray-300 dark:border-gray-700 px-6 py-3 text-[17px] font-semibold text-gray-900 dark:text-gray-100 min-h-[44px]"
+                className="inline-flex items-center justify-center rounded-xl border border-gray-300 dark:border-gray-700 px-6 py-3 text-[17px] font-semibold text-gray-900 dark:text-gray-100 min-h-[44px] hover:border-pub-signal/45 hover:text-pub-signal-ink transition-colors"
               >
                 Den Assistenten im Gespräch erleben
               </Link>

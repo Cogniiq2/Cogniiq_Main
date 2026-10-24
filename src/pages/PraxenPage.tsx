@@ -28,7 +28,7 @@ import {
   BETREUUNG,
   CTA,
   DATENSCHUTZ_PUNKTE,
-  DECKELUNG,
+  ABRECHNUNG,
   EINRICHTUNG_PROJEKT,
   FAKTEN,
   ZWEI_WOCHEN_GARANTIE,
@@ -46,6 +46,7 @@ import {
   UEBERGABE_ABWICKLUNG,
   UMKEHRBARKEIT,
   RECHNER,
+  EINRICHTUNG,
 } from "@/lib/telefonassistent-copy";
 import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
 
@@ -80,7 +81,7 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als geplant?",
     answer:
-      `Nur begrenzt. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung} ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
+      `Ja, wenn Sie das Kontingent überschreiten – um die Mehrminuten, zu einem festen Satz. ${FAKTEN.abrechnung} ${FAKTEN.tarifzuordnung} ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
   {
     question: "Wie komme ich wieder aus dem Vertrag heraus?",
@@ -138,15 +139,16 @@ const cityLinks = [
 const SECTION = "py-24";
 const SECTION_ALT = "py-24 bg-gray-50 dark:bg-gray-900/40";
 const PROSE = "text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]";
-const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+const H2 =
+  "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6 before:block before:w-8 before:h-1 before:rounded-full before:bg-pub-accent dark:before:bg-blue-400 before:mb-4";
 const H3 = "text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5";
 const CARD =
   "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
 const CARD_ALT =
   "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
-/** Neutraler Listenpunkt — Farbe bleibt der Handlung vorbehalten (§1.1). */
+/** Listenpunkt in Akzentblau (Markendetail, 24.10.2026); Signalblau bleibt der Handlung vorbehalten. */
 const DOT =
-  "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
+  "mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0";
 /** Primärer CTA, ≥ 44 px Tap-Ziel (§1.6). */
 const CTA_PRIMARY = CTA_PRIMARY_CLASS;
 
@@ -155,7 +157,7 @@ export function PraxenPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq"
-        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln. Termine werden im Gespräch vergeben, verschoben und abgesagt; Ausnahmen gehen an Ihr Team. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe."
+        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln. Termine werden im Gespräch vergeben, verschoben und abgesagt; Ausnahmen gehen an Ihr Team. Keine Triage, festes Minutenkontingent, in zwei Wochen eingerichtet und bereit zur Freigabe."
         canonical={`${base}/praxen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -180,7 +182,7 @@ export function PraxenPage() {
             </nav>
 
             <motion.div className="cq-rise">
-              <p className="text-[15px] font-medium uppercase tracking-[0.14em] text-pub-ink-3 dark:text-gray-500 mb-4">
+              <p className="text-[15px] font-medium uppercase tracking-[0.14em] text-pub-accent dark:text-blue-400 mb-4">
                 Am Tresen steht eine Patientin. Und das Telefon klingelt trotzdem.
               </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight mb-7">
@@ -251,11 +253,11 @@ export function PraxenPage() {
                 <Link
                   key={s.href}
                   to={s.href}
-                  className={`${CARD} block hover:border-gray-300 dark:hover:border-gray-600 transition-colors`}
+                  className={`${CARD} block hover:border-pub-accent-line dark:hover:border-blue-500/40 transition-colors`}
                 >
                   <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
                     {s.label}
-                    <ArrowRight size={15} className="text-gray-400" aria-hidden="true" />
+                    <ArrowRight size={15} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                   </h3>
                   <p className={PROSE}>{s.text}</p>
                 </Link>
@@ -414,7 +416,7 @@ export function PraxenPage() {
               ziehen und was vor der Freigabe geprüft gehört, steht im{" "}
               <Link
                 to="/ki-telefonassistent-einfuehren"
-                className="underline underline-offset-4 hover:no-underline text-gray-900 dark:text-gray-100"
+                className="underline underline-offset-4 hover:no-underline text-pub-accent-ink dark:text-blue-400 decoration-pub-accent-line"
               >
                 Leitfaden zur Einführung in der Praxis
               </Link>
@@ -548,14 +550,14 @@ export function PraxenPage() {
           </div>
         </section>
 
-        {/* ── 13 · M10 Preis und Deckelung — Obergrenze zuerst (§5.1) ── */}
+        {/* ── 13 · M10 Preis und Abrechnungsregel — vor der ersten Zahl (§5.1) ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{DECKELUNG.headline}</h2>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.geltung}</p>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.tarifwechsel}</p>
-            <p className={`${PROSE} mb-10`}>{DECKELUNG.nichtProBehandler}</p>
+            <h2 className={H2}>{ABRECHNUNG.headline}</h2>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.text}</p>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.geltung}</p>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.tarifwechsel}</p>
+            <p className={`${PROSE} mb-10`}>{ABRECHNUNG.nichtProBehandler}</p>
 
             {/* Die Tarifkarten stehen seit dem 24.10.2026 nur noch auf der
                 Kostenseite (eine Preisquelle, eine Darstellung). Der Hub nennt
@@ -567,15 +569,15 @@ export function PraxenPage() {
                     {t.name}
                   </p>
                   <p className={PROSE}>
-                    {t.minuten.toLocaleString("de-DE")} Minuten im Monat für {t.monatlich}; bei rund
-                    zwei Minuten je Anruf ungefähr {t.anrufeCa.toLocaleString("de-DE")} Anrufe.
+                    {t.minuten.toLocaleString("de-DE")} Inklusivminuten im Monat für {t.monatlich}; bei
+                    durchschnittlich rund zwei Minuten je Anruf ungefähr{" "}
+                    {t.anrufeCa.toLocaleString("de-DE")} Anrufe. Jede weitere Minute {FAKTEN.mehrpreisProMinute}.
                   </p>
                 </li>
               ))}
             </ul>
             <p className={`${PROSE} mt-6`}>
-              Die Einrichtung ist bei allen drei Tarifen derselbe Standardaufwand; ihr Betrag
-              steht im Angebot. Angegebene Obergrenzen, Zusatzsprachen und Vertragsrahmen stehen
+              {EINRICHTUNG.standard} Rechenbeispiele, Zusatzsprachen und Vertragsrahmen stehen
               auf der Kostenseite.
             </p>
             <p className={`${PROSE} mt-6`}>{TARIF_ENTERPRISE}</p>
@@ -589,7 +591,7 @@ export function PraxenPage() {
 
             <Link
               to="/kosten-ki-telefonassistent"
-              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors"
             >
               Alle Preisangaben im Detail
               <ArrowRight size={15} aria-hidden="true" />
@@ -598,7 +600,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── Rechner: steht NACH dem Preisblock, damit der Leser Tarife und
-            Deckelung kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
+            Abrechnungsregel kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
         {/*
           Seit dem 11.09.2026 rechnet auch diese Seite mit dem kanonischen
           Rechner. Vorher stand hier `PraxisRechnerSection` mit einem
@@ -649,7 +651,7 @@ export function PraxenPage() {
             </ul>
             <Link
               to="/datenschutz-sicherheit"
-              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors"
             >
               Datenschutz und Sicherheit im Detail
               <ArrowRight size={15} aria-hidden="true" />
@@ -698,7 +700,7 @@ export function PraxenPage() {
                 <li key={c.href}>
                   <Link
                     to={c.href}
-                    className="inline-flex items-center gap-2 px-5 py-3 min-h-[44px] rounded-xl border border-gray-200 dark:border-gray-700 text-[16px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-3 min-h-[44px] rounded-xl border border-gray-200 dark:border-gray-700 text-[16px] font-medium text-gray-700 dark:text-gray-300 hover:border-pub-accent-line hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors [&>svg]:text-pub-accent dark:[&>svg]:text-blue-400"
                   >
                     {c.label}
                     <ArrowRight size={14} aria-hidden="true" />

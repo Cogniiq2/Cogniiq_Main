@@ -221,9 +221,10 @@ export function KiTelefonassistentZahnarztpraxis() {
     mainEntityOfPage: { "@type": "WebPage", "@id": `${CANONICAL}#webpage` },
   };
 
-  const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+  const H2 =
+    "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6 before:block before:w-8 before:h-1 before:rounded-full before:bg-pub-accent dark:before:bg-blue-400 before:mb-4";
   const PROSE = "text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]";
-  const LINK = "underline underline-offset-4 hover:no-underline";
+  const LINK = "text-pub-accent-ink dark:text-blue-400 underline underline-offset-4 decoration-pub-accent-line hover:no-underline";
 
   return (
     <div className="bg-white dark:bg-gray-950">
@@ -362,7 +363,7 @@ export function KiTelefonassistentZahnarztpraxis() {
                 key={a.anlass}
                 className="rounded-xl border border-gray-200 dark:border-gray-800 p-6"
               >
-                <p className="text-[15px] uppercase tracking-wide text-gray-500 dark:text-gray-500">
+                <p className="text-[15px] uppercase tracking-wide text-pub-accent-ink dark:text-blue-300">
                   {REGEL_LABEL[a.regel]}
                 </p>
                 <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mt-1">
@@ -402,7 +403,7 @@ export function KiTelefonassistentZahnarztpraxis() {
               gern selbst führt. Drei Muster kommen als Ausgangspunkt infrage; welches passt,
               hängt an Ihrer Besetzung.
             </p>
-            <ol className="space-y-3 list-decimal pl-6">
+            <ol className="space-y-3 list-decimal pl-6 marker:text-pub-accent marker:font-semibold dark:marker:text-blue-400">
               <li>
                 <strong className="font-semibold text-gray-900 dark:text-gray-100">
                   Überlauf.
@@ -442,7 +443,7 @@ export function KiTelefonassistentZahnarztpraxis() {
               Die Absage ist der Anruf mit dem größten Hebel in der Zahnarztpraxis – und der
               mit den meisten Regeln. Vier davon gehören vor dem Start festgelegt.
             </p>
-            <ul className="space-y-3 list-disc pl-6">
+            <ul className="space-y-3 list-disc pl-6 marker:text-pub-accent-soft dark:marker:text-blue-400">
               <li>
                 <strong className="font-semibold text-gray-900 dark:text-gray-100">
                   Berechtigung.
@@ -506,7 +507,7 @@ export function KiTelefonassistentZahnarztpraxis() {
               >
                 <span
                   aria-hidden="true"
-                  className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400"
+                  className="absolute left-0 top-[0.62em] w-2 h-0.5 rounded-full bg-pub-accent-soft dark:bg-blue-400"
                 />
                 {fall}
               </li>
@@ -527,7 +528,7 @@ export function KiTelefonassistentZahnarztpraxis() {
           </h2>
           <div className={`${PROSE} space-y-5`}>
             <p>{GRENZEN_TRIAGE}</p>
-            <ul className="space-y-3 list-disc pl-6">
+            <ul className="space-y-3 list-disc pl-6 marker:text-pub-accent-soft dark:marker:text-blue-400">
               <li>
                 Er entscheidet nicht, ob ein Schmerzpatient heute noch drankommt. Er erkennt
                 das Anliegen und übergibt.
@@ -578,7 +579,7 @@ export function KiTelefonassistentZahnarztpraxis() {
             <p>
               {KOMPAKT_KOSTEN.text} {FAKTEN.nichtProBehandler}{" "}
               <Link to="/kosten-ki-telefonassistent" className={LINK}>
-                Alle Tarife, Kontingente und Obergrenzen
+                Alle Tarife, Kontingente und Mehrminuten
               </Link>
               .
             </p>
@@ -670,7 +671,7 @@ export function KiTelefonassistentZahnarztpraxis() {
                 Was ein KI-Telefonassistent kostet
               </Link>
               <span className="block text-gray-600 dark:text-gray-400">
-                Tarife mit Minutenkontingent und Obergrenze, Einrichtung, Laufzeit – und ein
+                Tarife mit Minutenkontingent und Mehrminutensatz, Einrichtung, Laufzeit – und ein
                 Rechner ohne Anmeldung.
               </span>
             </li>
@@ -687,7 +688,7 @@ export function KiTelefonassistentZahnarztpraxis() {
             </li>
           </ul>
 
-          <div className="mt-12 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
+          <div className="mt-12 rounded-2xl border border-pub-accent-line dark:border-blue-500/30 bg-pub-accent-wash/60 dark:bg-blue-500/5 p-8">
             <p className={PROSE}>
               Wenn Sie die Liste für Ihre Zahnarztpraxis durchgehen möchten: Wir nehmen Ihre
               Anrufanlässe auf und sagen Ihnen, was davon trägt und was nicht – auch dann,

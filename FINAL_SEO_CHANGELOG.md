@@ -111,3 +111,50 @@ Geprüfte Bildschirmgrößen: **keine** (kein Browser-Screenshot-Lauf möglich; 
 | `/kosten-ki-telefonassistent` | Markt- und Eigenpreise getrennt beschriftet (siehe C) |
 | `/ki-telefonassistent`, `/ki-telefonassistent-zahnarztpraxis`, `/regensburg/website-relaunch`, `/webdesign` | nur gemeinsame Komponenten (Button-Farbe, `GRENZEN`/`KOMPAKT_KOSTEN`-Sätze); Titel/H1/Struktur unverändert |
 | `/webdesign-agentur-deutschland` | 301 → `/webdesign` in `_redirects` (beide Formen) und `LEGACY_REDIRECTS`; nicht im Manifest, nicht in der Sitemap; keine internen Links darauf (nur Kommentare) |
+
+
+# Nachtrag 24.10.2026 (2) — verbindliche Preisstruktur, sichtbare Blau-Details
+
+Ersetzt die Abschnitte C und B oben, soweit sie „Betrag im Angebot", „angegebene Obergrenze" oder
+„kein Minutenpreis" nennen. Kein Merge, kein Deploy.
+
+## C2 · Preise
+
+| Stelle | Vorher | Nachher |
+|---|---|---|
+| `FAKTEN` (`telefonassistent-copy.ts`) | kein Minutenpreis; `deckelung*` mit angegebenen Obergrenzen 500/800/1.400 € | `mehrpreisProMinute` 0,50 € (`…Eur` 0.5); `abrechnung` (Kontingent, +0,50 € je Minute in allen Tarifen, „Einen Preisdeckel gibt es nicht", Rechnung steigt); `abrechnungGeltung` (Ausweis auf der Monatsrechnung, Zusatzposten getrennt); `abrechnungKurz`; `tarifzuordnung` (Rechner zeigt günstigsten Tarif inkl. Mehrminuten) |
+| `TARIFE` | `obergrenze`/`obergrenzeEur` | entfernt; 300/500/800 €, 500/1.000/2.000 Min unverändert |
+| `EINRICHTUNG` | Betrag offen | 990 € einmalig, alle Tarife; Sonderlösung separat mit Umfang und Preis vor Beauftragung |
+| `ABRECHNUNG`, `GENERISCH_ABRECHNUNG`, `KOMPAKT_KOSTEN`, `PLANBARE_KOSTEN`, `SAEULEN`, `ANBIETER_CHECKLISTE` | Deckel-/Obergrenzen-Sätze | Kontingent + Mehrminutensatz, kein Deckel |
+| `telefonassistent-rechner.ts` | kleinster Tarif mit ausreichendem Kontingent, darüber „individuell"; Einrichtung offen | `tarifPreis` = Grundgebühr + max(0, Min − Kontingent) × 0,50 €; `waehleSzenario` = niedrigster Monatsbetrag, Gleichstand → weniger Mehrminuten; kein Deckel; `einrichtungEur` 990 getrennt vom Monat; Erstjahr = 12 × Monat + 990 (nur bekannte Kosten); `individuellPruefen` ab 5.000 €/Monat (veröffentlichte Enterprise-Untergrenze); keine Amortisation; Anbindung bleibt unbekannt |
+| `TelefonRechner.tsx` | „Passender Tarif nach Kontingent" | „Günstigster Tarif bei diesem Aufkommen", Zeilen Grundgebühr / Mehrminuten (n × 0,50 €) / Monatsrechnung / Einrichtung 990 € / Erstes Jahr bekannte Kosten / Anbindung offen; Vergleichstabelle aller drei Tarife |
+| Kostenseite | Obergrenzen-Liste, Setup ohne Betrag | Rechnungsbeispiel Praxis 1.200 Min = 500 € + 200 × 0,50 € = 600 €; Karten mit „jede weitere Minute 0,50 €" und 990 €; JSON-LD Offers 300/500/800 + „Standard-Einrichtung (alle Tarife)" 990; Description mit 300 €/500 Min/0,50 €/990 € (Manifest und PageSEO, Abgleichstest) |
+| Praxen, Arzt, Flagship, Praxis-Segment, Standort-Configs, Blog-Linktext, Zahnarzt-Linktexte, Verpasste-Anrufe | Deckel-/Obergrenzen-Formulierungen | aus `FAKTEN`/`EINRICHTUNG`; Zahnarzt nur zwei Linktexte („Obergrenze" → „Mehrminuten…") |
+| `KiTelefonassistentPraxis` | „ab wann sich das trägt" (Amortisation ohne Grundlage) | „was davon in Geld messbar ist" |
+
+Tests: `telefonassistent-rechner.test.ts` (fünf Pflichtfälle, ±1 an jedem Kontingent, Gleichstände 900/1.600, Linearität ohne Deckel, keine Rundung), `…grenzfaelle.test.ts` (von Hand nachgerechnete Literale), `telefonassistent-copy.test.ts` (Literale 0,50 €/990 €/1.400 €/Staffel nur in der Quelle; Meta-Abgleich), `rechner-konsistenz`, `KostenKiTelefonassistent` (kein Deckel, 0,50 € in allen Tarifen, 990 €, Rechnungsbeispiel).
+
+## B2 · Blaue Details (sichtbar geprüft per lokalem Screenshot-Lauf)
+
+Nur vorhandene Tokens (`pub-accent*`, `pub-signal*`), keine neue Farbe, Preise bleiben Ink.
+
+| Route / Komponente | Ergänzt |
+|---|---|
+| `/ki-telefonassistent` | 17 Abschnitts-Eyebrows Akzentblau; Hero-Badge Akzent-Wash; Häkchen der Nutzenliste/Leiste/„Übernimmt" Akzent statt Grün; Icon-Kacheln (Problem, Fähigkeiten, Branchen), Ablauf-Schritte mit Icon und Nummer; Nummern der sechs Fragen und Einführungsphasen; Listenpunkte; Textlinks |
+| `/ki-telefonassistent-arzt` | Akzentbalken über jeder H2; Hero-Merkmale mit Akzentpunkten; Listenmarker und Nummern; Abschluss-Box Akzent-Wash; Hover der Sekundärbuttons und Breadcrumb |
+| `/ki-telefonassistent-zahnarztpraxis` | nur Klassen: H2-Akzentbalken, Linkfarbe, Regel-Label, Listenmarker, Abschluss-Box – kein Text geändert |
+| `/kosten-ki-telefonassistent` | H2-Akzentbalken, Listenpunkte, Textlinks Akzentblau |
+| `/praxen` | Hero-Eyebrow, Segmentkarten-Pfeile und Hover, H2-Balken, Listenpunkte, Textlinks, Stadtlinks |
+| `TelefonRechner` / `index.css .cq-range` | Schieberegler-Füllung und Griffring Signalblau; inaktive Bausteine A/B/C Akzent-Wash |
+| `TelefonassistentKompaktSection`, `TelefonassistentBeweiskette` | Listenpunkte Akzent |
+| `NationalIndustryPage` (Vorlage; auch Webdesign-/Automatisierungs-Branchenseiten) | Eyebrows, Häkchen, Badge, Marker – reine Farbangleichung an die freigegebene `/webdesign`-Optik |
+
+Messung (`scripts/visual/blue-audit.mjs`, Elemente in `main` mit berechneter Blaufarbe, Desktop 1440 / Mobil 390, identisch):
+
+| Route | vorher Buttons/Icons/Hervorhebungen/Links/sonstige | nachher |
+|---|---|---|
+| `/ki-telefonassistent` | 5 / 1 / 0 / 0 / 1 | 5 / 53 / 19 / 5 / 49 |
+| `/ki-telefonassistent-arzt` | 3 / 0 / 0 / 10 / 9 | 3 / 0 / 0 / 10 / 29 (+ H2-Balken als Pseudoelement, nicht gezählt) |
+| `/ki-telefonassistent-zahnarztpraxis` | 1 / 0 / 0 / 0 / 0 | 1 / 0 / 0 / 13 / 16 (+ H2-Balken) |
+| `/kosten-ki-telefonassistent` | 3 / 1 / 0 / 0 / 7 | 3 / 1 / 4 / 7 / 16 (+ H2-Balken) |
+| `/praxen` | 4 / 1 / 0 / 1 / 7 | 4 / 7 / 4 / 4 / 43 |

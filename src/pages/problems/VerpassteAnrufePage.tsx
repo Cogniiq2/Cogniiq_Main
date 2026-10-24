@@ -50,7 +50,7 @@ const config: ProblemPageConfig = {
       "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",
       "Terminwünsche werden nach Ihren Regeln aufgenommen – ins Kalender- oder Praxissystem geschrieben wird erst, wenn dessen Schnittstelle das nachweislich trägt",
-      "Festes Minutenkontingent, darüber ein fester Minutenpreis mit Obergrenze – planbar statt pro Anruf",
+      "Festes Minutenkontingent, darüber ein fester Minutenpreis – nachvollziehbar statt pro Anruf",
     ],
   },
   rechner: {

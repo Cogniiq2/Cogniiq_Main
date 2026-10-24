@@ -37,14 +37,16 @@
 export const FAKTEN = {
   // ── Zahlen ──
   /*
-    KEIN MINUTENPREIS MEHR (Inhaber-Entscheidung 24.10.2026). Bis dahin stand
-    hier „0,39 € je Minute über dem Kontingent" samt numerischem Zwilling, und
-    der Rechner rechnete damit Mehrverbrauch und Deckelung aus. Die
-    Vertragsregeln für Minuten über dem Kontingent und der Geltungsbereich der
-    Obergrenze sind nicht bestätigt (OWNER-INPUT J1–J8). Öffentlich steht
-    deshalb nur noch, was feststeht: Kontingent, Monatspreis, die ANGEGEBENE
-    Obergrenze je Tarif — und dass das Angebot den Rest festlegt.
+    MEHRMINUTEN — verbindliche Inhaber-Preisstruktur vom 24.10.2026 (zweite
+    Fassung des Tages). Jede abrechenbare Minute über dem Inklusivkontingent
+    kostet 0,50 €, in allen drei Tarifen. Es gibt KEINEN Preisdeckel und keine
+    „Obergrenze" mehr: Die Monatsrechnung steigt mit den Mehrminuten. Die
+    früheren Werte (0,39 €/Min. mit Deckel 500/800/1.400 €) sind ersatzlos
+    entfallen.
   */
+  mehrpreisProMinute: `0,50\u00A0€`,
+  /** Numerischer Zwilling — Rechner lesen nur diesen, nie den Anzeigetext. */
+  mehrpreisProMinuteEur: 0.5,
   /*
     Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
 
@@ -101,41 +103,23 @@ export const FAKTEN = {
   gleichzeitigeAnrufeKurz: "Mehrere Anrufe zur selben Zeit",
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
-  /** Kontingent und Obergrenze — nur das, was feststeht. Die Obergrenzen sind
-   *  die vom Inhaber ANGEGEBENEN Werte je Tarif; worauf sie sich beziehen und
-   *  wie Minuten über dem Kontingent berechnet werden, legt das Angebot fest. */
-  deckelung: `Der Monatspreis deckt das enthaltene Minutenkontingent und den laufenden Betrieb ab; die Minuten verursachen laufende Kosten, deshalb unterscheiden sich die Tarife. Für jeden Tarif ist eine Obergrenze angegeben – Basis 500\u00A0€ im Monat, Praxis 800\u00A0€, MVZ 1.400\u00A0€. Wie Minuten über dem Kontingent berechnet werden und worauf sich diese Obergrenze genau bezieht, steht in Ihrem Angebot.`,
+  /** Die Abrechnungsregel in einem Satz: Kontingent, Mehrminutensatz, kein Deckel. */
+  abrechnung: `Der Monatspreis enthält das Minutenkontingent Ihres Tarifs. Jede darüber hinausgehende abrechenbare Minute kostet zusätzlich 0,50\u00A0€ – in allen drei Tarifen. Einen Preisdeckel gibt es nicht: Überschreiten Sie das Kontingent, steigt die Monatsrechnung um die Mehrminuten.`,
 
-  /*
-    WORAUF SICH DIE OBERGRENZE BEZIEHT — Korrektur vom 12.09.2026.
+  /** Was auf der Monatsrechnung steht und was daneben ausgewiesen wird. Nennt
+   *  bewusst KEIN Dashboard und keine Warnmeldung: Eine Nutzungsauswertung im
+   *  Kundenbereich und Hinweise bei 80/100 % des Kontingents sind noch nicht
+   *  implementiert (OWNER-INPUT J14). */
+  abrechnungGeltung:
+    "Mehrminuten weisen wir auf der Monatsrechnung nachvollziehbar aus: Grundgebühr, enthaltene und abgerechnete Minuten, Anzahl der Mehrminuten und ihr Betrag zu 0,50\u00A0€. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten stehen als eigene Positionen daneben, soweit sie anfallen.",
 
-    `deckelung` (oben) beschreibt die Regel korrekt: Der TARIF ist gedeckelt.
-    Daraus wurde an mehreren Stellen ein Satz über die GESAMTRECHNUNG —
-    „Mehr zahlen Sie in diesem Monat nicht", „Mehr als die ausgewiesene
-    Obergrenze kostet es nie". Das ist zu weit: Die Preislogik deckelt
-    nachweislich Grundpreis plus Mehrverbrauch. Ob Zusatzsprachen, der
-    Aufschlag für monatliche Kündbarkeit und individuell vereinbarte
-    Anbindungskosten INNERHALB dieser Grenze liegen, sagt unsere eigene
-    Quelle nicht — der Rechner weist sie deshalb seit jeher als eigene
-    Positionen aus, während die Prosa sie stillschweigend mit eingeschlossen
-    hat. Zwei Flächen, zwei Aussagen, und die großzügigere stand im Fließtext.
+  /** Kurzform für Kacheln und Tabellen. */
+  abrechnungKurz: "Festes Kontingent, Mehrminuten 0,50\u00A0€",
 
-    `deckelungGeltung` benennt den Geltungsbereich, ohne die Gegenbehauptung
-    aufzustellen: Es steht hier NICHT, dass die Zusatzposten außerhalb der
-    Obergrenze liegen — auch das gäbe die Quelle nicht her. Es steht, dass
-    die Telefonie-Obergrenze allein die Endsumme nicht festlegt und das
-    Angebot die offenen Positionen schließt.
-  */
-  deckelungGeltung:
-    "Die angegebene Obergrenze ist kein garantierter Höchstbetrag Ihrer Monatsrechnung. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten weisen wir separat aus, soweit sie anfallen; ob sie in die Obergrenze fallen, legt Ihr Angebot fest. Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme.",
-
-  /** Kurzform für Kacheln und Tabellen: nennt den Bezug mit, in vier Wörtern. */
-  deckelungKurz: "Festes Kontingent, fester Monatspreis",
-
-  /** Tarifzuordnung. Beschreibt nicht nur den Rechner, sondern die Zusage an den
-   *  Kunden — siehe COPY-CLAIMS-TO-VERIFY F10. */
+  /** Tarifwahl. Nennt die Rechenregel, sagt keinen Tarifwechsel zu, den der
+   *  Vertrag nicht regelt. */
   tarifzuordnung:
-    "Liegt Ihr Aufkommen dauerhaft über dem Kontingent, besprechen wir mit Ihnen den passenden Tarif. Eine automatische Abrechnung von Mehrminuten sagen wir hier nicht zu – die Konditionen dafür stehen in Ihrem Angebot.",
+    "Welcher Tarif bei Ihrem Aufkommen am wenigsten kostet, zeigt der Rechner – einschließlich Mehrminuten. Liegt Ihr Aufkommen regelmäßig über dem Kontingent, ist oft ein größerer Tarif günstiger; wann ein Wechsel möglich ist, regelt Ihr Vertrag.",
 
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler.",
@@ -286,9 +270,9 @@ export const SAEULEN: Array<{ title: string; description: string }> = [
       "Jedes Gespräch endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch. Der übliche Weg sieht heute so aus, dass Ihre MFA dieses Ergebnis anschließend ins Praxissystem überträgt. Vor der Einrichtung prüfen wir, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung möglich ist, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht möglich ist, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
   },
   {
-    title: "Ein Kontingent, ein Monatspreis",
+    title: "Ein Kontingent, ein Mehrminutensatz",
     description:
-      `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen. ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
+      `${FAKTEN.abrechnung} Eine Grippewelle erhöht Ihre Rechnung deshalb um die Mehrminuten – nachvollziehbar zu einem festen Satz. ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
 ];
 
@@ -441,8 +425,8 @@ export const ANLIEGEN_IMMER_MENSCH: string[] = [
 
 /** M10 · Planbare Kosten — Vorhersehbarkeit vor Preishöhe. */
 export const PLANBARE_KOSTEN = {
-  headline: "Ein Kontingent, ein Monatspreis",
-  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Einrichtung Ihres Empfangs dazu; sie steht vor Vertragsschluss im Angebot. ${FAKTEN.preisgarantie}`,
+  headline: "Ein Kontingent, ein Mehrminutensatz",
+  text: `${FAKTEN.abrechnung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Standard-Einrichtung von 990\u00A0€ dazu. ${FAKTEN.preisgarantie}`,
 };
 
 /**
@@ -637,11 +621,8 @@ export interface Tarif {
   /** Ungefähre Anrufzahl — Praxen denken nicht in Minuten (Brief III §5.2). */
   anrufeCa: number;
   monatlich: string;
-  /** Die vom Inhaber ANGEGEBENE Obergrenze. Geltungsbereich laut Angebot;
-   *  nie als garantierter Höchstbetrag der Monatsrechnung darstellen. */
-  obergrenze: string;
   /*
-    NUMERISCHE ZWILLINGE der drei Beträge darüber.
+    NUMERISCHER ZWILLING des Monatsbetrags darüber.
 
     Warum additiv und nicht statt der Strings: Die Strings sind das, was auf der
     Seite steht, inklusive schmalem geschütztem Leerzeichen — und die Preisseite
@@ -657,34 +638,27 @@ export interface Tarif {
     eine Zahl von ihrem String ab, schlägt der Test an.
   */
   monatlichEur: number;
-  obergrenzeEur: number;
 }
 
 /*
-  EINRICHTUNG — EIN STANDARD, KEINE STAFFEL (Inhaber-Entscheidung 24.10.2026).
+  EINRICHTUNG — EIN STANDARD, EIN BETRAG (Inhaber-Entscheidung 24.10.2026).
 
-  Bis dahin trug jeder Tarif eine eigene Einrichtungsgebühr (1.490 / 2.490 /
-  3.490 €). Der Inhaber hat klargestellt: Der normale Einrichtungsaufwand ist
-  bei allen drei Tarifen im Prinzip gleich; Mehrarbeit entsteht nur, wenn eine
-  konkrete Systemanbindung schwieriger ist, nicht verfügbar ist oder deshalb
-  eine Sonderlösung gebaut werden muss. Eine nach Tarifnamen steigende
-  Gebühr bildet das nicht ab und steht deshalb nirgends mehr.
-
-  Der BETRAG der einheitlichen Standard-Einrichtung ist NICHT festgelegt: Ob
-  1.490 € Kosten, Arbeitszeit und Zielmarge trägt, zeigen keine Daten im
-  Repository, und eine Marge wird hier nicht erfunden (OWNER-INPUT J10). Bis
-  zur Entscheidung steht die Einrichtung als einmalige Position „im Angebot",
-  und kein Rechner bildet daraus Erstjahreskosten oder eine Amortisation.
+  Der normale Einrichtungsaufwand ist bei allen drei Tarifen gleich, deshalb
+  gilt für Basis, Praxis und MVZ dieselbe Standard-Einrichtung von 990 €
+  einmalig. Die frühere Staffel (1.490 / 2.490 / 3.490 €) ist ersatzlos
+  entfallen. Mehraufwand für eine nach Prüfung aufwendigere oder nicht
+  unterstützte Systemanbindung wird separat und vor Beauftragung mit
+  beschriebenem Umfang angeboten — dafür steht hier bewusst kein Betrag.
 */
 export const EINRICHTUNG = {
-  /** Anzeigetext in Tarifkarten und Rechner, solange der Betrag offen ist. */
-  kurz: "einmalig, Betrag im Angebot",
+  eur: 990,
+  anzeige: "990\u00A0€",
+  /** Kurzform für Tarifkarten und Rechner. */
+  kurz: "990\u00A0€ einmalig",
   standard:
-    "Die Einrichtung ist bei allen drei Tarifen derselbe Standardaufwand: Ihr Empfang wird nach Ihren Angaben aufgebaut, getestet und zur Freigabe übergeben. Der Betrag steht in Ihrem Angebot und ist für Basis, Praxis und MVZ gleich.",
+    "Die Standard-Einrichtung kostet in allen drei Tarifen einmalig 990\u00A0€, weil der Aufwand derselbe ist: Ihr Empfang wird nach Ihren Angaben aufgebaut, getestet und zur Freigabe übergeben.",
   sonder:
-    "Mehr Aufwand entsteht nur, wenn eine konkrete Systemanbindung aufwendiger ist, nicht verfügbar ist oder dafür eine Sonderlösung gebaut werden muss. Das prüfen wir vor dem Angebot und weisen es dort getrennt aus – wir behaupten nicht, dass jede Anbindung möglich ist.",
-  /** true, solange der Standardbetrag nicht freigegeben ist (OWNER-INPUT J10). */
-  betragOffen: true as const,
+    "Ist eine Systemanbindung nach unserer Prüfung deutlich aufwendiger oder wird sie nicht unterstützt, sodass eine Sonderlösung nötig ist, bieten wir diesen Mehraufwand separat an – mit beschriebenem Umfang und Preis vor der Beauftragung. Wir behaupten nicht, dass jede Anbindung möglich ist.",
 };
 
 export const TARIFE: Tarif[] = [
@@ -693,45 +667,40 @@ export const TARIFE: Tarif[] = [
     minuten: 500,
     anrufeCa: 250,
     monatlich: "300\u00A0€",
-    obergrenze: "500\u00A0€",
     monatlichEur: 300,
-    obergrenzeEur: 500,
   },
   {
     name: "Praxis",
     minuten: 1000,
     anrufeCa: 500,
     monatlich: "500\u00A0€",
-    obergrenze: "800\u00A0€",
     monatlichEur: 500,
-    obergrenzeEur: 800,
   },
   {
     name: "MVZ",
     minuten: 2000,
     anrufeCa: 1000,
     monatlich: "800\u00A0€",
-    obergrenze: "1.400\u00A0€",
     monatlichEur: 800,
-    obergrenzeEur: 1400,
   },
 ];
 
 /** Vierter Tarif ohne Kachel — bewusst als Fließtextzeile (Inhaber-Entscheidung). */
 export const TARIF_ENTERPRISE =
   "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000\u00A0€ im Monat.";
+/** Numerischer Zwilling der Enterprise-Untergrenze — der Rechner weist ab hier
+ *  auf ein individuelles Kontingent hin, statt nur Mehrminuten aufzuaddieren. */
+export const TARIF_ENTERPRISE_AB_EUR = 5000;
 
 /**
- * M10 · Die Deckelung — steht auf der Preisseite VOR der ersten Zahl
- * (Brief III §5.1).
+ * M10 · Die Abrechnungsregel — steht auf der Preisseite VOR der ersten Zahl
+ * (Brief III §5.1). Seit dem 24.10.2026 ohne Deckel: Kontingent + 0,50 € je
+ * Mehrminute, monatlich ausgewiesen.
  */
-export const DECKELUNG = {
-  headline: "Ein Kontingent, ein Monatspreis – und was das Angebot festlegt",
-  text:
-    `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung}`,
-  /** Der Geltungsbereich steht direkt neben der Angabe, nicht im Kleingedruckten. */
-  geltung: FAKTEN.deckelungGeltung,
-  hinweis: "Angegebene Obergrenze je Tarif – Geltungsbereich laut Angebot",
+export const ABRECHNUNG = {
+  headline: "Kontingent, Mehrminuten, Monatsrechnung – so rechnen wir ab",
+  text: FAKTEN.abrechnung,
+  geltung: FAKTEN.abrechnungGeltung,
   tarifwechsel: FAKTEN.tarifzuordnung,
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler. Ob bei Ihnen zwei oder sieben Personen behandeln, ändert am Monatsbetrag nichts.",
@@ -752,9 +721,9 @@ export const DECKELUNG = {
 
   NICHT abgebildet, weil der Satz es nicht eindeutig festlegt — siehe
   OWNER-INPUT: ob „bis zu fünf Sprachen gleichzeitig" Deutsch mitzählt, und ob
-  der Sprachaufschlag INNERHALB der Tarif-Obergrenze liegt oder daneben. Der
-  Rechner rät das nicht, sondern weist den Aufschlag als eigene Zeile aus und
-  sagt dazu, dass die Zuordnung zur Obergrenze im Angebot steht.
+  ab drei Sprachen ein Paketpreis gilt. Der Rechner rät das nicht, sondern
+  weist den Aufschlag als eigene Zeile aus (seit 24.10.2026 gibt es keinen
+  Preisdeckel mehr, dem er zugeordnet werden müsste).
 
   SICHTBARER TEXT UND RECHNER GEZOGEN, 12.09.2026 — OWNER-INPUT H3 offen.
 
@@ -1126,11 +1095,11 @@ export const KOMPAKT_SAEULEN: KompaktBlock & { punkte: string[] } = {
   },
 };
 
-/** M10 · Planbare Kosten — die Deckelungsaussage, sonst nichts. */
+/** M10 · Planbare Kosten — die Abrechnungsregel, sonst nichts. */
 export const KOMPAKT_KOSTEN: KompaktBlock & { text: string } = {
   modul: "M10",
-  headline: "Ein Kontingent, ein Monatspreis",
-  text: FAKTEN.deckelung,
+  headline: "Ein Kontingent, ein Monatspreis, ein Mehrminutensatz",
+  text: FAKTEN.abrechnung,
   mehr: {
     label: "Alle Tarife und Kontingente",
     href: "/kosten-ki-telefonassistent",
@@ -1444,8 +1413,8 @@ export const ANBIETER_CHECKLISTE: Array<{
   {
     frage: "Was steht am Monatsende auf der Rechnung?",
     warum:
-      "Minutenpreise ohne Obergrenze verschieben das Mengenrisiko auf Sie. Ein einzelner Ausnahmemonat — Rückrufwelle, Störung, Kampagne — kann eine Abrechnung sprengen, die im Normalbetrieb unauffällig war.",
-    cogniiq: `Jeder Tarif enthält ein festes Minutenkontingent zum festen Monatspreis; für jeden Tarif ist eine Obergrenze angegeben, deren Geltung das Angebot festlegt. ${FAKTEN.preisgarantie} Die Zahlen stehen vollständig auf der Kostenseite, nicht erst im Gespräch.`,
+      "Ein einzelner Ausnahmemonat — Rückrufwelle, Störung, Kampagne — kann eine Abrechnung deutlich erhöhen. Fragen Sie, wie Minuten über ein Kontingent hinaus berechnet werden, ob es einen Deckel gibt und wie die Rechnung die Nutzung aufschlüsselt.",
+    cogniiq: `${FAKTEN.abrechnung} ${FAKTEN.abrechnungGeltung} ${FAKTEN.preisgarantie} Die Zahlen stehen vollständig auf der Kostenseite, nicht erst im Gespräch.`,
   },
   {
     frage: "Was passiert mit dem, was Anrufer sagen?",
@@ -1491,21 +1460,21 @@ export const GENERISCH_UEBERGABE = {
 };
 
 /**
- * Branchenoffene Fassung von DECKELUNG.
+ * Branchenoffene Fassung von ABRECHNUNG.
  *
- * `DECKELUNG.text` nennt eine Grippewelle als Lastspitze und
- * `DECKELUNG.nichtProBehandler` rechnet „pro Praxis, nicht pro Behandler" —
+ * `ABRECHNUNG.text` nennt eine Grippewelle als Lastspitze und
+ * `ABRECHNUNG.nichtProBehandler` rechnet „pro Praxis, nicht pro Behandler" —
  * beides sind Praxisaussagen. Die Abrechnungseinheit wird hier NICHT
  * verallgemeinert („pro Betrieb, nicht pro Mitarbeiter" wäre eine Aussage, die
  * der Inhaber so nicht getroffen hat); sie entfällt auf der generischen Seite
  * und steht weiterhin dort, wo sie belegt ist. Die Obergrenze selbst gilt
  * unabhängig von der Branche und bleibt deshalb wörtlich erhalten.
  */
-export const GENERISCH_DECKELUNG = {
-  headline: "Ein Kontingent, ein Monatspreis – und was das Angebot festlegt",
-  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung}`,
-  geltung: FAKTEN.deckelungGeltung,
-  tarifwechsel: DECKELUNG.tarifwechsel,
+export const GENERISCH_ABRECHNUNG = {
+  headline: ABRECHNUNG.headline,
+  text: FAKTEN.abrechnung,
+  geltung: FAKTEN.abrechnungGeltung,
+  tarifwechsel: ABRECHNUNG.tarifwechsel,
   preisgarantie: FAKTEN.preisgarantie,
 };
 

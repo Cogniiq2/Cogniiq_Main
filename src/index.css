@@ -1029,7 +1029,8 @@ input:focus-visible + .cq-switch {
    Native `<input type="range">` styled so the filled portion of the track
    reads as the value (`--cq-fill` is set inline), with tick marks every 10 %
    so a value has a position, not just a number. The thumb grows slightly
-   while held. Both engines need their own pseudo-elements; the rules are kept
+   while held. Fill and thumb ring use the signal blue (24.10.2026): the
+   slider is the active control of the calculator. Both engines need their own pseudo-elements; the rules are kept
    separate because a single selector list with an unknown pseudo is dropped
    entirely by the other engine. */
 .cq-range {
@@ -1048,7 +1049,7 @@ input:focus-visible + .cq-switch {
   height: 4px;
   border-radius: 9999px;
   background:
-    linear-gradient(var(--pub-ink, #0b0f14), var(--pub-ink, #0b0f14)) 0 0 / var(--cq-fill) 100% no-repeat,
+    linear-gradient(var(--pub-signal, #1c4fd8), var(--pub-signal, #1c4fd8)) 0 0 / var(--cq-fill) 100% no-repeat,
     repeating-linear-gradient(to right, transparent 0 calc(10% - 1px), rgba(11, 15, 20, 0.28) calc(10% - 1px) 10%) 0 0 / 100% 100% no-repeat,
     rgba(11, 15, 20, 0.1);
 }
@@ -1060,7 +1061,7 @@ input:focus-visible + .cq-switch {
   height: 22px;
   border-radius: 9999px;
   background: #fff;
-  border: 1.5px solid var(--pub-ink, #0b0f14);
+  border: 1.5px solid var(--pub-signal, #1c4fd8);
   box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 0 rgba(28, 79, 216, 0);
   transition: transform 0.2s var(--cq-pub-ease), box-shadow 0.25s var(--cq-pub-ease);
 }
@@ -1069,7 +1070,7 @@ input:focus-visible + .cq-switch {
 }
 .cq-range:active::-webkit-slider-thumb {
   transform: scale(1.18);
-  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 6px rgba(11, 15, 20, 0.08);
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 6px rgba(28, 79, 216, 0.12);
 }
 .cq-range:focus-visible::-webkit-slider-thumb {
   box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 4px rgba(28, 79, 216, 0.35);
@@ -1084,20 +1085,20 @@ input:focus-visible + .cq-switch {
 .cq-range::-moz-range-progress {
   height: 4px;
   border-radius: 9999px;
-  background: var(--pub-ink, #0b0f14);
+  background: var(--pub-signal, #1c4fd8);
 }
 .cq-range::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 9999px;
   background: #fff;
-  border: 1.5px solid var(--pub-ink, #0b0f14);
+  border: 1.5px solid var(--pub-signal, #1c4fd8);
   box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18);
   transition: transform 0.2s var(--cq-pub-ease), box-shadow 0.25s var(--cq-pub-ease);
 }
 .cq-range:active::-moz-range-thumb {
   transform: scale(1.18);
-  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 6px rgba(11, 15, 20, 0.08);
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 6px rgba(28, 79, 216, 0.12);
 }
 .cq-range:focus-visible::-moz-range-thumb {
   box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 4px rgba(28, 79, 216, 0.35);

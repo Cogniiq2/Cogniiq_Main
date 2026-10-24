@@ -196,7 +196,7 @@ export function NationalIndustryPage({ config }: Props) {
 
             <div className="grid lg:grid-cols-[1fr_380px] gap-16 items-start cq-shrink-children">
               <motion.div className="cq-rise">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-wider uppercase mb-8 shadow-sm">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-pub-accent-line dark:border-blue-500/30 bg-pub-accent-wash dark:bg-blue-500/10 text-pub-accent dark:text-blue-300 text-sm font-medium tracking-wider uppercase mb-8 shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   {config.tagline}
                 </div>
@@ -232,7 +232,7 @@ export function NationalIndustryPage({ config }: Props) {
                       key={i}
                       className="cq-rise flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                     >
-                      <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
+                      <CheckCircle2 size={11} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" />
                       {item}
                     </motion.div>
                   ))}
@@ -251,7 +251,7 @@ export function NationalIndustryPage({ config }: Props) {
                   <div className="p-5 space-y-3">
                     {config.benefits.slice(0, 5).map((b, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50">
-                        <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" />
+                        <CheckCircle2 size={13} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" />
                         <span className="text-[17px] text-gray-700 dark:text-gray-300 leading-relaxed">{b}</span>
                       </div>
                     ))}
@@ -272,7 +272,7 @@ export function NationalIndustryPage({ config }: Props) {
             <div className="flex flex-wrap items-center justify-between gap-3">
               {["Deutschland · Remote", "AVV nach Art. 28 DSGVO", "Übergabe in zwei Wochen", "Individuelle Konfiguration", "Keine IT-Vorkenntnisse nötig"].map((item, i) => (
                 <span key={i} className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                  <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
+                  <CheckCircle2 size={11} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" />
                   {item}
                 </span>
               ))}
@@ -290,7 +290,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="max-w-2xl mb-14"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
                 Das Problem
               </p>
               <h2 id="problems-heading" className="text-3xl lg:text-[2.2rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -311,7 +311,7 @@ export function NationalIndustryPage({ config }: Props) {
                   variants={fadeUp}
                   className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-300 group"
                 >
-                  <div className="w-1 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0 mt-1 self-stretch group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors" />
+                  <div className="w-1 rounded-full bg-pub-accent-line dark:bg-blue-500/30 flex-shrink-0 mt-1 self-stretch group-hover:bg-pub-accent dark:group-hover:bg-blue-400 transition-colors" />
                   <div>
                     <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                       {problem.title}
@@ -340,7 +340,7 @@ export function NationalIndustryPage({ config }: Props) {
                 viewport={{ once: true, margin: "-60px" }}
                 variants={fadeUp}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
                   Die Lösung
                 </p>
                 <h2 id="solution-heading" className="text-3xl lg:text-[2.1rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -377,7 +377,7 @@ export function NationalIndustryPage({ config }: Props) {
                     variants={fadeUp}
                     className="flex items-center gap-4 p-4 rounded-xl cq-shrink-children bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 transition-colors duration-200"
                   >
-                    <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
+                    <CheckCircle2 size={14} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" />
                     <span className="text-[17px] text-gray-700 dark:text-gray-300 leading-relaxed">{benefit}</span>
                   </motion.div>
                 ))}
@@ -396,7 +396,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="max-w-2xl mb-16"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
                 Ablauf
               </p>
               <h2 id="workflow-heading" className="text-3xl lg:text-[2.1rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -450,7 +450,7 @@ export function NationalIndustryPage({ config }: Props) {
                 viewport={{ once: true, margin: "-60px" }}
                 variants={fadeUp}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
                   Klare Grenzen
                 </p>
                 <h2
@@ -468,7 +468,7 @@ export function NationalIndustryPage({ config }: Props) {
                       key={i}
                       className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed"
                     >
-                      <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+                      <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0" />
                       {point}
                     </li>
                   ))}
@@ -547,7 +547,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="mb-8"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-2">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-2">
                 Verfügbarkeit
               </p>
               <h2 id="cities-heading" className="text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -571,7 +571,7 @@ export function NationalIndustryPage({ config }: Props) {
                     to={link.href}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 text-[15px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all duration-200"
                   >
-                    <MapPin size={11} className="text-gray-400 flex-shrink-0" />
+                    <MapPin size={11} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" />
                     {link.label}
                   </Link>
                 </motion.div>
@@ -579,7 +579,7 @@ export function NationalIndustryPage({ config }: Props) {
             </div>
 
             <div className="pt-6 border-t border-gray-100 dark:border-gray-800">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
                 Weiterführende Seiten
               </p>
               <div className="flex flex-wrap gap-2.5">
@@ -615,7 +615,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="mb-10"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
                 FAQ
               </p>
               <h2 id="faq-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100">

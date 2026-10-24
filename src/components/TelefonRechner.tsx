@@ -380,7 +380,7 @@ function BausteinWahl({
           className={`flex-shrink-0 w-7 h-7 rounded-full text-[13px] font-bold flex items-center justify-center ${
             aktiv
               ? "bg-pub-signal text-white"
-              : "bg-gray-100 dark:bg-gray-800 text-gray-500"
+              : "bg-pub-accent-wash dark:bg-blue-500/10 text-pub-accent dark:text-blue-400"
           }`}
         >
           {kennung}
@@ -494,8 +494,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
     ]
   );
 
-  const s = preis.szenario;
-  const preisSteht = volumenVollstaendig && preis.modus === "standard" && s !== null;
+  const s = preis.empfehlung;
+  const preisSteht = volumenVollstaendig;
   const saldo = nutzen.cash.saldoProMonatEur;
   const saldoSteht = typeof saldo === "number";
 
@@ -599,8 +599,9 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           Was das bei Ihnen kostet
         </h3>
         <p className={`${HINT} mb-5`}>
-          Sofort, ohne E-Mail. Keine Kostenposition wird still weggelassen: Was
-          noch nicht feststeht, steht als offen in der Liste – nicht als Null.
+          Sofort, ohne E-Mail. Grundgebühr, Mehrminuten und Einrichtung stehen
+          getrennt; was vor der technischen Prüfung nicht feststeht, steht als
+          offen in der Liste – nicht als Null.
         </p>
 
         {!volumenVollstaendig ? (
@@ -610,114 +611,102 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           </p>
         ) : (
           <>
-        {kompakt && preisSteht && s && (
+        {kompakt && (
           <div className="mb-6 grid gap-6 border-b border-gray-100 pb-6 dark:border-gray-800 sm:grid-cols-2 sm:gap-8">
             <Betrag
-              label="Wiederkehrend pro Monat"
-              wert={
-                preis.monatlichGesamtEur === UNBEKANNT
-                  ? eur(s.tarif.monatlichEur, 2)
-                  : eur(preis.monatlichGesamtEur, 2)
-              }
-              betrag={
-                preis.monatlichGesamtEur === UNBEKANNT
-                  ? s.tarif.monatlichEur
-                  : preis.monatlichGesamtEur
-              }
+              label="Pro Monat"
+              wert={eur(s.monatlichEur, 2)}
+              betrag={s.monatlichEur}
               format={(n) => eur(n, 2)}
               hinweis={
-                preis.monatlichGesamtEur === UNBEKANNT
-                  ? `Tarif ${s.tarif.name}. Der Sprachaufschlag steht erst im Angebot fest und ist hier noch nicht enthalten.`
-                  : `Tarif ${s.tarif.name}: ${zahl(s.tarif.minuten)} Minuten enthalten. Minuten darüber stehen im Angebot.`
+                s.mehrminuten > 0
+                  ? `Tarif ${s.tarif.name}: ${s.tarif.monatlich} Grundgebühr + ${zahl(s.mehrminuten, 1)} Mehrminuten × ${FAKTEN.mehrpreisProMinute}.`
+                  : `Tarif ${s.tarif.name}: ${s.tarif.monatlich} Grundgebühr, ${zahl(s.inklusivMinuten)} Minuten enthalten.`
               }
             />
             <Betrag
               label="Einmalige Einrichtung"
-              wert={EINRICHTUNG.kurz}
-              hinweis="Gleicher Standardaufwand in jedem Tarif; zur Hälfte bei Vertragsabschluss, zur Hälfte nach dem Go-live."
+              wert={EINRICHTUNG.anzeige}
+              hinweis="Standardumfang, in jedem Tarif gleich. Nicht im Monatspreis enthalten."
             />
           </div>
         )}
 
         <Zeile
-          label="Gesprächsminuten pro Monat"
-          wert={`${zahl(preis.minutenProMonat)} Min.`}
-          hinweis="Anrufe × durchschnittliche Gesprächsdauer. Abgerechnet werden die Gespräche, die der Assistent führt."
+          label="Abrechenbare Minuten pro Monat"
+          wert={`${zahl(preis.minutenProMonat, 1)} Min.`}
+          hinweis="Anrufe × durchschnittliche Gesprächsdauer, ohne Rundung. Wie Gesprächssekunden in der Abrechnung zu Minuten werden, legt Ihr Vertrag fest."
         />
-
-        {!preisSteht || !s ? (
-          <>
-            <Zeile label="Passender Tarif nach Kontingent" wert="Individuell" pille />
-            <p className="pt-4 text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
-              Bei diesem Aufkommen reicht das Kontingent des größten Listentarifs
-              nicht. Dafür gilt kein Listenpreis: {TARIF_ENTERPRISE} Was es für
-              Ihr Aufkommen konkret ist, rechnen wir im Erstgespräch aus, statt
-              es hier zu schätzen.
-            </p>
-          </>
-        ) : (
+        <Zeile
+          label="Günstigster Tarif bei diesem Aufkommen"
+          wert={s.tarif.name}
+          pille
+          hinweis={FAKTEN.tarifzuordnung}
+        />
+        {!kompakt && (
           <>
             <Zeile
-              label="Passender Tarif nach Kontingent"
-              wert={s.tarif.name}
-              pille
-              hinweis={`Der kleinste Tarif, dessen Kontingent Ihr Aufkommen trägt. ${FAKTEN.tarifzuordnung}`}
+              label={`Grundgebühr Tarif ${s.tarif.name}`}
+              wert={eur(s.tarif.monatlichEur, 2)}
+              hinweis={`Enthält ${zahl(s.inklusivMinuten)} Minuten.`}
             />
-            {!kompakt && (
             <Zeile
-              label="Enthaltene Minuten"
-              wert={`${zahl(s.tarif.minuten)} Min.`}
-              hinweis={`Ihr Aufkommen: ${zahl(preis.minutenProMonat)} Min. – liegt innerhalb des Kontingents.`}
-            />
-            )}
-            {!kompakt && (
-            <Zeile
-              label="Monatspreis"
-              wert={s.tarif.monatlich}
-              hinweis={`Deckt Kontingent und laufenden Betrieb ab. Für diesen Tarif ist eine Obergrenze von ${s.tarif.obergrenze} angegeben; worauf sie sich bezieht und wie Minuten über dem Kontingent berechnet werden, legt Ihr Angebot fest.`}
-            />
-            )}
-            {preis.sprachenOffen ? (
-              <Zeile
-                label="Zusatzsprachen pro Monat"
-                wert="nach Sprachauswahl im Angebot"
-                hinweis={
-                  'Ab zwei Zusatzsprachen lässt unsere eigene Preisliste zwei Lesarten zu: Ob „ab drei Sprachen" Deutsch mitzählt, steht dort nicht. Wir raten das hier nicht, sondern weisen die Position aus und beziffern sie im Angebot. Auf null setzen wir sie ausdrücklich nicht.'
-                }
-              />
-            ) : (
-              (preis.sprachenMonatlichEur as number) > 0 && (
-                <Zeile
-                  label="Zusatzsprachen pro Monat"
-                  wert={eur(preis.sprachenMonatlichEur as number)}
-                  hinweis="Eigene Position neben dem Monatspreis."
-                />
-              )
-            )}
-            {!kompakt && (
-            <Zeile
-              label="Wiederkehrend pro Monat (bekannte Positionen)"
+              label="Mehrminuten"
               wert={
-                preis.monatlichGesamtEur !== UNBEKANNT
-                  ? eur(preis.monatlichGesamtEur, 2)
-                  : "Monatspreis steht fest, Sprachaufschlag im Angebot"
+                s.mehrminuten > 0
+                  ? `${zahl(s.mehrminuten, 1)} Min. × ${FAKTEN.mehrpreisProMinute} = ${eur(s.mehrminutenEur, 2)}`
+                  : "keine"
               }
-              stark
-              hinweis={
-                preis.monatlichGesamtEur !== UNBEKANNT
-                  ? "Monatspreis plus Zusatzsprachen. Ohne Einrichtung und Anbindung – beide stehen darunter als offen."
-                  : `Der Monatspreis beträgt ${s.tarif.monatlich}. Eine Summe nennen wir erst, wenn der Sprachaufschlag feststeht – eine Summe ohne ihn wäre niedriger als Ihre spätere Rechnung.`
-              }
+              hinweis={`Jede abrechenbare Minute über dem Kontingent kostet ${FAKTEN.mehrpreisProMinute}. Es gibt keinen Preisdeckel.`}
             />
-            )}
-            {!kompakt && (
-            <Zeile
-              label="Einmalige Einrichtung"
-              wert={EINRICHTUNG.kurz}
-              hinweis={`${EINRICHTUNG.standard} ${EINRICHTUNG.sonder}`}
-            />
-            )}
           </>
+        )}
+        {preis.sprachenOffen ? (
+          <Zeile
+            label="Zusatzsprachen pro Monat"
+            wert="nach Sprachauswahl im Angebot"
+            hinweis={
+              'Ab zwei Zusatzsprachen lässt unsere eigene Preisliste zwei Lesarten zu: Ob „ab drei Sprachen" Deutsch mitzählt, steht dort nicht. Wir raten das hier nicht, sondern weisen die Position aus und beziffern sie im Angebot. Auf null setzen wir sie ausdrücklich nicht.'
+            }
+          />
+        ) : (
+          (preis.sprachenMonatlichEur as number) > 0 && (
+            <Zeile
+              label="Zusatzsprachen pro Monat"
+              wert={eur(preis.sprachenMonatlichEur as number)}
+              hinweis="Eigene Position neben Grundgebühr und Mehrminuten."
+            />
+          )
+        )}
+        {!kompakt && (
+          <Zeile
+            label="Monatsrechnung (bekannte Positionen)"
+            wert={
+              preis.monatlichGesamtEur !== UNBEKANNT
+                ? eur(preis.monatlichGesamtEur, 2)
+                : `${eur(s.monatlichEur, 2)} + Sprachaufschlag`
+            }
+            stark
+            hinweis={
+              preis.monatlichGesamtEur !== UNBEKANNT
+                ? "Grundgebühr + Mehrminuten + Zusatzsprachen. Ohne Einrichtung (einmalig, darunter) und ohne Anbindung (offen)."
+                : "Eine Summe nennen wir erst, wenn der Sprachaufschlag feststeht – eine Summe ohne ihn wäre niedriger als Ihre spätere Rechnung."
+            }
+          />
+        )}
+        {!kompakt && (
+          <Zeile
+            label="Einmalige Standard-Einrichtung"
+            wert={EINRICHTUNG.anzeige}
+            hinweis={`${EINRICHTUNG.standard} ${EINRICHTUNG.sonder}`}
+          />
+        )}
+        {!kompakt && preis.ersteJahrBekannteKostenEur !== UNBEKANNT && (
+          <Zeile
+            label="Erstes Jahr, bekannte Kosten"
+            wert={eur(preis.ersteJahrBekannteKostenEur, 2)}
+            hinweis={`12 × ${eur(preis.monatlichGesamtEur as number, 2)} + ${EINRICHTUNG.anzeige} Einrichtung, bei gleichbleibendem Aufkommen. Ohne Anbindung, ohne Aufschlag für monatliche Kündbarkeit.`}
+          />
         )}
 
         <Zeile
@@ -726,19 +715,27 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           hinweis="Wird vor Vertragsabschluss nach der technischen Prüfung ausgewiesen – einschließlich Gebühren, die Dritte für eine Schnittstelle verlangen. Wir setzen diese Position hier bewusst nicht auf null."
         />
 
-        {!kompakt && preisSteht && (
+        {preis.individuellPruefen && (
+          <p className={`${HINT} mt-4`}>
+            Bei diesem Aufkommen liegt auch der günstigste Listentarif auf dem
+            Niveau eines individuellen Kontingents. {TARIF_ENTERPRISE} Sprechen
+            Sie uns darauf an.
+          </p>
+        )}
+
+        {!kompakt && (
           <details className="mt-5">
-            <summary className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 cursor-pointer min-h-[44px] flex items-center">
-              Alle drei Listentarife bei diesem Aufkommen
+            <summary className="text-[15px] font-semibold text-pub-accent-ink dark:text-blue-300 cursor-pointer min-h-[44px] flex items-center">
+              Alle drei Tarife bei diesem Aufkommen vergleichen
             </summary>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-[15px] text-left">
                 <thead>
                   <tr className="text-[13px] uppercase tracking-wider text-pub-ink-3 dark:text-gray-500">
                     <th scope="col" className="py-2 pr-4 font-semibold">Tarif</th>
-                    <th scope="col" className="py-2 pr-4 font-semibold">Kontingent</th>
-                    <th scope="col" className="py-2 pr-4 font-semibold">Monatspreis</th>
-                    <th scope="col" className="py-2 font-semibold">Bei Ihrem Aufkommen</th>
+                    <th scope="col" className="py-2 pr-4 font-semibold">Grundgebühr</th>
+                    <th scope="col" className="py-2 pr-4 font-semibold">Mehrminuten</th>
+                    <th scope="col" className="py-2 font-semibold">Monat</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -746,26 +743,24 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                     <tr key={v.tarif.name} className="border-t border-gray-100 dark:border-gray-800">
                       <th scope="row" className="py-2 pr-4 font-medium text-gray-900 dark:text-gray-100">
                         {v.tarif.name}
+                        {v.tarif.name === s.tarif.name && (
+                          <span className="ml-2 text-[12px] font-semibold text-pub-accent-ink dark:text-blue-300">günstigster</span>
+                        )}
                       </th>
-                      <td className="py-2 pr-4 tabular-nums">{zahl(v.tarif.minuten)} Min.</td>
-                      <td className="py-2 pr-4 tabular-nums">{v.tarif.monatlich}</td>
-                      <td className="py-2 text-gray-600 dark:text-gray-400">
-                        {v.passt
-                          ? v.tarif.name === s?.tarif.name
-                            ? "passt – kleinster ausreichender Tarif"
-                            : "passt"
-                          : `Kontingent um ${zahl(v.mehrverbrauchMinuten)} Min. überschritten – Konditionen im Angebot`}
+                      <td className="py-2 pr-4 tabular-nums">{v.tarif.monatlich} · {zahl(v.inklusivMinuten)} Min.</td>
+                      <td className="py-2 pr-4 tabular-nums">
+                        {v.mehrminuten > 0 ? `${zahl(v.mehrminuten, 1)} × ${FAKTEN.mehrpreisProMinute}` : "–"}
                       </td>
+                      <td className="py-2 tabular-nums font-medium text-gray-900 dark:text-gray-100">{eur(v.monatlichEur, 2)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className={`${HINT} mt-3`}>
-              Die Einrichtung ist bei allen drei Tarifen derselbe Standardaufwand
-              und steht als einmaliger Betrag im Angebot. Einen „günstigsten
-              Tarif" versprechen wir hier nicht; welcher Tarif für Sie gilt, legt
-              Ihr Vertrag fest.
+              Monat = Grundgebühr + Mehrminuten × {FAKTEN.mehrpreisProMinute},
+              ohne Deckel. Die Einrichtung ({EINRICHTUNG.anzeige} einmalig) ist
+              in jedem Tarif gleich und deshalb nicht Teil des Vergleichs.
             </p>
           </details>
         )}
@@ -1001,9 +996,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               </h4>
               <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
                 Solange der monatliche Betrag nicht feststeht – ohne vollständiges
-                Aufkommen, im individuellen Tarif oder bei offenem
-                Sprachaufschlag – gibt es keinen Betrag, gegen den sich
-                rechnen ließe. Ihre Zwischenstände oben bleiben davon unberührt;
+                Aufkommen oder bei offenem Sprachaufschlag – gibt es keinen
+                Betrag, gegen den sich rechnen ließe. Ihre Zwischenstände oben bleiben davon unberührt;
                 den Saldo rechnen wir im Erstgespräch mit Ihrer konkreten Zahl.
               </p>
             </>
@@ -1081,13 +1075,13 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 hinweis={
                   (saldo as number) < 0
                     ? "Negativ: Mit den gewählten Geldbausteinen decken die entfallenden Ausgaben und realisierbaren Termine die bekannten laufenden Kosten nicht. Zeitgewinn und Erreichbarkeit sind damit nicht bewertet – sie werden hier aber auch nicht in Euro umgedeutet."
-                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten. Der Zeitwert aus A ist nicht enthalten; Einrichtung und Anbindung stehen darunter als offen."
+                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten. Der Zeitwert aus A ist nicht enthalten; Einrichtung und Anbindung stehen darunter getrennt."
                 }
               />
               <Zeile
-                label="Einmalige Einrichtung"
-                wert="offen"
-                hinweis={`${EINRICHTUNG.standard} Solange der Betrag nicht feststeht, gibt es hier kein Erstjahresergebnis und keine Amortisationsdauer – eine Zahl aus einem geratenen Einmalbetrag wäre keine.`}
+                label="Einmalige Standard-Einrichtung"
+                wert={EINRICHTUNG.anzeige}
+                hinweis="Einmalig, nicht Teil des Monatssaldos. Eine Amortisationsdauer zeigen wir nicht: Sie hinge an der offenen Anbindung und an Annahmen, die wir nicht für Sie treffen."
               />
               <Zeile
                 label="Anbindung an Ihr System"

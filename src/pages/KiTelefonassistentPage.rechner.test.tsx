@@ -137,8 +137,8 @@ describe('Flaggschiff und Preisseite rechnen mit demselben Kern', () => {
       const t = new DOMParser().parseFromString(markup, 'text/html').querySelector('main')!
         .textContent!.replace(/\s+/g, ' ');
       // Ausgaben des kanonischen Kerns, nicht der Suspense-Platzhalter.
-      expect(t, `${label}: Tarifausgabe fehlt`).toContain('Passender Tarif nach Kontingent');
-      expect(t, `${label}: Minutenausgabe fehlt`).toContain('Gesprächsminuten pro Monat');
+      expect(t, `${label}: Tarifausgabe fehlt`).toContain('Günstigster Tarif bei diesem Aufkommen');
+      expect(t, `${label}: Minutenausgabe fehlt`).toContain('Abrechenbare Minuten pro Monat');
       expect(t, `${label}: Unvollständigkeitszustand fehlt`).toContain(
         'Wirtschaftlichkeit noch nicht vollständig berechnet'
       );
@@ -146,7 +146,7 @@ describe('Flaggschiff und Preisseite rechnen mit demselben Kern', () => {
         'Rechner wird geladen'
       );
       // Genau eine Instanz je Seite.
-      expect((t.match(/Passender Tarif nach Kontingent/g) ?? []).length, `${label}: doppelter Rechner`).toBe(1);
+      expect((t.match(/Günstigster Tarif bei diesem Aufkommen/g) ?? []).length, `${label}: doppelter Rechner`).toBe(1);
     }
   }, 60_000);
 });

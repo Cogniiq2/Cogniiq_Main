@@ -30,7 +30,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
+import { EINRICHTUNG, FAKTEN, SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
 import { RECHNER_ANKER, RECHNER_LINK, RECHNER_ROUTE } from '@/lib/rechner-anker';
 import { PROTECTED_EXPERIMENT_PATHS } from '@/lib/routing/protectedExperiments';
 import {
@@ -138,31 +138,31 @@ describe('Preis — eine Quelle, ein Ergebnis', () => {
 
   it('leitet jeden Tarifbetrag aus TARIFE ab, nie aus einem eigenen Literal', () => {
     for (const tarif of TARIFE) {
-      // Ein Aufkommen knapp unter dem Kontingent trifft diesen Tarif genau dann,
-      // wenn kein kleinerer ihn unterbietet, ohne am Deckel zu laufen.
+      // Genau am Kontingent eines Tarifs ist dieser Tarif der günstigste, und
+      // sein Betrag ist exakt die Grundgebühr aus TARIFE.
       const szenario = waehleSzenario(tarif.minuten);
-      expect(szenario).not.toBeNull();
-      expect(szenario!.tarif.name).toBe(tarif.name);
-      expect(szenario!.telefonieMonatlichEur).toBe(tarif.monatlichEur);
-      expect(TARIFE).toContain(szenario!.tarif);
+      expect(szenario.tarif.name).toBe(tarif.name);
+      expect(szenario.mehrminuten).toBe(0);
+      expect(szenario.monatlichEur).toBe(tarif.monatlichEur);
+      expect(TARIFE).toContain(szenario.tarif);
     }
   });
 
-  it('rechnet keinen Mehrverbrauch — eine Minute über dem Kontingent heißt nächster Tarif', () => {
+  it('rechnet Mehrminuten zum Satz aus FAKTEN — eine Minute über Basis kostet Grundgebühr + 0,50 €', () => {
     const einMinuteUeberBasis = TARIFE[0].minuten + 1;
-    const szenario = waehleSzenario(einMinuteUeberBasis)!;
-    expect(szenario.tarif.name).toBe(TARIFE[1].name);
-    expect(szenario.telefonieMonatlichEur).toBe(TARIFE[1].monatlichEur);
+    const szenario = waehleSzenario(einMinuteUeberBasis);
+    expect(szenario.tarif.name).toBe(TARIFE[0].name);
+    expect(szenario.mehrminuten).toBe(1);
+    expect(szenario.monatlichEur).toBe(TARIFE[0].monatlichEur + FAKTEN.mehrpreisProMinuteEur);
   });
 
-  it('kippt jenseits der Tarifliste in den individuellen Modus statt in eine zu billige Zahl', () => {
+  it('rechnet jenseits des größten Kontingents linear weiter — kein Deckel, kein Abbruch', () => {
     const groesster = TARIFE[TARIFE.length - 1];
-    const weitDarueber = groesster.minuten + 1;
-    expect(waehleSzenario(weitDarueber)).toBeNull();
+    const weitDarueber = groesster.minuten + 1000;
     const preis = berechnePreis({ anrufeProMonat: weitDarueber, minutenProAnruf: 1 }, 0);
-    expect(preis.modus).toBe('individuell');
-    expect(preis.monatlichGesamtEur).toBe('unbekannt');
-    expect(preis.einrichtungEur).toBe('offen');
+    expect(preis.empfehlung.tarif.name).toBe(groesster.name);
+    expect(preis.monatlichGesamtEur).toBe(groesster.monatlichEur + 1000 * FAKTEN.mehrpreisProMinuteEur);
+    expect(preis.einrichtungEur).toBe(EINRICHTUNG.eur);
   });
 
   it('weist die Anbindung IMMER als unbekannt aus, nie als 0', () => {
@@ -251,17 +251,23 @@ describe('Nutzen — drei Bausteine, ein Geldsaldo', () => {
     expect(r.cash.saldoProMonatEur).toBeLessThan(0);
   });
 
-  it('zeigt ohne freigegebenen Einrichtungsbetrag weder Erstjahr noch Amortisation', () => {
+  it('weist die Einrichtung als 990 € einmalig aus, aber ohne Amortisation – die Anbindung bleibt offen', () => {
     const r = berechneNutzen(preis, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } });
-    expect(r.cash.einmaligeKostenEur).toBe('offen');
+    expect(r.cash.einmaligeKostenEur).toBe(EINRICHTUNG.eur);
     expect(r.cash).not.toHaveProperty('ersteJahrSaldoEur');
     expect(r.cash).not.toHaveProperty('amortisationMonate');
-    expect(r.cash.offeneKosten).toEqual(['einrichtung', 'anbindung']);
+    expect(r.cash.offeneKosten).toEqual(['anbindung']);
   });
 
-  it('gibt bei individuellem Tarif und offenem Sprachaufschlag keinen Saldo aus', () => {
-    const riesig = { anrufeProMonat: 5000, minutenProAnruf: 5 };
-    expect(berechneNutzen(berechnePreis(riesig, 0), { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } }).cash.saldoProMonatEur).toBe('unbekannt');
+  it('rechnet sehr hohes Aufkommen zum Listenpreis ohne Deckel und markiert es zur individuellen Prüfung', () => {
+    // 25.000 Min: MVZ 800 € + 23.000 × 0,50 € = 12.300 € → Saldo 900 − 12.300 = −11.400 €.
+    const riesig = berechnePreis({ anrufeProMonat: 5000, minutenProAnruf: 5 }, 0);
+    expect(riesig.individuellPruefen).toBe(true);
+    expect(riesig.monatlichGesamtEur).toBe(12300);
+    expect(berechneNutzen(riesig, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } }).cash.saldoProMonatEur).toBe(-11400);
+  });
+
+  it('gibt bei offenem Sprachaufschlag keinen Saldo aus', () => {
     expect(berechneNutzen(berechnePreis(volumen, 3), { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } }).cash.saldoProMonatEur).toBe('unbekannt');
   });
 });
@@ -313,7 +319,7 @@ describe('Beträge stehen an genau einer Stelle', () => {
 
   it('tippt keinen Tarif-, Obergrenzen- oder Einrichtungsbetrag erneut', () => {
     const betraege = new Set(
-      TARIFE.flatMap((t) => [t.monatlichEur, t.obergrenzeEur])
+      [...TARIFE.map((t) => t.monatlichEur), EINRICHTUNG.eur]
     );
     /*
       Geprüft wird die ZUWEISUNG AN EINEN PREIS-BEZEICHNER, nicht die nackte
@@ -603,35 +609,22 @@ describe('Nutzenbausteine — ein Kern, beide Flächen', () => {
   });
 });
 
-describe('Obergrenze — die Prosa sagt, worauf sie sich bezieht', () => {
+describe('Kein Preisdeckel — die Prosa sagt, wie abgerechnet wird', () => {
   const copy = QUELLEN.get('src/lib/telefonassistent-copy.ts')!;
 
-  it('behauptet in keiner gerenderten Konstante eine Obergrenze für die Endsumme', () => {
+  it('behauptet in keiner gerenderten Konstante einen Deckel oder eine Obergrenze', () => {
     /*
       Geprüft wird der Quelltext OHNE Kommentare: Die Begründung der Korrektur
-      zitiert die alten Sätze absichtlich, und dieses Zitat darf die Wache
-      nicht auslösen.
+      zitiert die alten Sätze absichtlich.
     */
     const ohneKommentare = nurCode(copy);
-    for (const satz of [
-      'Mehr zahlen Sie in diesem Monat nicht',
-      'Mehr als die ausgewiesene Obergrenze kostet es nie',
-    ]) {
-      expect(ohneKommentare, `„${satz}" steht wieder in einer Konstante`).not.toContain(satz);
-    }
+    expect(ohneKommentare).not.toMatch(/Obergrenze|gedeckelt|Höchstpreis|Mehr zahlen Sie in diesem Monat nicht/);
   });
 
-  it('hält den Geltungsbereich an genau einer Stelle', () => {
-    expect(copy).toContain('deckelungGeltung:');
-    const treffer = [...copy.matchAll(/Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme/g)];
+  it('hält Abrechnung und Rechnungsausweis an genau einer Stelle', () => {
+    expect(copy).toContain('abrechnungGeltung:');
+    const treffer = [...copy.matchAll(/Einen Preisdeckel gibt es nicht/g)];
     expect(treffer).toHaveLength(1);
-  });
-
-  it('verortet die Zusatzposten nicht außerhalb der Obergrenze', () => {
-    // Die Quelle sagt nicht, dass sie darüber liegen — nur, dass das Angebot
-    // es festlegt. Die Gegenbehauptung wäre derselbe Fehler mit umgekehrtem
-    // Vorzeichen.
-    expect(copy).not.toMatch(/zusätzlich zur Obergrenze|kommen zur Obergrenze hinzu|liegen außerhalb der Obergrenze/);
   });
 });
 

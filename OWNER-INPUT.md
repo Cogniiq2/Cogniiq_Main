@@ -434,3 +434,45 @@ Wie wird Mehraufwand für aufwendige, nicht verfügbare oder neu zu bauende Anbi
 (Stundensatz, Pauschale nach Prüfung)? Bis zur Antwort: „nach Prüfung getrennt im Angebot", ohne Betrag.
 
 Offen bleiben weiterhin J1–J9 (Steuerbasis, 20-%-Bezug, Preisgarantie-Umfang, Sprachpaket).
+
+## Nachtrag 24.10.2026 (2) — verbindliche Preisstruktur umgesetzt
+
+Der Inhaber hat am 24.10.2026 verbindlich festgelegt und der Branch
+`claude/seo-design-pricing-2026-10` setzt um:
+
+| Tarif | Monat | Inklusivminuten | ca. Anrufe* | Mehrminute | Standard-Einrichtung |
+|---|---|---|---|---|---|
+| Basis | 300 € | 500 | 250 | 0,50 € | 990 € einmalig |
+| Praxis | 500 € | 1.000 | 500 | 0,50 € | 990 € einmalig |
+| MVZ | 800 € | 2.000 | 1.000 | 0,50 € | 990 € einmalig |
+
+\* nur mit sichtbarer Annahme „bei durchschnittlich rund zwei Minuten je Anruf".
+
+Kein Preisdeckel, keine Obergrenze: Die Monatsrechnung steigt um jede Mehrminute. Damit sind
+**J10 (990 €), J11 (Obergrenze entfällt), J12 (0,50 €/Minute, alle Tarife) und J13 (separat
+angeboten, Umfang und Preis vor Beauftragung, kein Pauschalbetrag) beantwortet.** Die frühere
+Fassung dieses Dokuments (Nachtrag oben, „Betrag im Angebot", „angegebene Obergrenze") ist überholt.
+
+Weiter offen und für den Release relevant:
+
+### J8 · Steuerbasis (weiter offen)
+Netto oder brutto? Die Website nennt die Beträge ohne Zusatz und behauptet weder netto noch
+brutto. Vor dem Go-live klären und dann zentral in `FAKTEN` ergänzen.
+
+### J14 · Monatlicher Nutzungsbericht und Alarme (Produktfunktion – NICHT implementiert)
+Im Repository gibt es keine Minutenerfassung, keine Abrechnungstabellen, keinen Import der
+Gesprächsdauer aus ElevenLabs/Telefonie und keine 80-/100-%-Warnungen (geprüft per Codesuche
+24.10.2026; Treffer nur in Marketingtexten). Die Website verspricht deshalb **keinen** Bericht und
+**keine** Warnungen, sondern nur den Ausweis der Mehrminuten auf der Monatsrechnung (Ihre Vorgabe).
+Benötigt, bevor ein Bericht beworben wird: Erfassung je Gespräch (Dauer in Sekunden, keine Inhalte,
+kein Audio, keine Patientendaten), Monatsaggregation je Kunde, Bericht mit Anrufen, abrechenbarer
+Zeit, Inklusiv-/genutzten Minuten, Anzahl/Dauer der Mehrminuten, Betrag zu 0,50 €, Monatssumme;
+optional Warnungen bei 80 % und 100 %.
+
+### J15 · Rundungsregel der abrechenbaren Minuten (offen)
+ElevenLabs liefert die Gesprächsdauer nach eigener Dokumentation in Sekunden; im Repo ist das nicht
+angebunden und nicht verifiziert. Entscheidung nötig: Sekunden je Monat summieren und einmal
+runden (empfohlen, kundenfreundlich, transparent) – oder je Gespräch auf volle Minuten aufrunden
+(teurer für den Kunden, muss dann ausdrücklich im Vertrag und auf der Website stehen). Bis dahin
+rechnet der Rechner ohne Rundung und sagt: „Wie Gesprächssekunden in der Abrechnung zu Minuten
+werden, legt Ihr Vertrag fest."

@@ -684,7 +684,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/kosten-ki-telefonassistent",
     title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
-    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, einheitlicher Standard-Einrichtung und Übergabe in zwei Wochen.",
+    description: "Was kostet ein KI Telefonassistent für Praxen? Ab 300 € im Monat mit 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €. Mit Rechner.",
     keywords: "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },

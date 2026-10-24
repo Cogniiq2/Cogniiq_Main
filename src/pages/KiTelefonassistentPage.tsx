@@ -41,7 +41,7 @@ import {
   EINRICHTUNG_SCHRITTE,
   FAKTEN,
   GENERISCH_DATENSCHUTZ_PUNKTE,
-  GENERISCH_DECKELUNG,
+  GENERISCH_ABRECHNUNG,
   GENERISCH_GRENZEN,
   GENERISCH_IMMER_MENSCH,
   GENERISCH_NICHT_PASSEND,
@@ -52,6 +52,7 @@ import {
   SPRACHEN,
   UMKEHRBARKEIT,
   WAS_IST,
+  EINRICHTUNG,
 } from "@/lib/telefonassistent-copy";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 
@@ -213,7 +214,7 @@ const faqItems = [
   },
   {
     question: "Was kostet ein KI Telefonassistent?",
-    answer: `Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. ${FAKTEN.deckelung} Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.`,
+    answer: `${FAKTEN.abrechnung} Einmalig kommt die Standard-Einrichtung von ${EINRICHTUNG.anzeige} dazu, in jedem Tarif gleich. Details finden Sie auf der Kostenseite.`,
   },
 ];
 
@@ -463,7 +464,7 @@ function HeroSection() {
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_400px] gap-16 items-start">
           <motion.div className="cq-rise">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-widest uppercase mb-8 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-pub-accent-line dark:border-blue-500/30 bg-pub-accent-wash dark:bg-blue-500/10 text-pub-accent dark:text-blue-300 text-sm font-medium tracking-widest uppercase mb-8 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               Für Betriebe mit hohem Telefonaufkommen
             </div>
@@ -554,7 +555,7 @@ function HeroSection() {
                   variants={fadeUp}
                   className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                 >
-                  <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
+                  <CheckCircle2 size={12} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" aria-hidden="true" />
                   {item}
                 </motion.div>
               ))}
@@ -659,7 +660,7 @@ function HeroCallPanel() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Festes Minutenkontingent", detail: "Fester Monatspreis; Minuten über dem Kontingent stehen im Angebot" },
+    { label: "Festes Minutenkontingent", detail: `Fester Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}` },
     { label: "Rufumleitung", detail: "Anrufe laufen auf die vereinbarte Nummer" },
     { label: "Termine im Gespräch", detail: "Gebucht, verschoben oder storniert — bei eingerichteter Anbindung" },
     // „Europäische Server" ist eine Aussage zum Verarbeitungsort und damit
@@ -675,7 +676,7 @@ function CredentialStrip() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           {items.map((item) => (
             <div key={item.label} className="flex items-center gap-2.5">
-              <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
+              <CheckCircle2 size={13} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" aria-hidden="true" />
               <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                 {item.label}
               </span>
@@ -710,7 +711,7 @@ function WasIstSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Grundlagen
             </p>
             <h2
@@ -762,7 +763,7 @@ function ProblemSection() {
           variants={fadeUp}
           className="max-w-2xl mb-14"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Das Problem
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -787,8 +788,8 @@ function ProblemSection() {
               variants={fadeUp}
               className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
             >
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
-                <item.icon size={17} className="text-pub-ink-3 dark:text-gray-500" aria-hidden="true" />
+              <div className="w-10 h-10 rounded-xl bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center mb-4">
+                <item.icon size={17} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
               </div>
               <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                 {item.title}
@@ -825,7 +826,7 @@ function SolutionSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Die Lösung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -862,8 +863,8 @@ function SolutionSection() {
                 key={feat.label}
                 className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
               >
-                <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0">
-                  <feat.icon size={14} className="text-gray-400 dark:text-gray-400" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <feat.icon size={14} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                 </div>
                 <span className="text-[17px] text-gray-700 dark:text-gray-300 leading-relaxed">
                   {feat.label}
@@ -919,7 +920,7 @@ function CallFlowSection() {
           variants={fadeUp}
           className="max-w-2xl mb-16"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Ablauf
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -945,12 +946,12 @@ function CallFlowSection() {
                 className="relative"
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-white dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0">
-                    <step.icon size={20} className="text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <step.icon size={20} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                   </div>
                 </div>
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="text-sm font-bold tracking-[0.2em] text-pub-ink-3 dark:text-gray-600 uppercase">
+                  <span className="text-sm font-bold tracking-[0.2em] text-pub-accent dark:text-blue-400 uppercase">
                     {step.number}
                   </span>
                 </div>
@@ -984,7 +985,7 @@ function CallSummarySection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Der Ausnahmeweg
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -1001,7 +1002,7 @@ function CallSummarySection() {
             <ul className="space-y-3">
               {GENERISCH_UEBERGABE.wasAnkommt.items.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400">
-                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0" />
                   {item}
                 </li>
               ))}
@@ -1020,7 +1021,7 @@ function CallSummarySection() {
             <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.25)]">
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
                 <div className="flex items-center gap-2.5">
-                  <FileText size={14} className="text-gray-400" aria-hidden="true" />
+                  <FileText size={14} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wide uppercase">
                     Beispiel eines Dashboard-Eintrags
                   </span>
@@ -1108,9 +1109,9 @@ function KettenStile() {
   const CARD =
     "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
   const DOT =
-    "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
+    "mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0";
   const TEXT_LINK =
-    "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors";
+    "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors";
 
   return { PROSE, H2C, CARD, DOT, TEXT_LINK };
 }
@@ -1136,7 +1137,7 @@ function AnliegenKatalogSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Anliegen-Katalog
           </p>
           <h2
@@ -1167,7 +1168,7 @@ function AnliegenKatalogSection() {
             <ul className="space-y-3">
               {GENERISCH_UEBERNIMMT.map((item) => (
                 <li key={item} className={`flex items-start gap-2.5 ${PROSE}`}>
-                  <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-1.5" aria-hidden="true" />
+                  <CheckCircle2 size={13} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0 mt-1.5" aria-hidden="true" />
                   {item}
                 </li>
               ))}
@@ -1250,7 +1251,7 @@ function AnbieterCheckSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Auswahlhilfe
           </p>
           <h2
@@ -1280,7 +1281,7 @@ function AnbieterCheckSection() {
               <div className="p-7">
                 <div className="flex items-start gap-4">
                   <span
-                    className="flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-sm font-bold text-gray-500 dark:text-gray-400"
+                    className="flex-shrink-0 w-8 h-8 rounded-full bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center text-sm font-bold text-pub-accent dark:text-blue-400"
                     aria-hidden="true"
                   >
                     {i + 1}
@@ -1295,7 +1296,7 @@ function AnbieterCheckSection() {
                       </p>
                     </div>
                     <div className="lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-10">
-                      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-2.5">
+                      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-2.5">
                         Unsere Antwort
                       </p>
                       <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]">
@@ -1324,7 +1325,7 @@ function SetupSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Implementierung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -1351,7 +1352,7 @@ function SetupSection() {
               steht im{" "}
               <Link
                 to="/ki-telefonassistent-einfuehren"
-                className="underline underline-offset-4 hover:no-underline text-gray-700 dark:text-gray-300"
+                className="underline underline-offset-4 hover:no-underline text-pub-accent dark:text-blue-400"
               >
                 Leitfaden zur Einführung eines KI-Telefonassistenten
               </Link>
@@ -1369,8 +1370,8 @@ function SetupSection() {
                 variants={fadeUp}
                 className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/60"
               >
-                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
-                  <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{i + 1}</span>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-pub-accent dark:text-blue-400">{i + 1}</span>
                 </div>
                 <div>
                   <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">{phase.title}</h3>
@@ -1403,7 +1404,7 @@ function GespraechSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Wie es klingt
           </p>
           <h2
@@ -1459,7 +1460,7 @@ function DreiWegeSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Das Ergebnis
           </p>
           <h2
@@ -1534,7 +1535,7 @@ function SprachenSection() {
   return (
     <section className="py-24 bg-white dark:bg-gray-950">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
           Mehrsprachig
         </p>
         <h2 className={H2C}>Wenn nicht jeder Anrufer Deutsch spricht</h2>
@@ -1591,15 +1592,15 @@ function RechnerSection() {
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* Statisch im HTML, damit Überschrift und Einordnung im Prerender
             stehen — der interaktive Teil darunter wird nachgeladen. */}
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
           Transparenz
         </p>
         <h2 id="rechner-heading" className={H2C}>
           Was das bei Ihrem Anrufaufkommen kostet — und ob es sich rechnet
         </h2>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.text}</p>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.geltung}</p>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.tarifwechsel}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_ABRECHNUNG.text}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_ABRECHNUNG.geltung}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_ABRECHNUNG.tarifwechsel}</p>
         <p className={`${PROSE} mb-10`}>
           Rechnen Sie es selbst durch. Keine E-Mail, keine Anmeldung, kein
           Ergebnis, das erst nach einem Klick erscheint — und jede Position
@@ -1687,7 +1688,7 @@ function NichtPassendSection() {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
           Ehrliche Beratung
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
@@ -1741,7 +1742,7 @@ function UseCasesSection() {
           variants={fadeUp}
           className="max-w-2xl mb-14"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Anwendungsbereiche
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1766,8 +1767,8 @@ function UseCasesSection() {
               variants={fadeUp}
               className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <item.icon size={17} className="text-gray-400 dark:text-gray-400" aria-hidden="true" />
+              <div className="w-10 h-10 rounded-xl bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <item.icon size={17} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
@@ -1779,7 +1780,7 @@ function UseCasesSection() {
                 {"href" in item && item.href && (
                   <Link
                     to={item.href}
-                    className="inline-block mt-3 text-[15px] font-semibold text-gray-900 dark:text-gray-100 underline underline-offset-4 hover:no-underline"
+                    className="inline-block mt-3 text-[15px] font-semibold text-pub-accent dark:text-blue-400 underline underline-offset-4 hover:no-underline"
                   >
                     {item.linkLabel}
                   </Link>
@@ -1806,7 +1807,7 @@ function FAQSectionBlock() {
           variants={fadeUp}
           className="mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             FAQ
           </p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1909,13 +1910,13 @@ function InternalLinksSection() {
             gleichrangige h2 am Seitenende („Nach Branche", „Nach Region",
             „Verwandte Themen") hätten die Gliederung mit Navigationslabels
             beendet statt mit Inhalt. */}
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-7">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-7">
           Weiterführende Seiten
         </h2>
         <div className="grid sm:grid-cols-3 gap-8">
           {cols.map((col) => (
             <div key={col.heading}>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-pub-ink-3 dark:text-gray-500 mb-3">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-pub-accent dark:text-blue-400 mb-3">
                 {col.heading}
               </h3>
               <ul className="space-y-2">
@@ -1928,7 +1929,7 @@ function InternalLinksSection() {
                       <ArrowRight
                         size={11}
                         aria-hidden="true"
-                        className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0"
+                        className="text-pub-accent-soft dark:text-blue-400 group-hover:text-pub-accent transition-colors flex-shrink-0"
                       />
                       {link.label}
                     </Link>

@@ -11,7 +11,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { FAKTEN, ZWEI_WOCHEN_GARANTIE, TARIFE } from "./telefonassistent-copy";
+import { EINRICHTUNG, FAKTEN, ZWEI_WOCHEN_GARANTIE, TARIFE } from "./telefonassistent-copy";
 
 const ROOT = join(__dirname, "..", "..");
 
@@ -43,8 +43,12 @@ const CLUSTER = [
  * der er kommen muss. Beides steht hier nebeneinander, damit klar ist, wohin
  * eine Änderung gehört.
  */
-const KERNZAHLEN: Array<{ literal: RegExp; quelle: string }> = [
-  { literal: /1\.400\s?€/, quelle: "TARIFE (obergrenze) bzw. FAKTEN.deckelung" },
+const KERNZAHLEN: Array<{ literal: RegExp; quelle: string; metaErlaubt?: boolean }> = [
+  // Die alte „Obergrenze 1.400 €" ist am 24.10.2026 entfallen; sie darf nicht zurückkehren.
+  { literal: /1\.400\s?€/, quelle: "entfallen (alte Obergrenze) – kein Preisdeckel" },
+  { literal: /0,50\s?€/, quelle: "FAKTEN.mehrpreisProMinute", metaErlaubt: true },
+  { literal: /\b990\s?€/, quelle: "EINRICHTUNG.anzeige", metaErlaubt: true },
+  { literal: /1\.490|2\.490|3\.490/, quelle: "entfallen (alte Einrichtungsstaffel) – EINRICHTUNG" },
   { literal: /(zwei\s+Wochen|\b14\s?Tage[n]?)\s+nach\s+Zahlungseingang/, quelle: "FAKTEN.uebergabeGarantie" },
   { literal: /innerhalb\s+von\s+3\s?Tagen/, quelle: "FAKTEN.aenderungen" },
   { literal: /24\s?Monate/, quelle: "FAKTEN.preisgarantie" },
@@ -65,23 +69,56 @@ function ohneKommentare(quelltext: string): string {
     .join("\n");
 }
 
+describe("Preis-Meta-Description stimmt mit der zentralen Preisquelle überein", () => {
+  const eur = (n: number) => `${n.toLocaleString("de-DE")} €`;
+  const erwartet = [
+    `Ab ${eur(TARIFE[0].monatlichEur)} im Monat`,
+    `${TARIFE[0].minuten} Inklusivminuten`,
+    `jede weitere Minute ${FAKTEN.mehrpreisProMinute.replace("\u00A0", " ")}`,
+    `Einrichtung einmalig ${EINRICHTUNG.anzeige.replace("\u00A0", " ")}`,
+  ];
+  it.each([
+    "src/lib/routing/publicRoutes.ts",
+    "src/pages/costs/KostenKiTelefonassistent.tsx",
+  ])("%s", (datei) => {
+    const m = lies(datei).match(/"Was kostet ein KI Telefonassistent für Praxen\?[^"]*"/);
+    expect(m, "Kosten-Description nicht gefunden").not.toBeNull();
+    for (const teil of erwartet) expect(m![0]).toContain(teil);
+    expect(m![0]).not.toMatch(/Obergrenze|gedeckelt|1\.490|0,39/);
+  });
+});
+
 describe("Kernaussagen liegen an genau einer Stelle", () => {
   it.each(CLUSTER)("%s tippt keine Kernzahl selbst", (datei) => {
     const text = ohneKommentare(lies(datei));
-    const treffer = KERNZAHLEN.filter((k) => k.literal.test(text)).map(
+    // Meta-Descriptions stehen im Manifest als Literal (test-seo-consistency
+    // liest den Quelltext). Für sie gilt stattdessen der Abgleichstest unten.
+    const ohneMeta = text.replace(/description(?:=|:)\s*"[^"]*"/g, "");
+    const treffer = KERNZAHLEN.filter((k) => k.literal.test(k.metaErlaubt ? ohneMeta : text)).map(
       (k) => `${k.literal.source} → gehört in ${k.quelle}`
     );
     expect(treffer).toEqual([]);
   });
 
   it("FAKTEN und TARIFE bleiben widerspruchsfrei", () => {
-    // Die Deckelungsaussage muss jede Obergrenze aus TARIFE wörtlich nennen.
-    for (const tarif of TARIFE) {
-      expect(FAKTEN.deckelung).toContain(tarif.obergrenze);
+    // Abrechnung (24.10.2026): Kontingent + 0,50 € je weitere Minute, kein Deckel.
+    expect(FAKTEN.mehrpreisProMinuteEur).toBe(0.5);
+    expect(FAKTEN.mehrpreisProMinute).toBe("0,50\u00A0€");
+    expect(FAKTEN.abrechnung).toContain(FAKTEN.mehrpreisProMinute);
+    expect(FAKTEN.abrechnung).toContain("in allen drei Tarifen");
+    expect(FAKTEN.abrechnung).toContain("Einen Preisdeckel gibt es nicht");
+    for (const text of [FAKTEN.abrechnung, FAKTEN.abrechnungGeltung, FAKTEN.abrechnungKurz, FAKTEN.tarifzuordnung]) {
+      expect(text).not.toMatch(/Obergrenze|gedeckelt|maximal\s+\d|Höchstpreis|0,39/);
     }
-    // Kein Minutenpreis mehr (24.10.2026): Konditionen über dem Kontingent stehen im Angebot.
-    expect(FAKTEN.deckelung).not.toMatch(/0,39|je Minute|jede weitere Minute/);
-    expect(FAKTEN.deckelung).toContain("Angebot");
+    for (const tarif of TARIFE) {
+      expect(tarif).not.toHaveProperty("obergrenze");
+      expect(tarif).not.toHaveProperty("obergrenzeEur");
+    }
+    // Einrichtung: ein Betrag für alle Tarife.
+    expect(EINRICHTUNG.eur).toBe(990);
+    expect(EINRICHTUNG.anzeige).toBe("990\u00A0€");
+    expect(EINRICHTUNG.standard).toContain(EINRICHTUNG.anzeige);
+    expect(EINRICHTUNG.standard).toContain("in allen drei Tarifen");
     // Die Zusage spricht die Frist aus ("zwei Wochen"), sie beziffert sie nicht.
     // Beide Formen muessen dieselbe Frist meinen — sonst steht eine Zusage mit
     // Geldfolge im Markt, die der Vertrag nicht deckt (Korrektur 23.08.2026).

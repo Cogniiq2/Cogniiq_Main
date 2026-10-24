@@ -276,7 +276,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         to: "/kosten-ki-telefonassistent",
         label: "Was ein KI-Telefonassistent kostet",
-        text: "Tarife mit Minutenkontingent und Obergrenze, Einrichtung, Laufzeit – und ein Rechner ohne Anmeldung.",
+        text: "Tarife mit Minutenkontingent und festem Mehrminutensatz, Einrichtung, Laufzeit – und ein Rechner ohne Anmeldung.",
       },
       {
         to: "/ki-telefonassistent-einfuehren",

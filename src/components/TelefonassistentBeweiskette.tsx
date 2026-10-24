@@ -110,7 +110,7 @@ function Punkte({ items }: { items: string[] }) {
         <li key={item} className={`${BODY} pl-5 relative`}>
           <span
             aria-hidden="true"
-            className="absolute left-0 top-[0.7em] w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"
+            className="absolute left-0 top-[0.7em] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400"
           />
           {item}
         </li>
