@@ -27,6 +27,7 @@ import {
   DATENSCHUTZ_SEITE,
   FAKTEN,
 } from "@/lib/telefonassistent-copy";
+import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
 
 const base = BUSINESS_INFO.website;
 const url = `${base}/datenschutz-sicherheit`;
@@ -71,8 +72,7 @@ const CARD_ALT =
   "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
 const DOT =
   "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
-const CTA_PRIMARY =
-  "inline-flex items-center gap-2 px-7 py-4 min-h-[44px] bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[16px] hover:bg-gray-700 dark:hover:bg-white transition-colors";
+const CTA_PRIMARY = CTA_PRIMARY_CLASS;
 const TEXT_LINK =
   "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors";
 

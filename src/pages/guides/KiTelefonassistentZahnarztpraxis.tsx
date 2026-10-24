@@ -695,7 +695,7 @@ export function KiTelefonassistentZahnarztpraxis() {
             </p>
             <Link
               to="/kontakt"
-              className="inline-block mt-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 text-[17px] font-semibold min-h-[44px]"
+              className="inline-block mt-6 rounded-xl bg-pub-signal text-white hover:bg-pub-signal-ink px-6 py-3 text-[17px] font-semibold min-h-[44px]"
             >
               Anrufanlässe gemeinsam durchgehen
             </Link>

@@ -290,6 +290,12 @@ html.cq-public-light {
      Rules, deliberately narrow:
      - `signal` marks the ONE primary action in a viewport. Never a section
        heading, never an icon fill, never a background wash for emphasis.
+       Since 24.10.2026 the primary BUTTON itself is filled with `signal`
+       (owner decision: blue buttons, action icons and selected highlights are
+       the brand's orientation element; the black pill made pages read "too
+       clean"). `PubButton.primary` and `CTA_PRIMARY_CLASS` carry it; the
+       one-per-viewport rationing is unchanged. This supersedes the 23.08 note
+       in PublicUI that reserved signal for links and focus.
      - `verify` marks facts that are contractually true (Go-Live-Garantie,
        Kündigung, keine Aufzeichnung). It is a proof colour, not a success tint.
      - `caution` marks a named limitation. The copy brief rewards naming limits;

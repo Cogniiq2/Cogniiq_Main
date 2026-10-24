@@ -25,6 +25,7 @@ import {
   BETREUUNG,
   CTA,
   DECKELUNG,
+  EINRICHTUNG,
   FAKTEN,
   EINRICHTUNG_PROJEKT,
   ZWEI_WOCHEN_GARANTIE,
@@ -40,13 +41,15 @@ import {
   ANBIETER_CHECKLISTE,
   GENERISCH_DECKELUNG,
 } from "@/lib/telefonassistent-copy";
+import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
 
 const base = BUSINESS_INFO.website;
 const url = `${base}/kosten-ki-telefonassistent`;
 
 /*
   Die numerischen Beträge des Angebots-Schemas kommen aus den numerischen
-  Zwillingen in TARIFE (`monatlichEur`, `einrichtungEur`).
+  Zwillingen in TARIFE (`monatlichEur`); die Einrichtung ist ein Standardaufwand
+  ohne freigegebenen Betrag (`EINRICHTUNG`) und steht deshalb nicht im Schema.
 
   Hier stand bis zum 11.09.2026 ein `toNumber`, das die ANZEIGESTRINGS zurück
   in Zahlen parste — Geschäftslogik, die an einer Tausenderpunkt-Formatierung
@@ -66,17 +69,17 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als der Tarif?",
     answer:
-      `Ja, aber nur bis zu einer festen Grenze. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung}`,
+      `Innerhalb des Kontingents nicht: Der Monatspreis steht fest. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung} ${FAKTEN.deckelungGeltung}`,
   },
   {
     question: "Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
     answer:
-      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen ungefähr ${TARIFE[0].anrufeCa} Anrufen. Dazu kommt einmalig die Einrichtung Ihres Empfangs, je nach Tarif ${TARIFE.map((t) => t.einrichtung).join(", ")}.`,
+      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen bei rund zwei Minuten je Anruf ungefähr ${TARIFE[0].anrufeCa} Anrufen – eine Annahme, keine Zusicherung. Dazu kommt einmalig die Standard-Einrichtung Ihres Empfangs; ${EINRICHTUNG.standard.charAt(0).toLowerCase()}${EINRICHTUNG.standard.slice(1)}`,
   },
   {
-    question: "Warum kostet die Einrichtung so viel?",
+    question: "Was kostet die Einrichtung – und warum ist sie in jedem Tarif gleich?",
     answer:
-      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, Übergabe zur Freigabe und zwei Tage Testphase. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. ${FAKTEN.zahlungsaufteilung} ${FAKTEN.uebergabeGarantie}`,
+      `${EINRICHTUNG.standard} Sie ist kein Freischalten, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, Übergabe zur Freigabe und zwei Tage Testphase. ${EINRICHTUNG.sonder} ${FAKTEN.zahlungsaufteilung} ${FAKTEN.uebergabeGarantie}`,
   },
   {
     question: "Ist die Testphase kostenlos?",
@@ -96,12 +99,12 @@ const faqItems = [
   {
     question: "Was kostet ein KI Telefonassistent pro Minute?",
     answer:
-      `Innerhalb des Kontingents nichts extra — die Minuten sind im Monatspreis enthalten. Rechnerisch ergibt das im kleinsten Tarif ${(TARIFE[0].monatlichEur / TARIFE[0].minuten).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} je Kontingentminute (${TARIFE[0].monatlich} für ${TARIFE[0].minuten.toLocaleString("de-DE")}\u00A0Minuten). Über dem Kontingent kostet jede weitere Minute ${FAKTEN.mehrpreisProMinute}, bis zur Obergrenze des Tarifs. Viele Angebote am Markt rechnen stattdessen pro Minute ohne Obergrenze — vergleichen Sie deshalb immer den Spitzenmonat, nicht den Minutenpreis.`,
+      `Innerhalb des Kontingents nichts extra — die Minuten sind im Monatspreis enthalten. Rechnerisch ergibt das im kleinsten Tarif ${(TARIFE[0].monatlichEur / TARIFE[0].minuten).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} je Kontingentminute (${TARIFE[0].monatlich} für ${TARIFE[0].minuten.toLocaleString("de-DE")}\u00A0Minuten). Wie Minuten über dem Kontingent berechnet werden, steht in Ihrem Angebot – wir nennen hier keinen Minutenpreis, den der Vertrag nicht bestätigt. Viele Angebote am Markt rechnen pro Minute ohne Kontingent; vergleichen Sie deshalb immer den Spitzenmonat, nicht den Minutenpreis.`,
   },
   {
     question: "Gibt es versteckte Kosten?",
     answer:
-      `Keine Kostenposition wird still weggelassen: Grundpreis, Mehrverbrauch, Obergrenze, Einrichtung und Zusatzsprachen stehen auf dieser Seite. Zwei Posten stehen bewusst als offen da, weil sie von Ihrem System abhängen: die Anbindung an Ihre Praxissoftware und Gebühren, die Dritte für eine Schnittstelle verlangen. Beides prüfen wir vor dem Angebot und nennen es dort — nicht danach. ${FAKTEN.deckelungGeltung}`,
+      `Keine Kostenposition wird still weggelassen: Monatspreis, Kontingent, angegebene Obergrenze, Einrichtung und Zusatzsprachen stehen auf dieser Seite; wie Minuten über dem Kontingent berechnet werden, steht in Ihrem Angebot. Zwei Posten stehen bewusst als offen da, weil sie von Ihrem System abhängen: die Anbindung an Ihre Praxissoftware und Gebühren, die Dritte für eine Schnittstelle verlangen. Beides prüfen wir vor dem Angebot und nennen es dort — nicht danach. ${FAKTEN.deckelungGeltung}`,
   },
   {
     question: "Lohnt sich ein KI Telefonassistent für eine kleine Praxis?",
@@ -149,7 +152,7 @@ const schema = {
         ...TARIFE.map((t) => ({
           "@type": "Offer",
           name: `Tarif ${t.name}`,
-          description: `${t.minuten}\u00A0Minuten im Monat, entspricht ungefähr ${t.anrufeCa} Anrufen.`,
+          description: `${t.minuten}\u00A0Minuten im Monat; bei rund zwei Minuten je Anruf ungefähr ${t.anrufeCa} Anrufe.`,
           url,
           priceSpecification: {
             "@type": "UnitPriceSpecification",
@@ -158,18 +161,6 @@ const schema = {
             unitCode: "MON",
             billingDuration: 1,
             billingIncrement: 1,
-          },
-        })),
-        ...TARIFE.map((t) => ({
-          "@type": "Offer",
-          name: `Einrichtung Ihres Empfangs – Tarif ${t.name}`,
-          description:
-            "Einmalige Einrichtung in acht Schritten, zahlbar zur Hälfte bei Vertragsabschluss und zur Hälfte nach dem Go-live.",
-          url,
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            price: t.einrichtungEur,
-            priceCurrency: "EUR",
           },
         })),
       ],
@@ -188,8 +179,7 @@ const CARD_ALT =
   "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
 const DOT =
   "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
-const CTA_PRIMARY =
-  "inline-flex items-center gap-2 px-7 py-4 min-h-[44px] bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[16px] hover:bg-gray-700 dark:hover:bg-white transition-colors";
+const CTA_PRIMARY = CTA_PRIMARY_CLASS;
 const TEXT_LINK =
   "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors";
 
@@ -198,7 +188,7 @@ export function KostenKiTelefonassistent() {
     <>
       <PageSEO
         title="Was kostet ein KI Telefonassistent? Preise | Cogniiq"
-        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie."
+        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, einheitlicher Standard-Einrichtung und Übergabe in zwei Wochen."
         canonical={url}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -263,7 +253,7 @@ export function KostenKiTelefonassistent() {
                   >
                     <span>Tarif {t.name}</span>
                     <span className="tabular-nums text-gray-900 dark:text-gray-100 font-medium">
-                      Telefonie höchstens {t.obergrenze} im Monat
+                      angegebene Obergrenze {t.obergrenze} im Monat
                     </span>
                   </li>
                 ))}
@@ -281,8 +271,10 @@ export function KostenKiTelefonassistent() {
             <h2 className={H2}>Welcher Tarif passt zu wie vielen Anrufen?</h2>
             <p className={`${PROSE} mb-10`}>
               Praxen denken nicht in Minuten, deshalb steht neben jedem Kontingent,
-              wie vielen Anrufen es ungefähr entspricht. Ein Anruf dauert in dieser
-              Rechnung rund zwei Minuten.
+              wie vielen Anrufen es ungefähr entspricht – unter der Annahme von rund
+              zwei Minuten je Anruf, nicht als Zusicherung. Die Monatspreise
+              unterscheiden sich, weil die genutzten Minuten laufende Kosten
+              verursachen; eine unbegrenzte Nutzung zum festen Preis gibt es nicht.
             </p>
             <div className="grid md:grid-cols-3 gap-5">
               {TARIFE.map((t) => (
@@ -308,15 +300,15 @@ export function KostenKiTelefonassistent() {
                       </dd>
                     </div>
                     <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Obergrenze</dt>
+                      <dt className="text-gray-500 dark:text-gray-500">angegebene Obergrenze</dt>
                       <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
                         {t.obergrenze}
                       </dd>
                     </div>
                     <div className="flex justify-between gap-3">
                       <dt className="text-gray-500 dark:text-gray-500">Einrichtung</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.einrichtung}
+                      <dd className="text-gray-700 dark:text-gray-300 text-right">
+                        {EINRICHTUNG.kurz}
                       </dd>
                     </div>
                   </dl>
@@ -360,7 +352,7 @@ export function KostenKiTelefonassistent() {
           tone="alt"
           headline="Was kostet das bei Ihrem Anrufaufkommen?"
           intro={[
-            "Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den passenden Tarif, den Monatsbetrag und die einmalige Einrichtung — sofort, ohne E-Mail und ohne Verkaufsgespräch.",
+            "Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den passenden Tarif nach Kontingent und den Monatsbetrag — sofort, ohne E-Mail und ohne Verkaufsgespräch. Die einmalige Standard-Einrichtung steht als offene Position dabei, bis ihr Betrag im Angebot steht.",
             "Danach können Sie weiterrechnen, ob sich das für Ihren Betrieb trägt. Für die wirtschaftlichen Felder setzen wir bewusst keine Werte ein: Stundenkosten, Routineanteil und verpasste Anrufe kennen nur Sie. Solange etwas fehlt, nennt der Rechner das Zeitpotenzial und sagt, was noch fehlt — er rechnet kein Ergebnis aus einem halben Modell.",
             "Was vor der technischen Prüfung nicht feststeht, etwa die Anbindung an Ihr System, steht als offene Position in der Liste. Nicht als Null.",
           ]}
@@ -481,9 +473,9 @@ export function KostenKiTelefonassistent() {
                   </tr>
                   <tr>
                     <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Kontingent mit Obergrenze — unser Modell</th>
-                    <td className="py-4 pr-4">Fester Monatspreis für ein Minutenkontingent; Mehrverbrauch zu {FAKTEN.mehrpreisProMinute}/Min., gedeckelt.</td>
-                    <td className="py-4 pr-4">Begrenzt: Die Telefonierechnung kann steigen, aber nur bis zur ausgewiesenen Obergrenze.</td>
-                    <td className="py-4">Kontingent, Minutenpreis und Obergrenze stehen zusammen auf einer Seite — wie oben.</td>
+                    <td className="py-4 pr-4">Fester Monatspreis für ein Minutenkontingent; die Konditionen für Minuten darüber stehen im Angebot.</td>
+                    <td className="py-4 pr-4">Planbar innerhalb des Kontingents; für jeden Tarif ist eine Obergrenze angegeben, deren Geltung das Angebot festlegt.</td>
+                    <td className="py-4">Kontingent, Monatspreis und angegebene Obergrenze stehen zusammen auf einer Seite — wie oben. Die Zeilen darüber beschreiben Marktmodelle, keine Cogniiq-Preise.</td>
                   </tr>
                 </tbody>
               </table>

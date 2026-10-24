@@ -90,7 +90,7 @@ describe('Flaggschiff — der Rechner ist auffindbar', () => {
       diese Grenze schlägt die Prüfung am eigenen Hover-Stil fehl.
     */
     const grundflaeche = (klasse: string) =>
-      klasse.split(/\s+/).some((k) => /^bg-gray-900(\/\d+)?$/.test(k));
+      klasse.split(/\s+/).some((k) => /^bg-(?:gray-900|pub-signal)(\/\d+)?$/.test(k));
     expect(grundflaeche(demo?.getAttribute('class') ?? '')).toBe(true);
     expect(grundflaeche(sekundaer.getAttribute('class') ?? '')).toBe(false);
   });
@@ -137,7 +137,7 @@ describe('Flaggschiff und Preisseite rechnen mit demselben Kern', () => {
       const t = new DOMParser().parseFromString(markup, 'text/html').querySelector('main')!
         .textContent!.replace(/\s+/g, ' ');
       // Ausgaben des kanonischen Kerns, nicht der Suspense-Platzhalter.
-      expect(t, `${label}: Tarifausgabe fehlt`).toContain('Tarif nach unserer Zuordnungsregel');
+      expect(t, `${label}: Tarifausgabe fehlt`).toContain('Passender Tarif nach Kontingent');
       expect(t, `${label}: Minutenausgabe fehlt`).toContain('Gesprächsminuten pro Monat');
       expect(t, `${label}: Unvollständigkeitszustand fehlt`).toContain(
         'Wirtschaftlichkeit noch nicht vollständig berechnet'
@@ -146,7 +146,7 @@ describe('Flaggschiff und Preisseite rechnen mit demselben Kern', () => {
         'Rechner wird geladen'
       );
       // Genau eine Instanz je Seite.
-      expect((t.match(/Tarif nach unserer Zuordnungsregel/g) ?? []).length, `${label}: doppelter Rechner`).toBe(1);
+      expect((t.match(/Passender Tarif nach Kontingent/g) ?? []).length, `${label}: doppelter Rechner`).toBe(1);
     }
   }, 60_000);
 });

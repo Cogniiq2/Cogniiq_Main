@@ -413,7 +413,7 @@ export function KiTelefonassistentDemoPage() {
                           type="submit"
                           disabled={loading}
                           aria-busy={loading}
-                          className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-full font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                          className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-pub-signal text-white rounded-full font-semibold text-[15px] hover:bg-pub-signal-ink transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                         >
                           {loading ? (
                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

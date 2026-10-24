@@ -32,6 +32,7 @@ import { trackEvent } from "@/lib/consent";
 import { RECHNER_LINK } from "@/lib/rechner-anker";
 import {
   ABWICKLUNG,
+  EINRICHTUNG,
   FAKTEN,
   SPRACHEN,
   SPRACHEN_PREISE,
@@ -55,7 +56,7 @@ import {
   erhoben haben. Alle Nutzenfelder starten LEER: Für sie gibt es keinen Wert,
   den wir für einen beliebigen Betrieb belegen könnten.
 */
-const START_ANRUFE = 300;
+const START_ANRUFE = 200;
 const START_DAUER = 2;
 
 const CARD =
@@ -262,7 +263,7 @@ function Zeile({
         <PulsBeiWechsel
           schluessel={wert}
           klasse="cq-tariff-pulse"
-          className="inline-flex h-8 items-center rounded-full bg-pub-ink px-3.5 text-[14px] font-semibold text-white whitespace-nowrap dark:bg-gray-100 dark:text-gray-900"
+          className="inline-flex h-8 items-center rounded-full bg-pub-signal px-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
         >
           {wert}
         </PulsBeiWechsel>
@@ -369,8 +370,8 @@ function BausteinWahl({
       onClick={onToggle}
       className={`text-left rounded-2xl border p-5 transition-[border-color,background-color,box-shadow] duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
         aktiv
-          ? "border-gray-900 dark:border-gray-100 bg-gray-50 dark:bg-gray-800/60 shadow-[inset_0_0_0_1px_#0b0f14]"
-          : "border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500"
+          ? "border-pub-signal bg-pub-signal-wash dark:bg-gray-800/60 shadow-[inset_0_0_0_1px_#1c4fd8]"
+          : "border-gray-200 dark:border-gray-700 hover:border-pub-signal/45"
       }`}
     >
       <span className="flex items-center gap-3">
@@ -378,7 +379,7 @@ function BausteinWahl({
           aria-hidden="true"
           className={`flex-shrink-0 w-7 h-7 rounded-full text-[13px] font-bold flex items-center justify-center ${
             aktiv
-              ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+              ? "bg-pub-signal text-white"
               : "bg-gray-100 dark:bg-gray-800 text-gray-500"
           }`}
         >
@@ -402,7 +403,8 @@ function BausteinWahl({
  * Darstellungsvariante — UND NUR DARSTELLUNG.
  *
  * `voll` ist die Fassung der Flaggschiff- und der Kostenseite: jede
- * Preisposition einzeln, Tarifvergleich, Sprachwahl, Nutzenbausteine.
+ * Preisposition einzeln, Kontingent-Passung aller Tarife, Sprachwahl,
+ * Nutzenbausteine.
  *
  * `kompakt` ist die Fassung für Seiten, auf denen der Rechner nicht die
  * Hauptsache ist — heute genau eine: die Startseite. Sie zeigt die PREISFRAGE
@@ -544,7 +546,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             step={10}
             ganzzahl
             einheit="Anrufe"
-            platzhalter="z. B. 300"
+            platzhalter="z. B. 200"
           />
           <Zahlenfeld
             label="Durchschnittliche Gesprächsdauer mit dem Assistenten"
@@ -579,8 +581,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 onClick={() => { meldePreisStart(); setSprachen(wert); }}
                 className={`inline-flex h-11 items-center rounded-full px-5 text-[15px] font-medium border transition-[background-color,border-color,color,transform] duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
                   sprachen === wert
-                    ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
-                    : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-500"
+                    ? "border-pub-signal bg-pub-signal text-white"
+                    : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-pub-signal/45"
                 }`}
               >
                 {text}
@@ -614,25 +616,25 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               label="Wiederkehrend pro Monat"
               wert={
                 preis.monatlichGesamtEur === UNBEKANNT
-                  ? eur(s.telefonieMonatlichEur, 2)
+                  ? eur(s.tarif.monatlichEur, 2)
                   : eur(preis.monatlichGesamtEur, 2)
               }
               betrag={
                 preis.monatlichGesamtEur === UNBEKANNT
-                  ? s.telefonieMonatlichEur
+                  ? s.tarif.monatlichEur
                   : preis.monatlichGesamtEur
               }
               format={(n) => eur(n, 2)}
               hinweis={
                 preis.monatlichGesamtEur === UNBEKANNT
-                  ? "Telefonie. Der Sprachaufschlag steht erst im Angebot fest und ist hier noch nicht enthalten."
-                  : `Tarif ${s.tarif.name} nach unserer Zuordnungsregel, inklusive Mehrverbrauch. Telefonie gedeckelt auf ${s.tarif.obergrenze}.`
+                  ? `Tarif ${s.tarif.name}. Der Sprachaufschlag steht erst im Angebot fest und ist hier noch nicht enthalten.`
+                  : `Tarif ${s.tarif.name}: ${zahl(s.tarif.minuten)} Minuten enthalten. Minuten darüber stehen im Angebot.`
               }
             />
             <Betrag
               label="Einmalige Einrichtung"
-              wert={s.tarif.einrichtung}
-              hinweis="Zur Hälfte bei Vertragsabschluss, zur Hälfte nach dem Go-live."
+              wert={EINRICHTUNG.kurz}
+              hinweis="Gleicher Standardaufwand in jedem Tarif; zur Hälfte bei Vertragsabschluss, zur Hälfte nach dem Go-live."
             />
           </div>
         )}
@@ -645,55 +647,34 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
 
         {!preisSteht || !s ? (
           <>
-            <Zeile label="Tarif nach unserer Zuordnungsregel" wert="Individuell" pille />
+            <Zeile label="Passender Tarif nach Kontingent" wert="Individuell" pille />
             <p className="pt-4 text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
-              Bei diesem Aufkommen liefe auch der größte Listentarif dauerhaft an
-              seiner Obergrenze. Dafür gilt kein Listenpreis: {TARIF_ENTERPRISE} Was
-              es für Ihr Aufkommen konkret ist, rechnen wir im Erstgespräch aus,
-              statt es hier zu schätzen.
+              Bei diesem Aufkommen reicht das Kontingent des größten Listentarifs
+              nicht. Dafür gilt kein Listenpreis: {TARIF_ENTERPRISE} Was es für
+              Ihr Aufkommen konkret ist, rechnen wir im Erstgespräch aus, statt
+              es hier zu schätzen.
             </p>
           </>
         ) : (
           <>
             <Zeile
-              label="Tarif nach unserer Zuordnungsregel"
+              label="Passender Tarif nach Kontingent"
               wert={s.tarif.name}
               pille
-              hinweis={`${FAKTEN.tarifzuordnung} Der Rechner wendet diese Regel auf den eingegebenen Monatswert an; ob ein Aufkommen als dauerhaft gilt und ab wann umgestellt wird, legt Ihr Vertrag fest.`}
+              hinweis={`Der kleinste Tarif, dessen Kontingent Ihr Aufkommen trägt. ${FAKTEN.tarifzuordnung}`}
             />
             {!kompakt && (
             <Zeile
               label="Enthaltene Minuten"
               wert={`${zahl(s.tarif.minuten)} Min.`}
-            />
-            )}
-            {!kompakt && (
-            <Zeile label="Monatlicher Grundpreis" wert={s.tarif.monatlich} />
-            )}
-            {!kompakt && (
-            <Zeile
-              label="Mehrverbrauch"
-              wert={
-                s.mehrverbrauchMinuten > 0
-                  ? `${zahl(s.mehrverbrauchMinuten)} Min. · ${eur(s.mehrverbrauchEur, 2)}`
-                  : "keiner"
-              }
-              hinweis={
-                s.mehrverbrauchMinuten > 0
-                  ? `Jede Minute über dem Kontingent: ${FAKTEN.mehrpreisProMinute}`
-                  : undefined
-              }
+              hinweis={`Ihr Aufkommen: ${zahl(preis.minutenProMonat)} Min. – liegt innerhalb des Kontingents.`}
             />
             )}
             {!kompakt && (
             <Zeile
-              label="Telefonie pro Monat"
-              wert={eur(s.telefonieMonatlichEur, 2)}
-              hinweis={
-                s.amDeckel
-                  ? `Auf die Telefonie-Obergrenze dieses Tarifs gedeckelt (${s.tarif.obergrenze}) – sie gilt für Grundpreis und Mehrverbrauch.`
-                  : `Telefonie-Obergrenze dieses Tarifs: ${s.tarif.obergrenze}. Mehr als das kosten Grundpreis und Mehrverbrauch in keinem Monat – Zusatzsprachen und Anbindung stehen als eigene Positionen darunter.`
-              }
+              label="Monatspreis"
+              wert={s.tarif.monatlich}
+              hinweis={`Deckt Kontingent und laufenden Betrieb ab. Für diesen Tarif ist eine Obergrenze von ${s.tarif.obergrenze} angegeben; worauf sie sich bezieht und wie Minuten über dem Kontingent berechnet werden, legt Ihr Angebot fest.`}
             />
             )}
             {preis.sprachenOffen ? (
@@ -709,7 +690,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 <Zeile
                   label="Zusatzsprachen pro Monat"
                   wert={eur(preis.sprachenMonatlichEur as number)}
-                  hinweis="Eigene Position. Ob dieser Aufschlag innerhalb der Telefonie-Obergrenze liegt, legt Ihr Angebot fest."
+                  hinweis="Eigene Position neben dem Monatspreis."
                 />
               )
             )}
@@ -719,25 +700,21 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               wert={
                 preis.monatlichGesamtEur !== UNBEKANNT
                   ? eur(preis.monatlichGesamtEur, 2)
-                  : preis.monatlichSpanne
-                    ? `${eur(preis.monatlichSpanne.min, 2)} bis ${eur(preis.monatlichSpanne.max, 2)}`
-                    : "Telefonie steht fest, Sprachaufschlag im Angebot"
+                  : "Monatspreis steht fest, Sprachaufschlag im Angebot"
               }
               stark
               hinweis={
                 preis.monatlichGesamtEur !== UNBEKANNT
-                  ? "Telefonie plus Zusatzsprachen. Ohne Anbindung – die steht darunter als offen."
-                  : preis.monatlichSpanne
-                    ? `Telefonie ${eur(s.telefonieMonatlichEur, 2)} plus Sprachaufschlag ${eur(preis.sprachenMonatlichEur as number)} überschreiten die Obergrenze ${s.tarif.obergrenze}. Fällt der Aufschlag unter die Obergrenze, bleibt es bei ${eur(preis.monatlichSpanne.min, 2)}; steht er daneben, sind es ${eur(preis.monatlichSpanne.max, 2)}. Das legt Ihr Angebot fest – wir wählen hier nicht still eine Lesart.`
-                    : `Die Telefonie kostet ${eur(s.telefonieMonatlichEur, 2)} im Monat. Eine Summe nennen wir erst, wenn der Sprachaufschlag feststeht – eine Summe ohne ihn wäre niedriger als Ihre spätere Rechnung.`
+                  ? "Monatspreis plus Zusatzsprachen. Ohne Einrichtung und Anbindung – beide stehen darunter als offen."
+                  : `Der Monatspreis beträgt ${s.tarif.monatlich}. Eine Summe nennen wir erst, wenn der Sprachaufschlag feststeht – eine Summe ohne ihn wäre niedriger als Ihre spätere Rechnung.`
               }
             />
             )}
             {!kompakt && (
             <Zeile
               label="Einmalige Einrichtung"
-              wert={s.tarif.einrichtung}
-              hinweis="Zur Hälfte bei Vertragsabschluss, zur Hälfte nach dem Go-live."
+              wert={EINRICHTUNG.kurz}
+              hinweis={`${EINRICHTUNG.standard} ${EINRICHTUNG.sonder}`}
             />
             )}
           </>
@@ -752,15 +729,16 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         {!kompakt && preisSteht && (
           <details className="mt-5">
             <summary className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 cursor-pointer min-h-[44px] flex items-center">
-              So kommt die Zuordnung zustande: alle drei Listentarife bei diesem Aufkommen
+              Alle drei Listentarife bei diesem Aufkommen
             </summary>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full text-[15px] text-left">
                 <thead>
                   <tr className="text-[13px] uppercase tracking-wider text-pub-ink-3 dark:text-gray-500">
                     <th scope="col" className="py-2 pr-4 font-semibold">Tarif</th>
-                    <th scope="col" className="py-2 pr-4 font-semibold">Telefonie / Monat</th>
-                    <th scope="col" className="py-2 font-semibold">Stand</th>
+                    <th scope="col" className="py-2 pr-4 font-semibold">Kontingent</th>
+                    <th scope="col" className="py-2 pr-4 font-semibold">Monatspreis</th>
+                    <th scope="col" className="py-2 font-semibold">Bei Ihrem Aufkommen</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -769,13 +747,14 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                       <th scope="row" className="py-2 pr-4 font-medium text-gray-900 dark:text-gray-100">
                         {v.tarif.name}
                       </th>
-                      <td className="py-2 pr-4 tabular-nums">{eur(v.telefonieMonatlichEur, 2)}</td>
+                      <td className="py-2 pr-4 tabular-nums">{zahl(v.tarif.minuten)} Min.</td>
+                      <td className="py-2 pr-4 tabular-nums">{v.tarif.monatlich}</td>
                       <td className="py-2 text-gray-600 dark:text-gray-400">
-                        {v.amDeckel
-                          ? `an der Obergrenze ${v.tarif.obergrenze}`
-                          : v.tarif.name === s?.tarif.name
-                            ? "Zuordnung nach Regel"
-                            : "unter der Obergrenze"}
+                        {v.passt
+                          ? v.tarif.name === s?.tarif.name
+                            ? "passt – kleinster ausreichender Tarif"
+                            : "passt"
+                          : `Kontingent um ${zahl(v.mehrverbrauchMinuten)} Min. überschritten – Konditionen im Angebot`}
                       </td>
                     </tr>
                   ))}
@@ -783,18 +762,16 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               </table>
             </div>
             <p className={`${HINT} mt-3`}>
-              Die Regel wählt den günstigsten Tarif, der bei diesem Aufkommen
-              nicht an seiner Obergrenze läuft. Ein Tarif an der Obergrenze kann
-              in einem einzelnen Spitzenmonat rechnerisch günstiger sein; ob Sie
-              dann in ihm bleiben oder umgestellt werden, regelt Ihr Vertrag.
-              Wir versprechen hier keinen „günstigsten Tarif", sondern zeigen den
-              Rechenweg.
+              Die Einrichtung ist bei allen drei Tarifen derselbe Standardaufwand
+              und steht als einmaliger Betrag im Angebot. Einen „günstigsten
+              Tarif" versprechen wir hier nicht; welcher Tarif für Sie gilt, legt
+              Ihr Vertrag fest.
             </p>
           </details>
         )}
 
         <p className={`${HINT} mt-5 flex items-start gap-2`}>
-          <Info size={14} className="flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <Info size={14} className="flex-shrink-0 mt-0.5 text-pub-signal" aria-hidden="true" />
           <span>
             {FAKTEN.laufzeit} Wie sich dieser Aufschlag im Einzelnen bemisst,
             steht in Ihrem Angebot; diese Rechnung bildet ihn deshalb nicht ab,
@@ -1024,8 +1001,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               </h4>
               <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
                 Solange der monatliche Betrag nicht feststeht – ohne vollständiges
-                Aufkommen, im individuellen Tarif, bei offenem Sprachaufschlag
-                oder einer Preisspanne – gibt es keinen Betrag, gegen den sich
+                Aufkommen, im individuellen Tarif oder bei offenem
+                Sprachaufschlag – gibt es keinen Betrag, gegen den sich
                 rechnen ließe. Ihre Zwischenstände oben bleiben davon unberührt;
                 den Saldo rechnen wir im Erstgespräch mit Ihrer konkreten Zahl.
               </p>
@@ -1095,7 +1072,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               <Zeile
                 label="Bekannte laufende Kosten Cogniiq"
                 wert={`− ${eur(nutzen.cash.bekannteKostenProMonatEur as number, 2)}`}
-                hinweis="Telefonie plus Zusatzsprachen. Zuzüglich offener Anbindung – siehe unten."
+                hinweis="Monatspreis plus Zusatzsprachen. Zuzüglich offener Einrichtung und Anbindung – siehe unten."
               />
               <Zeile
                 label={`Geldsaldo pro Monat${umfangText}`}
@@ -1103,27 +1080,14 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 stark
                 hinweis={
                   (saldo as number) < 0
-                    ? "Negativ: Mit den gewählten Geldbausteinen decken die entfallenden Ausgaben und realisierbaren Termine die bekannten Kosten nicht. Zeitgewinn und Erreichbarkeit sind damit nicht bewertet – sie werden hier aber auch nicht in Euro umgedeutet."
-                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten. Der Zeitwert aus A ist nicht enthalten."
+                    ? "Negativ: Mit den gewählten Geldbausteinen decken die entfallenden Ausgaben und realisierbaren Termine die bekannten laufenden Kosten nicht. Zeitgewinn und Erreichbarkeit sind damit nicht bewertet – sie werden hier aber auch nicht in Euro umgedeutet."
+                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten. Der Zeitwert aus A ist nicht enthalten; Einrichtung und Anbindung stehen darunter als offen."
                 }
               />
               <Zeile
-                label="Erstes Jahr, bekannte Kosten, inklusive Einrichtung"
-                wert={eur(nutzen.cash.ersteJahrSaldoEur as number)}
-                hinweis={`12 gleiche Monate angenommen: 12 × Geldsaldo − Einrichtung ${eur(nutzen.cash.einmaligeKostenEur as number)}. Start- und Anlaufmonat sind nicht gesondert modelliert.`}
-              />
-              <Zeile
-                label="Einrichtung hereingeholt nach"
-                wert={
-                  nutzen.cash.amortisationMonate === null
-                    ? "— bei diesen Angaben nicht"
-                    : `${zahl(nutzen.cash.amortisationMonate, 1)} Monaten`
-                }
-                hinweis={
-                  nutzen.cash.amortisationMonate === null
-                    ? "Der Geldsaldo ist null oder negativ. Dann gibt es keine Amortisation, und wir zeigen auch keine."
-                    : "Vereinfachte Modellrechnung: Einrichtung ÷ Geldsaldo, nur aus bekannten Kosten. Offene Anbindungskosten verlängern sie."
-                }
+                label="Einmalige Einrichtung"
+                wert="offen"
+                hinweis={`${EINRICHTUNG.standard} Solange der Betrag nicht feststeht, gibt es hier kein Erstjahresergebnis und keine Amortisationsdauer – eine Zahl aus einem geratenen Einmalbetrag wäre keine.`}
               />
               <Zeile
                 label="Anbindung an Ihr System"
@@ -1210,7 +1174,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             href={RECHNER_LINK}
             onClick={() => trackEvent("calculator_anchor_click", "Kompaktrechner")}
             {...magnetic}
-            className="group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+            className="group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-signal px-7 text-[15px] font-semibold text-white hover:bg-pub-signal-ink hover:shadow-[0_10px_28px_-10px_rgba(28,79,216,0.55)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
           >
             Wirtschaftlichkeit berechnen
             <ArrowRight size={15} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -1223,7 +1187,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           className={
             kompakt
               ? "group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-pub-ink/20 bg-white px-7 text-[15px] font-semibold text-pub-ink hover:border-pub-ink/45 hover:bg-pub-paper-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
-              : "group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+              : "group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-signal px-7 text-[15px] font-semibold text-white hover:bg-pub-signal-ink hover:shadow-[0_10px_28px_-10px_rgba(28,79,216,0.55)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
           }
         >
           {kompakt ? "Zahlen gemeinsam durchgehen" : "Szenario und Anbindung prüfen"}

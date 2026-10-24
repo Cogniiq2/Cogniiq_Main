@@ -30,7 +30,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { FAKTEN, SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
+import { SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
 import { RECHNER_ANKER, RECHNER_LINK, RECHNER_ROUTE } from '@/lib/rechner-anker';
 import { PROTECTED_EXPERIMENT_PATHS } from '@/lib/routing/protectedExperiments';
 import {
@@ -142,30 +142,27 @@ describe('Preis — eine Quelle, ein Ergebnis', () => {
       // wenn kein kleinerer ihn unterbietet, ohne am Deckel zu laufen.
       const szenario = waehleSzenario(tarif.minuten);
       expect(szenario).not.toBeNull();
-      expect(szenario!.telefonieMonatlichEur).toBeLessThanOrEqual(szenario!.tarif.obergrenzeEur);
+      expect(szenario!.tarif.name).toBe(tarif.name);
+      expect(szenario!.telefonieMonatlichEur).toBe(tarif.monatlichEur);
       expect(TARIFE).toContain(szenario!.tarif);
     }
   });
 
-  it('rechnet den Mehrverbrauch mit dem kanonischen Minutenpreis', () => {
+  it('rechnet keinen Mehrverbrauch — eine Minute über dem Kontingent heißt nächster Tarif', () => {
     const einMinuteUeberBasis = TARIFE[0].minuten + 1;
     const szenario = waehleSzenario(einMinuteUeberBasis)!;
-    // Basis ist bei einer Minute Mehrverbrauch noch der günstigste Tarif.
-    expect(szenario.tarif.name).toBe(TARIFE[0].name);
-    expect(szenario.mehrverbrauchEur).toBeCloseTo(FAKTEN.mehrpreisProMinuteEur, 10);
+    expect(szenario.tarif.name).toBe(TARIFE[1].name);
+    expect(szenario.telefonieMonatlichEur).toBe(TARIFE[1].monatlichEur);
   });
 
   it('kippt jenseits der Tarifliste in den individuellen Modus statt in eine zu billige Zahl', () => {
     const groesster = TARIFE[TARIFE.length - 1];
-    const weitDarueber =
-      groesster.minuten +
-      (groesster.obergrenzeEur - groesster.monatlichEur) / FAKTEN.mehrpreisProMinuteEur +
-      1;
+    const weitDarueber = groesster.minuten + 1;
     expect(waehleSzenario(weitDarueber)).toBeNull();
     const preis = berechnePreis({ anrufeProMonat: weitDarueber, minutenProAnruf: 1 }, 0);
     expect(preis.modus).toBe('individuell');
     expect(preis.monatlichGesamtEur).toBe('unbekannt');
-    expect(preis.einrichtungEur).toBe('unbekannt');
+    expect(preis.einrichtungEur).toBe('offen');
   });
 
   it('weist die Anbindung IMMER als unbekannt aus, nie als 0', () => {
@@ -224,8 +221,6 @@ describe('Nutzen — drei Bausteine, ein Geldsaldo', () => {
     const r = berechneNutzen(preis, AUS);
     expect(r.vollstaendig).toBe(false);
     expect(r.cash.saldoProMonatEur).toBe(UNVOLLSTAENDIG);
-    expect(r.cash.ersteJahrSaldoEur).toBe(UNVOLLSTAENDIG);
-    expect(r.cash.amortisationMonate).toBeNull();
   });
 
   it('nennt genau die Felder, die ein aktiver Baustein noch braucht', () => {
@@ -241,7 +236,6 @@ describe('Nutzen — drei Bausteine, ein Geldsaldo', () => {
     });
     expect(nurZeit.zeit.zeitwertEur).toBeCloseTo(800, 10);
     expect(nurZeit.cash.saldoProMonatEur).toBeCloseTo(-(preis.monatlichGesamtEur as number), 10);
-    expect(nurZeit.cash.amortisationMonate).toBeNull();
   });
 
   it('Potenzial ohne Kapazität ist kein Gewinn', () => {
@@ -255,13 +249,14 @@ describe('Nutzen — drei Bausteine, ein Geldsaldo', () => {
     const r = berechneNutzen(preis, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 50 } });
     expect(r.vollstaendig).toBe(true);
     expect(r.cash.saldoProMonatEur).toBeLessThan(0);
-    expect(r.cash.ersteJahrSaldoEur).toBeLessThan(0);
-    expect(r.cash.amortisationMonate).toBeNull();
   });
 
-  it('lässt die Einrichtung im ersten Jahr NICHT weg', () => {
+  it('zeigt ohne freigegebenen Einrichtungsbetrag weder Erstjahr noch Amortisation', () => {
     const r = berechneNutzen(preis, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } });
-    expect(r.cash.ersteJahrSaldoEur).toBeCloseTo((r.cash.saldoProMonatEur as number) * 12 - (preis.einrichtungEur as number), 6);
+    expect(r.cash.einmaligeKostenEur).toBe('offen');
+    expect(r.cash).not.toHaveProperty('ersteJahrSaldoEur');
+    expect(r.cash).not.toHaveProperty('amortisationMonate');
+    expect(r.cash.offeneKosten).toEqual(['einrichtung', 'anbindung']);
   });
 
   it('gibt bei individuellem Tarif und offenem Sprachaufschlag keinen Saldo aus', () => {
@@ -311,14 +306,14 @@ describe('Beträge stehen an genau einer Stelle', () => {
       if (KANONISCHE_ZAHLENQUELLEN.has(pfad)) continue;
       expect(
         /0[.,]39/.test(inhalt),
-        `${pfad} tippt den Mehrpreis je Minute erneut; er steht in FAKTEN.mehrpreisProMinuteEur`
+        `${pfad} tippt einen Minutenpreis; seit dem 24.10.2026 gibt es keinen — Konditionen über dem Kontingent stehen im Angebot`
       ).toBe(false);
     }
   });
 
   it('tippt keinen Tarif-, Obergrenzen- oder Einrichtungsbetrag erneut', () => {
     const betraege = new Set(
-      TARIFE.flatMap((t) => [t.monatlichEur, t.obergrenzeEur, t.einrichtungEur])
+      TARIFE.flatMap((t) => [t.monatlichEur, t.obergrenzeEur])
     );
     /*
       Geprüft wird die ZUWEISUNG AN EINEN PREIS-BEZEICHNER, nicht die nackte

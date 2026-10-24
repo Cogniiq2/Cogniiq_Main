@@ -34,6 +34,22 @@ export const pubFocus =
 
 /* ------------------------------------------------------------------ button */
 
+/*
+  Class strings for the hand-rolled CTAs that still exist on older pages
+  (`const CTA_PRIMARY = "..."` per page). They mirror the PubButton variants so
+  a page that cannot yet adopt the component still gets the same blue primary
+  and the same focus ring. Prefer PubButton / PubLinkButton in new code.
+*/
+export const CTA_PRIMARY_CLASS =
+  'inline-flex items-center gap-2 px-7 py-4 min-h-[44px] rounded-xl font-semibold text-[16px] ' +
+  'bg-pub-signal text-white hover:bg-pub-signal-ink transition-colors ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2';
+export const CTA_SECONDARY_CLASS =
+  'inline-flex items-center gap-2 px-7 py-4 min-h-[44px] rounded-xl font-semibold text-[16px] ' +
+  'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 ' +
+  'hover:border-pub-signal/45 hover:text-pub-signal-ink transition-colors ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2';
+
 type PubButtonVariant = 'primary' | 'secondary' | 'quiet';
 type PubButtonSize = 'md' | 'lg';
 
@@ -43,14 +59,17 @@ type PubButtonSize = 'md' | 'lg';
   primaries are visible at once, one of them is wrong.
 */
 const variantClass: Record<PubButtonVariant, string> = {
-  // Ink, not signal: the black pill is the one button shape the identity already
-  // owns (navigation CTA). Signal blue stays reserved for links and focus.
+  // Signal, not ink (owner decision 24.10.2026): blue details — buttons,
+  // action icons, selected highlights — are the orientation element of the
+  // brand, and pages built on the black pill read as "too clean". The 23.08
+  // rule "one filled signal per viewport" still holds: `primary` is that one
+  // action; `secondary` stays on ink. White on signal measures 6.27:1 (AA).
   primary:
-    'bg-pub-ink text-white border border-transparent ' +
-    'hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:bg-pub-ink active:shadow-none',
+    'bg-pub-signal text-white border border-transparent ' +
+    'hover:bg-pub-signal-ink hover:shadow-[0_10px_28px_-10px_rgba(28,79,216,0.55)] active:bg-pub-signal-ink active:shadow-none',
   secondary:
     'bg-white text-pub-ink border border-pub-ink/20 ' +
-    'hover:border-pub-ink/45 hover:bg-pub-paper-2',
+    'hover:border-pub-signal/45 hover:text-pub-signal-ink hover:bg-pub-signal-wash',
   quiet:
     'bg-transparent text-pub-ink-2 border border-transparent ' +
     'hover:text-pub-ink hover:bg-pub-ink/[0.04]',

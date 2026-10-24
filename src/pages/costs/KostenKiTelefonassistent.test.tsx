@@ -32,7 +32,7 @@ const { render } = await import('@/entry-server');
 const { PROTECTED_EXPERIMENT_PATHS, GRADUATED_EXPERIMENT_PATHS } = await import(
   '@/lib/routing/protectedExperiments'
 );
-const { SPRACHEN, SPRACHEN_PREISE, TARIFE, FAKTEN } = await import('@/lib/telefonassistent-copy');
+const { EINRICHTUNG, SPRACHEN, SPRACHEN_PREISE, TARIFE, FAKTEN } = await import('@/lib/telefonassistent-copy');
 
 const PFAD = '/kosten-ki-telefonassistent';
 
@@ -64,7 +64,7 @@ describe('Preisseite — das Experiment ist beendet', () => {
 describe('Preisseite — ein Rechner, der kanonische', () => {
   it('rendert den kanonischen Rechner und genau einmal', () => {
     // Der Tarifblock des kanonischen Rechners. Zweimal hiesse: zwei Instanzen.
-    expect(text.match(/Tarif nach unserer Zuordnungsregel/g) ?? []).toHaveLength(1);
+    expect(text.match(/Passender Tarif nach Kontingent/g) ?? []).toHaveLength(1);
     expect(text).toContain('Gesprächsminuten pro Monat');
   });
 
@@ -108,7 +108,7 @@ describe('Preisseite — ein Rechner, der kanonische', () => {
   it('trägt die Tarife und die Deckelung weiterhin VOR dem Rechner', () => {
     const tarife = text.indexOf('Welcher Tarif passt zu wie vielen Anrufen?');
     expect(tarife).toBeGreaterThan(-1);
-    expect(tarife).toBeLessThan(text.indexOf('Tarif nach unserer Zuordnungsregel'));
+    expect(tarife).toBeLessThan(text.indexOf('Passender Tarif nach Kontingent'));
   });
 });
 
@@ -253,10 +253,10 @@ describe('Preisseite — die Obergrenze ist auf die Telefonie bezogen', () => {
     }
   });
 
-  it('nennt den Bezug der Obergrenze: Grundpreis und Mehrverbrauch', () => {
-    expect(text).toContain('Grundpreis');
-    expect(text).toContain('Mehrverbrauch');
-    expect(text).toMatch(/Für Grundpreis und Mehrverbrauch kostet es nie mehr als die ausgewiesene Obergrenze/);
+  it('nennt die Obergrenze als ANGEGEBEN und verweist ihre Geltung ins Angebot', () => {
+    expect(text).toMatch(/angegebene Obergrenze/i);
+    expect(text).toContain('legt Ihr Angebot fest');
+    expect(text).not.toMatch(/kostet es nie mehr als|Mehrverbrauch zu \d|0,39/);
   });
 
   it('sagt ausdrücklich, dass die Telefonie-Obergrenze nicht die Endsumme ist', () => {
@@ -271,10 +271,10 @@ describe('Preisseite — die Obergrenze ist auf die Telefonie bezogen', () => {
     expect(text).not.toMatch(/zusätzlich zur Obergrenze|kommen zur Obergrenze hinzu|außerhalb der Obergrenze/);
   });
 
-  it('beschriftet die Tarifzeilen der Obergrenzenliste als Telefoniekosten', () => {
-    expect(text).toContain('Telefonie höchstens 500 € im Monat');
-    expect(text).toContain('Telefonie höchstens 800 € im Monat');
-    expect(text).toContain('Telefonie höchstens 1.400 € im Monat');
+  it('beschriftet die Tarifzeilen der Obergrenzenliste als angegebene Werte', () => {
+    expect(text).toContain('angegebene Obergrenze 500 € im Monat');
+    expect(text).toContain('angegebene Obergrenze 800 € im Monat');
+    expect(text).toContain('angegebene Obergrenze 1.400 € im Monat');
   });
 });
 
@@ -284,22 +284,24 @@ describe('Preisseite — die Geschäftspreise sind unverändert', () => {
     Jede Zahl unten stammt aus TARIFE / FAKTEN / SPRACHEN_PREISE und steht
     hier als Wache gegen eine stille Preisänderung im Zuge einer Copy-Korrektur.
   */
-  it('zeigt Grundpreise, Kontingente und Einrichtung unverändert', () => {
+  it('zeigt Grundpreise, Kontingente und angegebene Obergrenzen unverändert; Einrichtung ohne Staffel', () => {
     const norm = (v: string) => v.replace(/\s+/g, ' ');
     for (const t of TARIFE) {
       expect(text).toContain(norm(t.monatlich));
-      expect(text).toContain(norm(t.einrichtung));
       expect(text).toContain(norm(t.obergrenze));
     }
     expect(TARIFE.map((t) => t.monatlichEur)).toEqual([300, 500, 800]);
     expect(TARIFE.map((t) => t.obergrenzeEur)).toEqual([500, 800, 1400]);
-    expect(TARIFE.map((t) => t.einrichtungEur)).toEqual([1490, 2490, 3490]);
     expect(TARIFE.map((t) => t.minuten)).toEqual([500, 1000, 2000]);
+    // Die alte Staffel 1.490 / 2.490 / 3.490 € steht nirgends mehr; die
+    // Einrichtung ist ein Standardaufwand mit offenem Betrag (OWNER-INPUT J10).
+    expect(text).not.toMatch(/1\.490|2\.490|3\.490/);
+    expect(text).toContain(EINRICHTUNG.kurz);
   });
 
-  it('hält den Minutenpreis bei 0,39 €', () => {
-    expect(FAKTEN.mehrpreisProMinuteEur).toBe(0.39);
-    expect(text).toContain('0,39');
+  it('nennt keinen Minutenpreis und keine Mehrminutenformel', () => {
+    expect(FAKTEN).not.toHaveProperty('mehrpreisProMinuteEur');
+    expect(text).not.toMatch(/0,39|je weitere Minute|jede weitere Minute/);
   });
 
   it('hält den bestätigten Preis für eine Zusatzsprache bei 79 €', () => {

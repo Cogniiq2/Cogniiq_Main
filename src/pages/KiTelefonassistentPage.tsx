@@ -431,7 +431,7 @@ function PrimaryCta({ className = "" }: { className?: string }) {
     <Link
       to={PRIMARY_CTA.to}
       onClick={() => trackEvent("cta_demo_click", PRIMARY_CTA.label)}
-      className={`inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg ${className}`}
+      className={`inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-[15px] hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg ${className}`}
     >
       <Phone size={15} aria-hidden="true" />
       {PRIMARY_CTA.label}
@@ -659,7 +659,7 @@ function HeroCallPanel() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Festes Minutenkontingent", detail: `Darüber ${FAKTEN.mehrpreisProMinute}/Min., gedeckelt auf die Obergrenze Ihres Tarifs` },
+    { label: "Festes Minutenkontingent", detail: "Fester Monatspreis; Minuten über dem Kontingent stehen im Angebot" },
     { label: "Rufumleitung", detail: "Anrufe laufen auf die vereinbarte Nummer" },
     { label: "Termine im Gespräch", detail: "Gebucht, verschoben oder storniert — bei eingerichteter Anbindung" },
     // „Europäische Server" ist eine Aussage zum Verarbeitungsort und damit

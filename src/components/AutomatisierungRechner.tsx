@@ -523,7 +523,7 @@ export function AutomatisierungRechner() {
           <Link
             to="/kontakt"
             onClick={() => trackEvent("automation_cta_clicked", "rechner")}
-            className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
           >
             Prozess besprechen und einschätzen lassen
             <ArrowRight size={16} />

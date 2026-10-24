@@ -47,6 +47,7 @@ import {
   UMKEHRBARKEIT,
   RECHNER,
 } from "@/lib/telefonassistent-copy";
+import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
 
 const base = BUSINESS_INFO.website;
 
@@ -147,8 +148,7 @@ const CARD_ALT =
 const DOT =
   "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
 /** Primärer CTA, ≥ 44 px Tap-Ziel (§1.6). */
-const CTA_PRIMARY =
-  "inline-flex items-center gap-2 px-7 py-4 min-h-[44px] bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[16px] hover:bg-gray-700 dark:hover:bg-white transition-colors";
+const CTA_PRIMARY = CTA_PRIMARY_CLASS;
 
 export function PraxenPage() {
   return (
@@ -557,48 +557,27 @@ export function PraxenPage() {
             <p className={`${PROSE} mb-4`}>{DECKELUNG.tarifwechsel}</p>
             <p className={`${PROSE} mb-10`}>{DECKELUNG.nichtProBehandler}</p>
 
-            {/* Tarife als Karten — auf dem Handy kein horizontales Scrollen */}
-            <div className="grid md:grid-cols-3 gap-5">
+            {/* Die Tarifkarten stehen seit dem 24.10.2026 nur noch auf der
+                Kostenseite (eine Preisquelle, eine Darstellung). Der Hub nennt
+                die Kontingente und verlinkt. */}
+            <ul className="grid md:grid-cols-3 gap-5">
               {TARIFE.map((t) => (
-                <div key={t.name} className={CARD}>
-                  <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                <li key={t.name} className={CARD}>
+                  <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2">
                     {t.name}
                   </p>
-                  <p className="text-[28px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-none mb-1">
-                    {t.monatlich}
+                  <p className={PROSE}>
+                    {t.minuten.toLocaleString("de-DE")} Minuten im Monat für {t.monatlich}; bei rund
+                    zwei Minuten je Anruf ungefähr {t.anrufeCa.toLocaleString("de-DE")} Anrufe.
                   </p>
-                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">
-                    im Monat
-                  </p>
-                  <dl className="space-y-2.5 text-[16px]">
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Kontingent</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.minuten.toLocaleString("de-DE")} Min.
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">entspricht</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        ca. {t.anrufeCa.toLocaleString("de-DE")} Anrufe
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Obergrenze</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.obergrenze}
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Einrichtung</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.einrichtung}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
+            <p className={`${PROSE} mt-6`}>
+              Die Einrichtung ist bei allen drei Tarifen derselbe Standardaufwand; ihr Betrag
+              steht im Angebot. Angegebene Obergrenzen, Zusatzsprachen und Vertragsrahmen stehen
+              auf der Kostenseite.
+            </p>
             <p className={`${PROSE} mt-6`}>{TARIF_ENTERPRISE}</p>
 
             <div className={`${CARD} mt-8`}>
@@ -634,37 +613,25 @@ export function PraxenPage() {
           nachsatz={RECHNER.anbindungsHinweis}
         />
 
-        {/* ── 14 · M19 Umkehrbarkeit ── */}
-        <section className={SECTION_ALT}>
+        {/* ── 14/15 · Vertrag und Grenzen der Passung: seit dem 24.10.2026 nur
+            noch als Kurzfassung mit Verweis. Die vollständigen Blöcke M19
+            (Umkehrbarkeit) und M16 (Wann wir nicht passen) stehen auf der
+            Produktseite und der Kostenseite; dreimal derselbe Text auf drei
+            Seiten einer Familie war ein Befund des Reviews. ── */}
+        <section className={SECTION_ALT} aria-labelledby="vertrag-heading">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{UMKEHRBARKEIT.headline}</h2>
-            <dl className="space-y-5 mb-8">
-              {UMKEHRBARKEIT.fakten.map((f) => (
-                <div key={f.label} className={CARD_ALT}>
-                  <dt className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    {f.label}
-                  </dt>
-                  <dd className={PROSE}>{f.wert}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className={PROSE}>{UMKEHRBARKEIT.vetorecht}</p>
-          </div>
-        </section>
-
-        {/* ── 15 · M16 Wann wir nicht passen ── */}
-        <section className={SECTION}>
-          <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{NICHT_PASSEND.headline}</h2>
-            <p className={`${PROSE} mb-8`}>{NICHT_PASSEND.intro}</p>
-            <ul className="space-y-5">
-              {NICHT_PASSEND.points.map((point, i) => (
-                <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
-                  <span className={DOT} />
-                  {point}
-                </li>
-              ))}
-            </ul>
+            <h2 id="vertrag-heading" className={H2}>{UMKEHRBARKEIT.headline}</h2>
+            <p className={`${PROSE} mb-5`}>
+              {FAKTEN.laufzeit} {FAKTEN.kuendigung} {FAKTEN.preisgarantie}
+            </p>
+            <p className={`${PROSE} mb-5`}>{NICHT_PASSEND.intro}</p>
+            <Link
+              to="/kosten-ki-telefonassistent"
+              className="inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent-ink hover:text-pub-signal-ink transition-colors"
+            >
+              Laufzeit, Kündigung, Testphase und die Fälle, in denen wir abraten
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
           </div>
         </section>
 

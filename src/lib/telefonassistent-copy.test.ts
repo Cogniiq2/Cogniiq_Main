@@ -44,7 +44,6 @@ const CLUSTER = [
  * eine Änderung gehört.
  */
 const KERNZAHLEN: Array<{ literal: RegExp; quelle: string }> = [
-  { literal: /0,39\s?€/, quelle: "FAKTEN.mehrpreisProMinute bzw. FAKTEN.deckelung" },
   { literal: /1\.400\s?€/, quelle: "TARIFE (obergrenze) bzw. FAKTEN.deckelung" },
   { literal: /(zwei\s+Wochen|\b14\s?Tage[n]?)\s+nach\s+Zahlungseingang/, quelle: "FAKTEN.uebergabeGarantie" },
   { literal: /innerhalb\s+von\s+3\s?Tagen/, quelle: "FAKTEN.aenderungen" },
@@ -80,7 +79,9 @@ describe("Kernaussagen liegen an genau einer Stelle", () => {
     for (const tarif of TARIFE) {
       expect(FAKTEN.deckelung).toContain(tarif.obergrenze);
     }
-    expect(FAKTEN.deckelung).toContain(FAKTEN.mehrpreisProMinute);
+    // Kein Minutenpreis mehr (24.10.2026): Konditionen über dem Kontingent stehen im Angebot.
+    expect(FAKTEN.deckelung).not.toMatch(/0,39|je Minute|jede weitere Minute/);
+    expect(FAKTEN.deckelung).toContain("Angebot");
     // Die Zusage spricht die Frist aus ("zwei Wochen"), sie beziffert sie nicht.
     // Beide Formen muessen dieselbe Frist meinen — sonst steht eine Zusage mit
     // Geldfolge im Markt, die der Vertrag nicht deckt (Korrektur 23.08.2026).

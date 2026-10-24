@@ -56,7 +56,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       ],
     },
     warumCogniiq: [
-      `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
+      "Festes Minutenkontingent zum festen Monatspreis; Minuten über dem Kontingent und Einmalposten stehen vor Vertragsschluss im Angebot",
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
       "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",
       "Ihre Anrufe werden auf die vereinbarte Nummer umgeleitet – was dafür an Ihrem Anschluss nötig ist, sehen wir uns vor dem Angebot an",
@@ -442,7 +442,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       ],
     },
     warumCogniiq: [
-      `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
+      "Festes Minutenkontingent zum festen Monatspreis; Minuten über dem Kontingent und Einmalposten stehen vor Vertragsschluss im Angebot",
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
       // Keine pauschale Übergabe-Zusage: ob Kalender, CRM oder Buchungssystem
       // angebunden werden können, entscheidet die Prüfung des konkreten Systems
@@ -805,12 +805,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
         "In München sitzen Privatpraxen, Kanzleien, Beratungen, Immobilienbüros, Hotels und Gastronomie dicht beieinander und konkurrieren um dieselben Kunden – und um dieselben Fachkräfte. Anrufer erwarten schnelle Reaktion, ein erheblicher Teil spricht Englisch, und dauerhaft besetzte Telefonplätze sind bei Münchner Personalkosten schwer darstellbar.",
         "Der Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist oder der Betrieb geschlossen hat – morgens vor Öffnung, abends, am Wochenende, in Urlaubszeiten. Wiederkehrende Fragen beantwortet er nach Ihren Vorgaben, Terminwünsche erfasst er nach Ihren Regeln, komplexe Anliegen übergibt er strukturiert an das zuständige Teammitglied. Mehrsprachige Konfiguration ist möglich – üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage.",
         "Entscheidend ist dabei nicht die Technik, sondern der Zuschnitt: Ein Assistent überzeugt erst, wenn die Ansagen zum Haus passen, die Regeln den Abläufen folgen und das Ergebnis im richtigen System ankommt. Deshalb beginnt jedes Projekt mit einem Aufnahmegespräch über Ihre tatsächlichen Anrufe – und endet erst nach einer Testphase, in der Sie den Assistenten selbst gehört und freigegeben haben.",
-        `Cogniiq betreut Münchner Projekte vollständig remote; persönliche Termine im Raum München sind auf Anfrage möglich. Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört dazu, Gespräche werden nicht aufgezeichnet. Die Kosten sind fest vereinbart – ein Monatsbetrag für ein definiertes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. und gedeckelt auf die Obergrenze Ihres Tarifs.`,
+        `Cogniiq betreut Münchner Projekte vollständig remote; persönliche Termine im Raum München sind auf Anfrage möglich. Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört dazu, Gespräche werden nicht aufgezeichnet. Die Kosten sind fest vereinbart – ein Monatsbetrag für ein definiertes Minutenkontingent; Minuten über dem Kontingent stehen im Angebot.`,
         "Als Teil einer digitalen Gesamtaufstellung lässt sich der Telefonassistent mit [Prozessautomatisierung für München](/muenchen/automatisierung) und [Webdesign für München](/muenchen/webdesign) kombinieren – Anfragen annehmen, verarbeiten und sichtbar sein greifen ineinander.",
       ],
     },
     warumCogniiq: [
-      `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
+      "Festes Minutenkontingent zum festen Monatspreis; Minuten über dem Kontingent und Einmalposten stehen vor Vertragsschluss im Angebot",
       "Mehrsprachige Konfiguration möglich: üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage",
       "Vollständige Remote-Einrichtung – persönliche Termine im Raum München auf Anfrage",
       "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",

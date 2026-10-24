@@ -921,7 +921,7 @@ export function ProzessautomatisierungHub() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-white font-semibold transition-colors"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-pub-signal text-white hover:bg-pub-signal-ink font-semibold transition-colors"
                 >
                   Erstgespräch vereinbaren <ArrowRight size={16} />
                 </Link>

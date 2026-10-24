@@ -212,7 +212,7 @@ export function NationalIndustryPage({ config }: Props) {
                 <div className="flex flex-wrap gap-3 mb-10">
                   <Link
                     to="/kontakt"
-                    className="inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+                    className="inline-flex items-center gap-2.5 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-[15px] hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
                   >
                     <Phone size={14} />
                     Kostenloses Erstgespräch
@@ -351,7 +351,7 @@ export function NationalIndustryPage({ config }: Props) {
                 </p>
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-[15px] hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
                 >
                   Lösung anfragen
                   <ArrowRight size={14} />
@@ -503,7 +503,7 @@ export function NationalIndustryPage({ config }: Props) {
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-[15px] hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
                 >
                   <Phone size={14} />
                   Kostenloses Erstgespräch
@@ -649,7 +649,7 @@ export function NationalIndustryPage({ config }: Props) {
               <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
+                  className="inline-flex items-center gap-2.5 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-[15px] hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={14} />

@@ -221,7 +221,7 @@ function HeroSection({
           <div className="flex flex-wrap gap-4">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
             >
               {config.hero.ctaLabel}
               <ArrowRight size={16} />
@@ -631,7 +631,7 @@ function CTASection({ config }: { config: ClusterPageConfig }) {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
             >
               {config.hero.ctaLabel}
               <ArrowRight size={16} />

@@ -170,19 +170,11 @@ const FAQ: Array<{ question: string; answer: string }> = [
     question: "Wie steht es um Schweigepflicht und Datenschutz?",
     answer: `${DATENSCHUTZ_PUNKTE.slice(0, 5).map((p) => p.replace(/\.$/, "")).join(". ")}. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung braucht, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen zu.`,
   },
-  {
-    question: "Was kostet ein KI-Telefonassistent für eine Arztpraxis?",
-    answer: `Jeder Tarif enthält ein festes Minutenkontingent zu einem festen Monatspreis; abgerechnet wird pro Praxis, nicht pro Behandler. ${FAKTEN.deckelung} Alle Tarife, Kontingente und die Einrichtung im Detail stehen auf der Kostenseite.`,
-  },
-  {
-    question: "Wie lange dauert die Einrichtung?",
-    answer: `${FAKTEN.uebergabeGarantie} ${FAKTEN.freigabeNachUebergabe}`,
-  },
 ];
 
 const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
 const PROSE = "text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]";
-const LINK = "underline underline-offset-4 hover:no-underline";
+const LINK = "text-pub-accent-ink underline underline-offset-4 decoration-pub-accent-line hover:no-underline";
 const STRONG = "font-semibold text-gray-900 dark:text-gray-100";
 const SECTION = "py-14";
 const SECTION_ALT = "py-14 bg-gray-50 dark:bg-gray-900/40";
@@ -260,7 +252,7 @@ export function KiTelefonassistentArzt() {
           <div className="flex flex-col sm:flex-row gap-3 mt-9">
             <Link
               to="/kontakt"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3.5 text-[16px] font-semibold min-h-[44px]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-pub-signal text-white hover:bg-pub-signal-ink px-6 py-3.5 text-[16px] font-semibold min-h-[44px]"
             >
               Unverbindliches Erstgespräch vereinbaren
               <ArrowRight size={16} aria-hidden="true" />
@@ -354,7 +346,7 @@ export function KiTelefonassistentArzt() {
                 key={a.anlass}
                 className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-6"
               >
-                <p className="text-[14px] uppercase tracking-wide text-gray-500 dark:text-gray-500">
+                <p className="text-[14px] uppercase tracking-wide text-pub-accent-ink dark:text-blue-300">
                   {REGEL_LABEL[a.regel]}
                 </p>
                 <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mt-1">
@@ -595,7 +587,7 @@ export function KiTelefonassistentArzt() {
             </p>
             <p>
               <Link to="/kosten-ki-telefonassistent" className={`${LINK} ${STRONG}`}>
-                Alle Tarife, Kontingente und Obergrenzen für Praxen
+                Alle Tarife und Kontingente für Praxen
               </Link>
             </p>
           </div>
@@ -603,7 +595,7 @@ export function KiTelefonassistentArzt() {
             <RechnerCta
               ankertext="Was es bei Ihrem Anrufaufkommen kostet"
               kontext="arztpraxis"
-              einleitung="Anrufe pro Monat und Minuten pro Anruf eingeben – der Rechner zeigt Tarif, Monatsbetrag und Einrichtung, und was noch offen ist, steht als offen da."
+              einleitung="Anrufe pro Monat und Minuten pro Anruf eingeben – der Rechner zeigt den Tarif nach Kontingent und den Monatsbetrag; Einrichtung und Anbindung stehen als offene Positionen dabei."
             />
           </div>
         </div>
@@ -695,7 +687,7 @@ export function KiTelefonassistentArzt() {
                 Was ein KI-Telefonassistent kostet
               </Link>
               <span className="block text-gray-600 dark:text-gray-400">
-                Tarife, Kontingente, Obergrenzen, Einrichtung – und ein Rechner ohne Anmeldung.
+                Tarife, Kontingente, Einrichtung – und ein Rechner ohne Anmeldung.
               </span>
             </li>
             <li>
@@ -727,7 +719,7 @@ export function KiTelefonassistentArzt() {
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <Link
                 to="/kontakt"
-                className="inline-flex items-center justify-center rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 text-[17px] font-semibold min-h-[44px]"
+                className="inline-flex items-center justify-center rounded-xl bg-pub-signal text-white hover:bg-pub-signal-ink px-6 py-3 text-[17px] font-semibold min-h-[44px]"
               >
                 Anrufanlässe gemeinsam durchgehen
               </Link>

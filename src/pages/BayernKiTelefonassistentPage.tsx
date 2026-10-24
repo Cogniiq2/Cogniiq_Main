@@ -199,7 +199,7 @@ function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-3 mb-12">
             <Link
               to="/ki-telefonassistent/demo"
-              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
             >
               <Phone size={16} />
               Kostenlose Demo buchen
@@ -562,7 +562,7 @@ function DemoCtaSection() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/ki-telefonassistent/demo"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
               >
                 <Phone size={16} />
                 Kostenlose Demo buchen
@@ -655,7 +655,7 @@ function FinalCtaSection() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
             <Link
               to="/ki-telefonassistent/demo"
-              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5"
             >
               <Phone size={16} />
               Kostenlose Demo buchen

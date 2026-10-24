@@ -112,7 +112,7 @@ export function ProblemPage({ config }: Props) {
               <div className="flex flex-wrap gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />
@@ -214,7 +214,7 @@ export function ProblemPage({ config }: Props) {
                 </p>
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
                 >
                   Erstgespräch vereinbaren
                   <ArrowRight size={15} />
@@ -321,7 +321,7 @@ export function ProblemPage({ config }: Props) {
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />

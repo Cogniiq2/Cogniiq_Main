@@ -9,7 +9,7 @@
 // Kontingent, eine Minute darüber, exakt am Deckel, darüber.
 // ─────────────────────────────────────────────────────────────────────────────
 import { describe, expect, it } from "vitest";
-import { FAKTEN, SPRACHEN, SPRACHEN_PREISE, TARIFE } from "./telefonassistent-copy";
+import { EINRICHTUNG, FAKTEN, SPRACHEN, SPRACHEN_PREISE, TARIFE } from "./telefonassistent-copy";
 import {
   UNBEKANNT,
   UNVOLLSTAENDIG,
@@ -50,11 +50,16 @@ describe("Die numerischen Zwillinge stimmen mit den Anzeigetexten überein", () 
   it.each(TARIFE)("$name: Zahl und String sagen dasselbe", (t) => {
     expect(alsZahl(t.monatlich)).toBe(t.monatlichEur);
     expect(alsZahl(t.obergrenze)).toBe(t.obergrenzeEur);
-    expect(alsZahl(t.einrichtung)).toBe(t.einrichtungEur);
   });
 
-  it("Mehrpreis je Minute stimmt mit FAKTEN.mehrpreisProMinute überein", () => {
-    expect(alsZahl(FAKTEN.mehrpreisProMinute)).toBe(FAKTEN.mehrpreisProMinuteEur);
+  it("die Einrichtung ist kein Tariffeld mehr — ein Standard, Betrag offen", () => {
+    for (const t of TARIFE) {
+      expect(t).not.toHaveProperty("einrichtung");
+      expect(t).not.toHaveProperty("einrichtungEur");
+    }
+    expect(EINRICHTUNG.betragOffen).toBe(true);
+    expect(EINRICHTUNG.kurz).toMatch(/Angebot/);
+    expect(FAKTEN).not.toHaveProperty("mehrpreisProMinute");
   });
 
   it("Der eindeutige Sprachpreis steht so auch im Fließtext", () => {
@@ -115,81 +120,59 @@ describe("Minutenbedarf", () => {
   });
 });
 
-describe("Tarifwahl und Deckelung", () => {
-  it("null Minuten: kleinster Tarif, kein Mehrverbrauch", () => {
+describe("Tarifwahl nach Kontingent", () => {
+  it("null Minuten: kleinster Tarif, Kontingent reicht", () => {
     const s = waehleSzenario(0)!;
     expect(s.tarif.name).toBe(BASIS.name);
     expect(s.mehrverbrauchMinuten).toBe(0);
+    expect(s.passt).toBe(true);
     expect(s.telefonieMonatlichEur).toBe(BASIS.monatlichEur);
-    expect(s.amDeckel).toBe(false);
   });
 
-  it("exakt am Kontingent: noch kein Mehrverbrauch", () => {
+  it("exakt am Kontingent: Basis passt noch", () => {
     const s = waehleSzenario(BASIS.minuten)!;
     expect(s.tarif.name).toBe(BASIS.name);
-    expect(s.mehrverbrauchMinuten).toBe(0);
     expect(s.telefonieMonatlichEur).toBe(BASIS.monatlichEur);
   });
 
-  it("eine Minute über dem Kontingent: genau ein Minutenpreis mehr", () => {
+  it("eine Minute über dem Basis-Kontingent: der nächste Tarif, kein Minutenpreis", () => {
     const s = waehleSzenario(BASIS.minuten + 1)!;
-    expect(s.tarif.name).toBe(BASIS.name);
-    expect(s.mehrverbrauchMinuten).toBe(1);
-    expect(s.telefonieMonatlichEur).toBeCloseTo(
-      BASIS.monatlichEur + FAKTEN.mehrpreisProMinuteEur,
-      10
-    );
+    expect(s.tarif.name).toBe(PRAXIS.name);
+    expect(s.telefonieMonatlichEur).toBe(PRAXIS.monatlichEur);
+    // Basis liegt im Vergleich als „überschritten" mit offenem Betrag.
+    const basis = tarifVergleich(BASIS.minuten + 1)[0];
+    expect(basis.passt).toBe(false);
+    expect(basis.mehrverbrauchMinuten).toBe(1);
+    expect(basis.telefonieMonatlichEur).toBe(OFFEN);
   });
 
-  it("überschreitet der Basistarif seinen Deckel, greift der nächste Tarif", () => {
-    // Basis erreicht 500 € bei 300 € + 0,39 €/Min → 512,82 Minuten über 500,
-    // also ab 1.013 Minuten (aufgerundet). Ab dort ist Basis „am Deckel" und
-    // fällt nach Regel 3 aus der Auswahl.
-    const deckelMinuten = BASIS.minuten + (BASIS.obergrenzeEur - BASIS.monatlichEur) / FAKTEN.mehrpreisProMinuteEur;
-    const s = waehleSzenario(Math.ceil(deckelMinuten))!;
-    expect(s.tarif.name).not.toBe(BASIS.name);
-  });
-
-  it("wählt den günstigsten Tarif, der NICHT am Deckel läuft", () => {
-    const minuten = 1200;
-    const s = waehleSzenario(minuten)!;
-    expect(s.amDeckel).toBe(false);
-    // Kein anderer Tarif ohne Deckel ist billiger.
-    for (const t of TARIFE) {
-      const ueber = Math.max(0, minuten - t.minuten);
-      const roh = t.monatlichEur + ueber * FAKTEN.mehrpreisProMinuteEur;
-      if (roh < t.obergrenzeEur) {
-        expect(s.telefonieMonatlichEur).toBeLessThanOrEqual(roh);
-      }
+  it("jede Kontingentgrenze: knapp darunter, genau darauf, knapp darüber", () => {
+    for (let i = 0; i < TARIFE.length; i += 1) {
+      const t = TARIFE[i];
+      expect(waehleSzenario(t.minuten - 1)!.tarif.name).toBe(t.name === BASIS.name ? BASIS.name : waehleSzenario(t.minuten - 1)!.tarif.name);
+      expect(waehleSzenario(t.minuten)!.tarif.name).toBe(t.name);
+      const darueber = waehleSzenario(t.minuten + 1);
+      if (i + 1 < TARIFE.length) expect(darueber!.tarif.name).toBe(TARIFE[i + 1].name);
+      else expect(darueber).toBeNull();
     }
   });
 
-  it("zahlt nie mehr als die Obergrenze des gewählten Tarifs", () => {
-    for (let minuten = 0; minuten <= 3500; minuten += 50) {
-      const s = waehleSzenario(minuten);
-      if (!s) continue;
-      expect(s.telefonieMonatlichEur).toBeLessThanOrEqual(s.tarif.obergrenzeEur);
-      expect(s.telefonieMonatlichEur).toBeGreaterThanOrEqual(s.tarif.monatlichEur);
+  it("der Monatspreis eines passenden Tarifs ist nie höher als sein Listenpreis", () => {
+    for (let m = 0; m <= MVZ.minuten; m += 25) {
+      const s = waehleSzenario(m)!;
+      expect(s.telefonieMonatlichEur).toBe(s.tarif.monatlichEur);
     }
   });
 
-  it("sehr hohes Aufkommen: kein Listenpreis mehr, sondern individuell", () => {
-    // Über dem Punkt, an dem auch der größte Tarif dauerhaft am Deckel liefe.
-    const mvzDeckel = MVZ.minuten + (MVZ.obergrenzeEur - MVZ.monatlichEur) / FAKTEN.mehrpreisProMinuteEur;
-    expect(waehleSzenario(Math.ceil(mvzDeckel))).toBeNull();
+  it("über dem größten Kontingent: kein Listenpreis mehr, sondern individuell", () => {
+    expect(waehleSzenario(MVZ.minuten + 1)).toBeNull();
     expect(waehleSzenario(50_000)).toBeNull();
   });
 
-  it("der mittlere Tarif wird tatsächlich irgendwo gewählt", () => {
-    // Schutz gegen eine Regel, die einen Tarif faktisch nie erreichbar macht.
+  it("jeder Tarif wird irgendwo gewählt", () => {
     const gewaehlte = new Set<string>();
-    for (let m = 0; m <= 3500; m += 25) {
-      const s = waehleSzenario(m);
-      if (s) gewaehlte.add(s.tarif.name);
-    }
-    expect(gewaehlte).toContain(BASIS.name);
-    expect(gewaehlte).toContain(PRAXIS.name);
-    expect(gewaehlte).toContain(MVZ.name);
+    for (let m = 0; m <= MVZ.minuten; m += 10) gewaehlte.add(waehleSzenario(m)!.tarif.name);
+    expect([...gewaehlte]).toEqual(TARIFE.map((t) => t.name));
   });
 });
 
@@ -228,28 +211,21 @@ describe("Sprachaufschlag", () => {
 });
 
 describe("Preisergebnis", () => {
-  it("weist die Anbindung als unbekannt aus — niemals als 0", () => {
-    const p = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 0);
+  it("weist Anbindung als unbekannt und Einrichtung als offen aus — niemals als 0", () => {
+    const p = berechnePreis({ anrufeProMonat: 100, minutenProAnruf: 2 }, 0);
     expect(p.anbindungEur).toBe(UNBEKANNT);
-    // Der eigentliche Punkt: Die unbekannte Position darf nicht still als
-    // Null in die Monatssumme eingehen.
+    expect(p.einrichtungEur).toBe(OFFEN);
     expect(p.monatlichGesamtEur).toBe(p.szenario!.telefonieMonatlichEur);
   });
 
   it("addiert einen eindeutigen Sprachaufschlag zur Monatssumme", () => {
-    const ohne = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 0);
-    const mit = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 1);
-    expect(mit.monatlichGesamtEur).toBe(
-      (ohne.monatlichGesamtEur as number) + SPRACHEN_PREISE.proSpracheEur
-    );
+    const ohne = berechnePreis({ anrufeProMonat: 100, minutenProAnruf: 2 }, 0);
+    const mit = berechnePreis({ anrufeProMonat: 100, minutenProAnruf: 2 }, 1);
+    expect(mit.monatlichGesamtEur).toBe((ohne.monatlichGesamtEur as number) + SPRACHEN_PREISE.proSpracheEur);
   });
 
   it("nennt KEINE Monatssumme, solange der Sprachaufschlag offen ist", () => {
-    const p = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 2);
-    // Die Telefonie steht fest …
-    expect(p.szenario!.telefonieMonatlichEur).toBeGreaterThan(0);
-    // … die Summe nicht. Sie ohne den offenen Posten auszuweisen wäre eine
-    // Zahl, die niedriger ist als die spätere Rechnung des Kunden.
+    const p = berechnePreis({ anrufeProMonat: 100, minutenProAnruf: 2 }, 2);
     expect(p.sprachenOffen).toBe(true);
     expect(p.monatlichGesamtEur).toBe(UNBEKANNT);
   });
@@ -259,99 +235,68 @@ describe("Preisergebnis", () => {
     expect(p.modus).toBe("standard");
     expect(p.minutenProMonat).toBe(0);
     expect(p.monatlichGesamtEur).toBe(BASIS.monatlichEur);
-    expect(p.einrichtungEur).toBe(BASIS.einrichtungEur);
   });
 
   it("im individuellen Modus gibt es keinen erfundenen Monatsbetrag", () => {
-    const p = berechnePreis({ anrufeProMonat: 5000, minutenProAnruf: 4 }, 1);
+    const p = berechnePreis({ anrufeProMonat: 5000, minutenProAnruf: 5 }, 1);
     expect(p.modus).toBe("individuell");
     expect(p.monatlichGesamtEur).toBe(UNBEKANNT);
-    expect(p.einrichtungEur).toBe(UNBEKANNT);
-    // Der eindeutige Sprachaufschlag bleibt bekannt, auch wenn der Tarif es
-    // nicht ist — zwei verschiedene Gründe für „keine Zahl".
+    expect(p.einrichtungEur).toBe(OFFEN);
     expect(p.sprachenMonatlichEur).toBe(SPRACHEN_PREISE.proSpracheEur);
   });
 });
 
 /* ───────────────────────────────────────────────────────────────────────────
-   DREI BAUSTEINE, EIN GELDSALDO — Korrektur vom 23.10.2026.
+   DREI BAUSTEINE, EIN GELDSALDO — Korrektur vom 23.10.2026; Preisbasis seit
+   24.10.2026 nach Kontingent (kein Minutenpreis, Einrichtung offen).
 
    Erwartungswerte sind von Hand hergeleitet und stehen als Literal, damit ein
    Fehler in der Implementierung nicht zugleich die Erwartung verschiebt.
-   Preis für 300 × 2 Minuten, Deutsch: Basis 300 € + 100 × 0,39 € = 339 €;
-   Einrichtung 1.490 €; bekannte Jahreskosten 12 × 339 + 1.490 = 5.558 €.
+   Preis für 200 × 2 Minuten = 400 Minuten, Deutsch: Basis, 300 € im Monat.
+   Einrichtung: offen (kein Erstjahr, keine Amortisation).
    ────────────────────────────────────────────────────────────────────────── */
-const VOLUMEN = { anrufeProMonat: 300, minutenProAnruf: 2 };
+const VOLUMEN = { anrufeProMonat: 200, minutenProAnruf: 2 };
 const PREIS = berechnePreis(VOLUMEN, 0);
 
-describe("Preisfixpunkt 300 × 2 Minuten", () => {
-  it("339 € Listenrechnung, 1.490 € Einrichtung, 5.558 € bekannte Jahreskosten", () => {
+describe("Preisfixpunkte", () => {
+  it("200 × 2 Minuten: Basis, 300 €, Einrichtung offen", () => {
     expect(PREIS.szenario!.tarif.name).toBe("Basis");
-    expect(PREIS.monatlichGesamtEur).toBeCloseTo(339, 10);
-    expect(PREIS.einrichtungEur).toBe(1490);
-    expect((PREIS.monatlichGesamtEur as number) * 12 + (PREIS.einrichtungEur as number)).toBeCloseTo(5558, 10);
+    expect(PREIS.monatlichGesamtEur).toBe(300);
+    expect(PREIS.einrichtungEur).toBe(OFFEN);
     expect(PREIS.anbindungEur).toBe(UNBEKANNT);
   });
 
-  it("legt alle drei Listentarife bei diesem Aufkommen offen", () => {
-    const v = tarifVergleich(600);
-    expect(v.map((x) => x.tarif.name)).toEqual([BASIS.name, PRAXIS.name, MVZ.name]);
-    expect(v[0].telefonieMonatlichEur).toBeCloseTo(339, 10);
-    expect(v[1].telefonieMonatlichEur).toBe(PRAXIS.monatlichEur);
-    expect(v[2].telefonieMonatlichEur).toBe(MVZ.monatlichEur);
-    expect(PREIS.vergleich).toHaveLength(TARIFE.length);
+  it("300 × 2 Minuten = 600 Minuten: Basis-Kontingent überschritten → Praxis, 500 €", () => {
+    const p = berechnePreis({ anrufeProMonat: 300, minutenProAnruf: 2 }, 0);
+    expect(p.szenario!.tarif.name).toBe("Praxis");
+    expect(p.monatlichGesamtEur).toBe(500);
+    expect(p.vergleich[0].passt).toBe(false);
+    expect(p.vergleich[0].mehrverbrauchMinuten).toBe(100);
   });
 
-  it("1.000 × 2 Minuten: Zuordnungsregel nennt MVZ, der Vergleich zeigt Basis und Praxis an der Obergrenze", () => {
+  it("1.000 × 2 Minuten = 2.000 Minuten: MVZ passt genau, 800 €", () => {
     const p = berechnePreis({ anrufeProMonat: 1000, minutenProAnruf: 2 }, 0);
     expect(p.szenario!.tarif.name).toBe("MVZ");
-    expect(p.szenario!.telefonieMonatlichEur).toBe(800);
-    const [b, pr] = p.vergleich;
-    // 300 + 1.500 × 0,39 = 885 → Deckel 500; 500 + 1.000 × 0,39 = 890 → Deckel 800.
-    expect(b.amDeckel).toBe(true);
-    expect(b.telefonieMonatlichEur).toBe(BASIS.obergrenzeEur);
-    expect(pr.amDeckel).toBe(true);
-    expect(pr.telefonieMonatlichEur).toBe(PRAXIS.obergrenzeEur);
+    expect(p.monatlichGesamtEur).toBe(800);
+    expect(p.vergleich.map((v) => v.passt)).toEqual([false, false, true]);
+  });
+
+  it("legt alle drei Listentarife offen und rechnet nirgends mit Obergrenze oder Minutenpreis", () => {
+    const v = tarifVergleich(600);
+    expect(v.map((x) => x.tarif.name)).toEqual([BASIS.name, PRAXIS.name, MVZ.name]);
+    expect(v[0].telefonieMonatlichEur).toBe(OFFEN);
+    expect(v[1].telefonieMonatlichEur).toBe(PRAXIS.monatlichEur);
+    expect(v[2].telefonieMonatlichEur).toBe(MVZ.monatlichEur);
+    for (const x of v) expect(x).not.toHaveProperty("amDeckel");
   });
 });
 
-describe("Sprachaufschlag und Obergrenze — Summe nur, wo beide Lesarten gleich sind", () => {
-  it("unter der Obergrenze ist Telefonie + Aufschlag eine Zahl", () => {
-    const p = berechnePreis(VOLUMEN, 1);
-    expect(p.monatlichGesamtEur).toBeCloseTo(339 + SPRACHEN_PREISE.proSpracheEur, 10);
-    expect(p.monatlichSpanne).toBeNull();
-  });
-
-  it("über der Obergrenze steht eine Spanne, keine stille Lesart", () => {
-    // 1.012 Minuten: Basis 300 + 512 × 0,39 = 499,68 (knapp unter 500) + 79 = 578,68 > 500.
-    const p = berechnePreis({ anrufeProMonat: 1012, minutenProAnruf: 1 }, 1);
-    expect(p.szenario!.tarif.name).toBe("Basis");
-    expect(p.monatlichGesamtEur).toBe(UNBEKANNT);
-    expect(p.monatlichSpanne).toEqual({ min: BASIS.obergrenzeEur, max: 499.68 + SPRACHEN_PREISE.proSpracheEur });
-  });
-
-  it("ohne Zusatzsprache gibt es nie eine Spanne", () => {
-    for (let m = 0; m <= 3600; m += 7) {
-      const p = berechnePreis({ anrufeProMonat: m, minutenProAnruf: 1 }, 0);
-      expect(p.monatlichSpanne).toBeNull();
-    }
-  });
-
-  it("jede Tarif- und Deckelgrenze: knapp darunter, genau darauf, knapp darüber ohne Sprung ins Falsche", () => {
-    for (const t of TARIFE) {
-      for (const m of [t.minuten - 1, t.minuten, t.minuten + 1]) {
-        const p = berechnePreis({ anrufeProMonat: m, minutenProAnruf: 1 }, 0);
-        const eigene = p.vergleich.find((v) => v.tarif.name === t.name)!;
-        expect(eigene.mehrverbrauchMinuten).toBe(Math.max(0, m - t.minuten));
-        expect(eigene.telefonieMonatlichEur).toBeLessThanOrEqual(t.obergrenzeEur);
-      }
-      const deckelMinuten = t.minuten + (t.obergrenzeEur - t.monatlichEur) / FAKTEN.mehrpreisProMinuteEur;
-      for (const m of [Math.floor(deckelMinuten) - 1, Math.floor(deckelMinuten), Math.ceil(deckelMinuten) + 1]) {
-        const eigene = tarifVergleich(m).find((v) => v.tarif.name === t.name)!;
-        expect(eigene.telefonieMonatlichEur).toBeLessThanOrEqual(t.obergrenzeEur);
-        expect(eigene.amDeckel).toBe(t.monatlichEur + eigene.mehrverbrauchEur >= t.obergrenzeEur);
-      }
-    }
+describe("Sprachaufschlag — 0, 1, 2, 3+ Zusatzsprachen", () => {
+  it("0: keine Position; 1: 79 € dazu; 2 und 3+: offen", () => {
+    expect(berechnePreis(VOLUMEN, 0).monatlichGesamtEur).toBe(300);
+    expect(berechnePreis(VOLUMEN, 1).monatlichGesamtEur).toBe(300 + SPRACHEN_PREISE.proSpracheEur);
+    expect(berechnePreis(VOLUMEN, 2).monatlichGesamtEur).toBe(UNBEKANNT);
+    expect(berechnePreis(VOLUMEN, 3).monatlichGesamtEur).toBe(UNBEKANNT);
   });
 });
 
@@ -371,10 +316,9 @@ describe("Baustein A — Zeit ist kein Geldzufluss", () => {
     expect(r.cash.umfang).toEqual({ kosten: false, termine: false });
     // Der Saldo enthält nur Geld: 0 + 0 − 339. Die alten −189 €/Monat
     // (150 − 339) dürfen nicht als Cash-Rechnung fortbestehen.
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(-339, 10);
-    expect(r.cash.saldoProMonatEur).not.toBeCloseTo(-189, 10);
-    expect(r.cash.ersteJahrSaldoEur).toBeCloseTo(-339 * 12 - 1490, 10);
-    expect(r.cash.amortisationMonate).toBeNull();
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(-300, 10);
+    expect(r.cash.saldoProMonatEur).not.toBeCloseTo(-150, 10);
+    expect(r.cash.offeneKosten).toEqual(["einrichtung", "anbindung"]);
   });
 
   it("100 % übernommen, 50 €/Stunde: 10 Stunden / 500 € Zeitwert, keine Amortisation aus dem Zeitwert", () => {
@@ -383,7 +327,7 @@ describe("Baustein A — Zeit ist kein Geldzufluss", () => {
     expect(r.zeit.zeitwertEur).toBeCloseTo(500, 10);
     // Vorher: (500 − 339) = +161 €/Monat und 9,3 Monate „hereingeholt".
     expect(r.cash.saldoProMonatEur).toBeLessThan(0);
-    expect(r.cash.amortisationMonate).toBeNull();
+    expect(r.cash).not.toHaveProperty("amortisationMonate");
   });
 
   it("ohne Restaufwand-Angabe ist das Ergebnis bedingt; mit Restaufwand wird abgezogen", () => {
@@ -410,7 +354,6 @@ describe("Baustein A — Zeit ist kein Geldzufluss", () => {
     expect(r.zeit.status).toBe("unvollstaendig");
     expect(r.zeit.fehlend).toEqual(["anrufeHeuteVomTeam"]);
     expect(r.cash.saldoProMonatEur).toBe(UNVOLLSTAENDIG);
-    expect(r.cash.amortisationMonate).toBeNull();
   });
 
   it("negative, NaN und zu große Eingaben erzeugen weder NaN noch Infinity", () => {
@@ -431,14 +374,15 @@ describe("Baustein B — nur tatsächlich entfallende Ausgaben", () => {
     const r = berechneNutzen(PREIS, mitKosten(0));
     expect(r.kosten.status).toBe("ok");
     expect(r.kosten.ersparnisEur).toBe(0);
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(-339, 10);
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(-300, 10);
   });
 
-  it("600 € entfallender Telefonservice: Saldo 261 €, Erstjahr 1.642 €, Amortisation 5,7 Monate", () => {
+  it("600 € entfallender Telefonservice: Saldo 300 €/Monat — ohne Erstjahr und Amortisation, weil die Einrichtung offen ist", () => {
     const r = berechneNutzen(PREIS, mitKosten(600));
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(261, 10);
-    expect(r.cash.ersteJahrSaldoEur).toBeCloseTo(261 * 12 - 1490, 10);
-    expect(r.cash.amortisationMonate).toBeCloseTo(1490 / 261, 10);
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(300, 10);
+    expect(r.cash.einmaligeKostenEur).toBe(OFFEN);
+    expect(r.cash).not.toHaveProperty("ersteJahrSaldoEur");
+    expect(r.cash).not.toHaveProperty("amortisationMonate");
   });
 
   it("keine Vollkosten auf Minuten: das Aufkommen ändert die Ersparnis nicht", () => {
@@ -455,7 +399,7 @@ describe("Baustein C — zusätzliche Termine nur mit Kapazität", () => {
     expect(r.termine.potenzialEur).toBe(200);
     expect(r.termine.kapazitaetUnbekannt).toBe(true);
     expect(r.termine.realisierbarEur).toBeNull();
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(-339, 10);
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(-300, 10);
   });
 
   it("0 freie Kapazität: kein realisierbarer Beitrag", () => {
@@ -475,7 +419,7 @@ describe("Baustein C — zusätzliche Termine nur mit Kapazität", () => {
     const r = berechneNutzen(PREIS, mitTerminen({ zusaetzlicheTermine: 0, deckungsbeitragEur: 40, freieKapazitaet: 8 }));
     expect(r.termine.status).toBe("ok");
     expect(r.termine.realisierbarEur).toBe(0);
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(-339, 10);
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(-300, 10);
   });
 
   it("erzeugt keine Fälle aus Anrufversuchen — es gibt kein Feld für verpasste Anrufe", () => {
@@ -486,17 +430,15 @@ describe("Baustein C — zusätzliche Termine nur mit Kapazität", () => {
 });
 
 describe("Geldsaldo — nur Geld, nur bekannte Kosten", () => {
-  it("Fixture: 600 € Ersparnis + 5 × 40 € realisierbar − 339 € = 461 €/Monat; 4.042 €/Jahr; 3,23 Monate", () => {
+  it("Fixture: 600 € Ersparnis + 5 × 40 € realisierbar − 300 € = 500 €/Monat; kein Jahreswert ohne Einrichtungsbetrag", () => {
     const r = berechneNutzen(PREIS, {
       zeit: NICHTS.zeit,
       kosten: { aktiv: true, entfallendeAusgabenEur: 600 },
       termine: { aktiv: true, zusaetzlicheTermine: 5, deckungsbeitragEur: 40, freieKapazitaet: 8 },
     });
     expect(r.vollstaendig).toBe(true);
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(461, 10);
-    expect(r.cash.ersteJahrSaldoEur).toBeCloseTo(4042, 10);
-    expect(r.cash.amortisationMonate).toBeCloseTo(1490 / 461, 4);
-    expect(r.cash.offeneKosten).toEqual(["anbindung"]);
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(500, 10);
+    expect(r.cash.offeneKosten).toEqual(["einrichtung", "anbindung"]);
     expect(r.cash.kapazitaetskonflikt).toBe(true);
   });
 
@@ -511,8 +453,6 @@ describe("Geldsaldo — nur Geld, nur bekannte Kosten", () => {
     const r = berechneNutzen(PREIS, NICHTS);
     expect(r.vollstaendig).toBe(false);
     expect(r.cash.saldoProMonatEur).toBe(UNVOLLSTAENDIG);
-    expect(r.cash.ersteJahrSaldoEur).toBe(UNVOLLSTAENDIG);
-    expect(r.cash.amortisationMonate).toBeNull();
   });
 
   it("ein unvollständiger aktiver Baustein blockiert den Saldo, auch wenn ein anderer vollständig ist", () => {
@@ -522,23 +462,17 @@ describe("Geldsaldo — nur Geld, nur bekannte Kosten", () => {
     expect(r.cash.saldoProMonatEur).toBe(UNVOLLSTAENDIG);
   });
 
-  it("Saldo ≤ 0: keine Amortisation, negativer Wert sichtbar", () => {
+  it("Saldo ≤ 0: negativer Wert sichtbar, nicht versteckt", () => {
     const r = berechneNutzen(PREIS, mitKosten(100));
-    expect(r.cash.saldoProMonatEur).toBeCloseTo(-239, 10);
-    expect(r.cash.ersteJahrSaldoEur).toBeLessThan(0);
-    expect(r.cash.amortisationMonate).toBeNull();
-    const exakt = berechneNutzen(PREIS, mitKosten(339));
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(-200, 10);
+    const exakt = berechneNutzen(PREIS, mitKosten(300));
     expect(exakt.cash.saldoProMonatEur).toBeCloseTo(0, 10);
-    expect(exakt.cash.amortisationMonate).toBeNull();
   });
 
-  it("ohne bezifferbaren Preis (individuell, offene Sprachen, Spanne) gibt es keinen Saldo", () => {
+  it("ohne bezifferbaren Preis (individuell, offene Sprachen) gibt es keinen Saldo", () => {
     const riesig = { anrufeProMonat: 5000, minutenProAnruf: 5 };
     expect(berechneNutzen(berechnePreis(riesig, 0), mitKosten(600)).cash.saldoProMonatEur).toBe(UNBEKANNT);
     expect(berechneNutzen(berechnePreis(VOLUMEN, 3), mitKosten(600)).cash.saldoProMonatEur).toBe(UNBEKANNT);
-    const spanne = berechnePreis({ anrufeProMonat: 1012, minutenProAnruf: 1 }, 1);
-    expect(spanne.monatlichSpanne).not.toBeNull();
-    expect(berechneNutzen(spanne, mitKosten(600)).cash.saldoProMonatEur).toBe(UNBEKANNT);
   });
 
   it("über eine Matrix aus Eingaben: unvollständig heißt nie eine Zahl, vollständig heißt endlich", () => {
@@ -554,7 +488,6 @@ describe("Geldsaldo — nur Geld, nur bekannte Kosten", () => {
           expect(Number.isFinite(r.cash.saldoProMonatEur as number)).toBe(true);
         } else {
           expect(typeof r.cash.saldoProMonatEur).not.toBe("number");
-          expect(r.cash.amortisationMonate).toBeNull();
         }
       }
     }
