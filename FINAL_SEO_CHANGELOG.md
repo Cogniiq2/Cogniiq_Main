@@ -65,3 +65,49 @@ Drittkosten. Dokumentiert in `FINAL_SEO_RELEASE_AUDIT.md` §Owner-Inputs und `OW
 `FINAL_SEO_RELEASE_AUDIT.md`, `FINAL_SEO_CHANGELOG.md` (dieses), `FINAL_KEYWORD_OWNERSHIP.md`,
 `FINAL_EXTERNAL_AUTHORITY_PLAN.md`, `RELEASE_CHECKLIST.md`; Verweise in `SEO_AUDIT_2026.md`,
 `SEO_CHANGELOG.md`; Messzeilen in `docs/seo/organic-growth-scoreboard.md`; Owner-Fragen in `OWNER-INPUT.md`.
+
+---
+
+# Durchgang 24.10.2026 — SEO, blaue Markendetails, Preislogik
+
+Branch `claude/seo-design-pricing-2026-10` (von `claude/seo-release-fixes-2026-10` @ `ce42080`).
+Kein Deploy, kein Merge. Vorrang hatten die Besitzerangaben aus dem Auftrag vom 24.10.2026.
+
+## C · Preislogik
+
+| Datei / Stelle | Ursache | Vorher → Nachher | Test | Rollback |
+|---|---|---|---|---|
+| `src/lib/telefonassistent-copy.ts` · `TARIFE` | Einrichtungsgebühr nach Tarifnamen gestaffelt (1.490 / 2.490 / 3.490 €); Inhaber: Aufwand ist gleich | Felder `einrichtung`/`einrichtungEur` entfernt; neues `EINRICHTUNG` (Standard gleich für alle, Betrag **offen**, Sonderintegration getrennt nach Prüfung). Monatspreise, Kontingente, angegebene Obergrenzen unverändert | `telefonassistent-rechner.test.ts` „kein Tariffeld mehr"; `KostenKiTelefonassistent.test.tsx` „keine Staffel im Text" | `git checkout ce42080 -- src/lib/telefonassistent-copy.ts` (bringt die Staffel zurück – nicht empfohlen) |
+| ebd. · `FAKTEN` | `mehrpreisProMinute` 0,39 € + Deckelungsformel als Vertragsregel; nicht bestätigt | Minutenpreis entfernt; `deckelung` nennt Kontingent, Monatspreis, **angegebene** Obergrenzen und verweist Mehrminuten/Geltung ins Angebot; `deckelungGeltung` sagt ausdrücklich „kein garantierter Höchstbetrag"; `deckelungKurz` „Festes Kontingent, fester Monatspreis"; `tarifzuordnung` ohne „günstigster Tarif" | `telefonassistent-copy.test.ts` (keine 0,39-Literal, Angebotsverweis); `rechner-konsistenz` „tippt keinen Minutenpreis" | wie oben |
+| ebd. · `DECKELUNG`, `GENERISCH_DECKELUNG`, `KOMPAKT_KOSTEN`, `ANBIETER_CHECKLISTE`, `EINRICHTUNG_PROJEKT.intro` | Überschriften/Sätze „Zuerst die Obergrenze", „kostet es nie mehr als", „gedeckelt" | „Ein Kontingent, ein Monatspreis – und was das Angebot festlegt"; Standardaufwand-Satz | Prerender-Suche nach „gedeckelt/nie mehr als" = 0 Treffer auf den 8 Seiten | — |
+| `src/lib/telefonassistent-rechner.ts` | Tarifwahl über Mehrminuten × 0,39 € und Deckel; Erstjahr/Amortisation aus Einrichtungsbetrag | `waehleSzenario` = kleinster Tarif, dessen Kontingent reicht; darüber `OFFEN`/individuell; `einrichtungEur` immer `OFFEN`; `CashErgebnis` ohne `ersteJahrSaldoEur`/`amortisationMonate`; `offeneKosten = ["einrichtung","anbindung"]` | 60 Kerntests + `grenzfaelle` (jede Kontingentgrenze ±1, 0/1/2/3 Sprachen, individuell) | `git checkout ce42080 -- src/lib/telefonassistent-rechner.ts src/components/TelefonRechner.tsx` + Tests |
+| `src/components/TelefonRechner.tsx` | Zeilen Mehrverbrauch/Telefonie-Deckel/Spanne; Einrichtung als Zahl; Erstjahr/Amortisation | „Passender Tarif nach Kontingent", „Monatspreis" mit Hinweis auf angegebene Obergrenze, Einrichtung „einmalig, Betrag im Angebot", Vergleichstabelle „passt / Kontingent überschritten", Ergebnis ohne Erstjahr/Amortisation und mit Einrichtung „offen"; Startbeispiel 200 × 2 Min (= Basis) | `homepageVerdichtung`, `KostenKiTelefonassistent`, `KiTelefonassistentPage.rechner` | wie oben |
+| `src/pages/costs/KostenKiTelefonassistent.tsx` | JSON-LD mit Setup-Offers je Tarif; FAQ „Warum kostet die Einrichtung so viel", Minutenpreis-Satz; Kartenzeile Einrichtung/Obergrenze; Marktzeile „Mehrverbrauch zu 0,39 €/Min., gedeckelt" | Setup-Offers entfernt (nur Monats-Offers); FAQ „Was kostet die Einrichtung – und warum ist sie in jedem Tarif gleich?"; „pro Minute" ohne Satz; Karten „angegebene Obergrenze" + `EINRICHTUNG.kurz`; Liste „angegebene Obergrenze X im Monat"; Marktzeile verweist Konditionen ins Angebot und sagt, dass die anderen Zeilen Marktmodelle sind; Description „einheitlicher Standard-Einrichtung" | `KostenKiTelefonassistent.test.tsx` (Obergrenze angegeben, keine Staffel, kein Minutenpreis) | Datei auf `ce42080` |
+| `src/pages/PraxenPage.tsx` | zweite vollständige Tarifkarten-Darstellung (Dopplung der Kostenseite) | Kurzliste (Kontingent, Monatspreis, ca.-Anrufe mit Annahme) + Satz zur Einrichtung + Link | Prerender | Karten zurück |
+| `src/pages/industries/KiTelefonassistentArzt.tsx`, `src/pages/industries/KiTelefonassistentPraxis.tsx`, `src/pages/KiTelefonassistentPage.tsx`, `src/lib/standorte-service-configs.ts` (4 Stellen) | „darüber 0,39 €/Min., gedeckelt" | „Festes Minutenkontingent zum festen Monatspreis; Minuten über dem Kontingent stehen im Angebot" | `telefonassistent-copy.test.ts` „tippt keine Kernzahl selbst" | — |
+| `src/lib/routing/publicRoutes.ts` (`/kosten-ki-telefonassistent`) | Description „gedeckelter Telefonie" | „einheitlicher Standard-Einrichtung" | Manifest-Test | — |
+
+**Bewusst NICHT geändert:** Monatspreise, Kontingente, angegebene Obergrenzen (Zahlen), 79 € je Zusatzsprache, Laufzeit/Aufschlag/Preisgarantie-Sätze, Enterprise „ab 5.000 €". **Nicht gesetzt:** ein Betrag für die einheitliche Einrichtung (J10), ein Minutenpreis (J12), eine Definition der Obergrenze (J11), ein Preis für Sonderintegration (J13).
+
+## B · Blaue Markendetails
+
+| Datei | Änderung | Grenze |
+|---|---|---|
+| `src/components/public/PublicUI.tsx` | `PubButton.primary` → `bg-pub-signal`/`hover:bg-pub-signal-ink` (weiß auf Signal 6,27:1); `secondary` Hover in Signalblau; neue `CTA_PRIMARY_CLASS`/`CTA_SECONDARY_CLASS` | eine gefüllte Signalfläche je Viewport bleibt die Regel |
+| `src/index.css` | Token-Kommentar: Inhaber-Entscheidung 24.10. dokumentiert (ersetzt die 23.08-Reservierung von Signal für Links/Fokus) | keine neuen Farbwerte |
+| 19 Seiten/Komponenten, 36 handgerollte primäre Buttons (`bg-gray-900 … text-white` + `font-semibold` + `rounded`) | → `bg-pub-signal text-white hover:bg-pub-signal-ink` (Skript, nur Button-Klassenstrings) | Chat-Blase auf dem Flagship (kein Button) unverändert; Dashboard/App/Consent nicht angefasst |
+| `PraxenPage`, `KostenKiTelefonassistent`, `IntegrationenPage`, `DatenschutzSicherheitPage` | `CTA_PRIMARY` → `CTA_PRIMARY_CLASS` | — |
+| `TelefonRechner` | Tarif-Pille, Sprach-Chips, aktive Bausteine und Info-Icon in Signal/Signal-Wash | Preise/Beträge bleiben Ink – Blau hebt keinen Preis oder Vorteil hervor |
+| `KiTelefonassistentArzt` | kontextuelle Links `text-pub-accent-ink`, Karten-Eyebrow der Anrufanlässe in Akzentblau | keine Headline, kein Absatz blau |
+
+Geprüfte Bildschirmgrößen: **keine** (kein Browser-Screenshot-Lauf möglich; siehe RELEASE_CHECKLIST).
+
+## A · SEO
+
+| URL | Entscheidung |
+|---|---|
+| `/ki-telefonassistent-arzt` | 2 FAQ entfernt, deren Themen eigene Abschnitte haben (Kosten, Einrichtungsdauer); Rechner-CTA-Text ohne „Einrichtung zeigt"; Links „Alle Tarife und Kontingente" |
+| `/praxen` | Tarifkarten → Kurzliste; M19/M16 → Kurzfassung mit Link; Router nach dem Hero bleibt |
+| `/kosten-ki-telefonassistent` | Markt- und Eigenpreise getrennt beschriftet (siehe C) |
+| `/ki-telefonassistent`, `/ki-telefonassistent-zahnarztpraxis`, `/regensburg/website-relaunch`, `/webdesign` | nur gemeinsame Komponenten (Button-Farbe, `GRENZEN`/`KOMPAKT_KOSTEN`-Sätze); Titel/H1/Struktur unverändert |
+| `/webdesign-agentur-deutschland` | 301 → `/webdesign` in `_redirects` (beide Formen) und `LEGACY_REDIRECTS`; nicht im Manifest, nicht in der Sitemap; keine internen Links darauf (nur Kommentare) |

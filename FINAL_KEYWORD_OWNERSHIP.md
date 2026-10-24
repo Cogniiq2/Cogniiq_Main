@@ -37,3 +37,10 @@ Query×Page mit identischem Zeitraum, Suchtyp und Land-/Gerätefilter; vergleich
 frühere Zeiträume; Google-selected canonical / Indexierungsdaten für `/webdesign`,
 `/webdesign-agentur-deutschland`, `/ki-telefonassistent-praxis`. Keine URL-Löschung
 oder 301 allein aus semantischer Ähnlichkeit.
+
+## Nachtrag 24.10.2026
+
+Zuordnung unverändert. Abgrenzung geschärft: `/praxen` trägt keine zweite Tarifkarten-Darstellung
+und keine vollständigen Vertrags-/„Wann wir nicht passen"-Blöcke mehr (Kurzfassung + Link auf die
+Kostenseite); `/ki-telefonassistent-arzt` ohne FAQ zu Kosten und Einrichtungsdauer (eigene Abschnitte).
+Preis-Intention bleibt vollständig bei `/kosten-ki-telefonassistent`.

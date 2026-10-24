@@ -135,3 +135,45 @@ Query×Page-Export, SERP-Snapshots, GSC-Canonical-Prüfung, J9-Bestätigung.
 ## Externe Aufgaben
 
 `FINAL_EXTERNAL_AUTHORITY_PLAN.md`.
+
+---
+
+# Nachtrag 24.10.2026 — Preislogik, blaue Markendetails, Seitenabgrenzung
+
+Branch `claude/seo-design-pricing-2026-10`. Vorrang: Auftrag und Besitzerangaben vom 24.10.2026.
+
+## Konflikte mit bestehenden Dokumenten (dokumentiert, Auftrag hat Vorrang)
+
+| Dokument / Code | Bisherige Aussage | Entscheidung 24.10. |
+|---|---|---|
+| `OWNER-INPUT.md` A (17.08.), `TARIFE` | Einrichtung je Tarif 1.490 / 2.490 / 3.490 € | Standardaufwand gleich; Staffel entfernt; Betrag offen (J10) |
+| `FAKTEN.deckelung`, `DECKELUNG`, Kosten-/Praxen-/Arzt-Seite, Rechner | „jede weitere Minute 0,39 €", „gedeckelt auf die Obergrenze" | kein Minutenpreis, keine Deckelungsrechnung; Obergrenze nur „angegeben", Geltung laut Angebot (J11/J12) |
+| `COPY-CLAIMS-TO-VERIFY.md` F10/Z1 | Zuordnung nach günstigstem Gesamtpreis als offene Zusage | Zusage aus Copy und Rechner entfernt; Tarif = kleinstes ausreichendes Kontingent |
+| `src/index.css` (23.08.), `PublicUI` (Kommentar) | Primärbutton schwarz, Signal nur für Links/Fokus | Primärbutton Signalblau; Rationierung „eine Signalfläche je Viewport" bleibt |
+| `FINAL_SEO_RELEASE_AUDIT.md` (23.10.) Rechnermodell | Erstjahr = 12 × Saldo − Einrichtung; Amortisation | entfällt, bis der Einrichtungsbetrag freigegeben ist |
+| `SEO_AUDIT_2026.md` | Fixtures mit 339 € (300 × 2 Min) | Beispiel 200 × 2 Min = Basis 300 €; 600 Min → Praxis 500 € |
+
+## Setup-Preisentscheidung
+
+**Offen (Owner-Input J10).** Repository und Dokumente enthalten keine Kosten-, Zeit- oder
+Margendaten für die Einrichtung; 1.490 € wurde deshalb nicht als gemeinsamer Betrag gesetzt und
+keine Marge geschätzt. Die irreführende steigende Staffel ist entfernt; die Einrichtung steht als
+„einmalig, Betrag im Angebot – bei allen Tarifen derselbe Standardaufwand; Sonderintegration nach
+Prüfung getrennt". Diese Darstellung ist sicher und verständlich; sie ist kein neuer Preis.
+
+## Weiterhin fehlende Definitionen
+
+J10 Einrichtungsbetrag · J11 Bedeutung der Obergrenze · J12 Mehrminuten · J13 Sonderintegration ·
+J8 Steuerbasis · J4 Bezug des 20-%-Aufschlags · J5 Umfang der Preisgarantie · J7/H3 Sprachpaket ·
+J1/J2 Tarifzulässigkeit und „dauerhaft".
+
+## Deploy-Blocker (Stand 24.10.2026)
+
+1. J10–J13 unbeantwortet: Die Preisseite nennt die Einrichtung ohne Betrag und Mehrminuten ohne
+   Konditionen – vollständig, aber für ein Angebot nicht ausreichend; vor dem Deploy bestätigen,
+   dass dieser Stand öffentlich so stehen soll.
+2. Edge-Verifikation (HEAD, Robots-Header) und Mobile-Rendering nach Deploy der Preview – aus dem
+   Container weiterhin nicht möglich.
+
+Status: **NOT READY TO DEPLOY** bis J10 (oder die ausdrückliche Freigabe der offenen Darstellung)
+und die Edge-/Mobile-Prüfung vorliegen. Nichts gemergt, nichts deployt.

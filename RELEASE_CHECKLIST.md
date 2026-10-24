@@ -1,43 +1,36 @@
-# RELEASE_CHECKLIST — Branch `claude/seo-release-fixes-2026-10` (23.10.2026)
+# RELEASE_CHECKLIST — Branch `claude/seo-design-pricing-2026-10` (24.10.2026)
 
-Umgebung: Node 22.22.2, `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` als CI-Platzhalter, Chromium
-headless (vorinstalliert), `wrangler pages dev dist` lokal. **Produktion (`cogniiq.de`) und
-Preview (`511f15e7.cogniiq-main.pages.dev`) waren aus diesem Container nicht erreichbar**
-(Proxy 403 für beide Hosts, `curl` Exit 56). Alles, was nur dort prüfbar ist, steht als
-NOT VERIFIED mit dem Grund.
+Vorgänger: `claude/seo-release-fixes-2026-10` @ `ce42080` (Checkliste vom 23.10. gilt dort weiter).
+Umgebung: Node 22.22.2, `VITE_SUPABASE_*` als CI-Platzhalter, Chromium headless, `wrangler pages dev dist`
+lokal. **Produktion und Preview waren aus diesem Container nicht erreichbar** (Proxy 403); alles, was nur
+dort prüfbar ist, steht als NOT VERIFIED.
 
 | # | Prüfpunkt | Ergebnis | Evidenz |
 |---|---|---|---|
-| 1 | `npm run typecheck` | **PASS** | `tsc --noEmit -p tsconfig.app.json`, Exit 0 (inkl. `functions/_middleware.ts` über den neuen Unit-Test) |
-| 2 | `npm test` (vitest) | **PASS** | 115 Dateien · 2.805 bestanden · 1 übersprungen · 0 fehlgeschlagen; davon neu: `src/test/middleware-head.test.ts` (6), `telefonassistent-rechner.test.ts` (71 nach Umbau) |
-| 3 | `npm run build` (SSR-Build, Sitemap, Client, Prerender, `_redirects`-Prüfung) | **PASS** | Exit 0; 86 Sitemap-URLs; „dist/ was not modified" trat nur im Zwischenstand auf, bevor die `GRENZEN`-Finder in Einführen/Zahnarzt nachgezogen waren |
+| 1 | `npm run typecheck` | **PASS** | `tsc --noEmit -p tsconfig.app.json`, Exit 0 |
+| 2 | `npm test` (vitest) | **PASS** | 115 Dateien · 2.800 bestanden · 1 übersprungen · 0 fehlgeschlagen (nach Umbau: `telefonassistent-rechner.test.ts`, `…grenzfaelle`, `telefonassistent-copy.test.ts`, `rechner-konsistenz.test.tsx`, `KostenKiTelefonassistent.test.tsx`, `homepageVerdichtung.test.tsx`, `KiTelefonassistentPage.rechner.test.tsx`) |
+| 3 | `npm run build` (SSR, Sitemap, Client, Prerender, `_redirects`-Prüfung) | **PASS** | Exit 0; 86 Sitemap-URLs |
 | 4 | `npm run lint` | **PASS** | 0 Fehler, 34 Warnungen (alle bereits auf `main`) |
-| 5 | GET/HEAD-Matrix | **PASS (lokal)** / **NOT VERIFIED (Edge)** | Unit-Test mit bodyloser HEAD-Antwort: Dokument 200, 404, privater Deep-Link mit `X-Robots-Tag`, Redirect 307, kaputtes Asset 500 ohne Textbody – alt 4/6 rot, neu 6/6 grün. `wrangler pages dev`: HEAD = GET-Status, kein `X-Cogniiq-Shell-Error`, kein Body für `/`, `/ki-telefonassistent-arzt`, `/kosten-ki-telefonassistent`, `/praxen`, `/app/login`, `/completely-unknown-url` (404), `/webdesign-agentur-deutschland` (301), `/sitemap.xml`, `/robots.txt`; `/praxen/` → 307. Edge-Verhalten nach Deploy per `curl -I` nachholen |
-| 6 | Echte 404 | **PASS (lokal)** | GET und HEAD `/completely-unknown-url` → 404 mit 404-Dokument; kein Soft-404 |
-| 7 | 301 `/webdesign-agentur-deutschland` → `/webdesign`, keine Kette/Loop | **PASS (lokal)** | `dist/_redirects` Zeilen 77–78 (beide Formen); wrangler 301 → `/webdesign` (200); `legacyRedirects.test.ts` |
-| 8 | Canonical genau einmal, Produktionspfad, Ziel indexierbar | **PASS** | Prerender der 7 Prioritäts-URLs: ein `rel="canonical"` auf `https://cogniiq.de/<pfad>`, `robots index, follow`; 0 Treffer `pages.dev` in HTML und Sitemap |
-| 9 | Sitemap: nur kanonische indexierbare Ziele, keine Redirectquelle, keine Preview-Hosts | **PASS** | 86 `<loc>`, 0 Treffer `webdesign-agentur-deutschland`/`pages.dev`; `npm run sitemap` im Build |
-| 10 | robots je Umgebung | **PASS (Repo)** / **NOT VERIFIED (Preview-Header)** | Repo setzt kein Preview-`noindex`; der im Review beobachtete `X-Robots-Tag: noindex` auf der Preview kommt aus der Umgebung und darf nicht in Produktion erscheinen – nach Deploy per `curl -I https://cogniiq.de/` prüfen |
-| 11 | Title/Description, eine H1, H2/H3 | **PASS** | Prerender: je eine H1 auf Arzt, Kosten, Flagship, Praxen, Regensburg, Webdesign, Zahnarzt; Descriptions Arzt 158, Praxen 151, Kosten 157, Flagship 157, Webdesign 145 Zeichen; Regensburg 164 (unverändert, geschützt) |
-| 12 | SSR/Prerender = Hydration | **PASS** | `src/prerender.hydration.test.tsx` 19/19 gegen den frischen Build; `.github/scripts/test-browser-hydration.mjs` (echter Chromium) bestanden |
-| 13 | JSON-LD gültig, dedupliziert, keine erfundenen Ratings/Offers | **PASS** | 5 `ld+json`-Blöcke je Seite (4 auf Zahnarzt), `test-seo-consistency.mjs` bestanden; kein `AggregateRating`/`Offer` hinzugefügt; FAQ-Schema wie vor dem Durchgang, kein Rich-Result zugesagt |
-| 14 | hreflang | **PASS** | unverändert: `de-DE` je Seite, `x-default` nur auf `/` (ein Sprachcluster); nicht erweitert |
-| 15 | Interne Links, Fragmente, Haupt-CTAs | **PASS (statisch)** | `test-prerender-output.mjs` (jede indexierbare Route eingehend verlinkt, Links nur auf Manifest-Routen); Rechneranker `#preis-roi-rechner` genau einmal auf `/ki-telefonassistent`, Links von `/`, Arzt, Praxen zeigen dorthin; neuer Praxen-Router verlinkt Arzt/Zahnarzt/Therapie |
-| 16 | Formulare | **NOT VERIFIED (bewusst)** | kein Versand ausgelöst; Demo-/Kontaktpfade sind in `test-pages-routing.mjs` als Journeys abgedeckt; keine Zustellbehauptung |
-| 17 | Responsive 360/390/768/1440, 200 % Zoom, Tabellen/Rechner ohne Overflow | **NOT VERIFIED** | kein Screenshot-Lauf möglich (kein Viewport-Screenshot-Skript im Repo; Preview nicht erreichbar). Statisch: Tarifvergleich in `overflow-x-auto`, Beträge `break-words`, Eingaben `min-w-0`; Mobile-Rendering bleibt vor dem Deploy manuell zu prüfen |
-| 18 | Tastatur/Screenreader | **PASS (statisch)** / **NOT VERIFIED (AT)** | Bausteine `role="checkbox"` + `aria-checked`, Felder mit `label`/`aria-describedby`, Ergebnisbereiche `aria-live="polite"`, `Rollwert` mit `sr-only`-Endwert; kein Screenreader-Lauf |
-| 19 | Claims | **PASS (Repo)** | Notfall-Erkennung → konfigurierte Weiterleitung (Copy, Blog, CostComparison); „Hälfte", „Normalfall", „niemand hört ein Besetztzeichen", Regensburg-Garantien korrigiert; Build bricht, wenn der `GRENZEN`-Notfallpunkt fehlt |
-| 20 | Preise | **PASS (Code)** / **BLOCKER (Regeln)** | alle Beträge aus `TARIFE`/`FAKTEN`/`SPRACHEN_PREISE` (`rechner-konsistenz` „tippt keinen Betrag erneut"); Zuordnungsregel offengelegt statt „günstigster Tarif"; Sprachaufschlag als Spanne über der Obergrenze; **J1–J8 unbestätigt → NOT READY** |
-| 21 | Quellen | **PASS** (GKV, Zi) / **NOT VERIFIED** (vzbv) | GKV 39 % mit Population/Gegenstand/n; Zi 52,1 % nur auf Einführen mit Bezugsgröße; vzbv-Original nicht abrufbar, Formulierung auf die befragte Nutzergruppe eingeschränkt |
-| 22 | Gewinnerdiffs | **PASS** | Dental: 1 Zeile (Finder-String), kein Inhalt; Regensburg: 12 Zeilen (Title, Lead, Tag, 2 Sätze, 1 FAQ), H1/Struktur/Preise unverändert; keine Shared-Component-Änderung außer `GRENZEN.points[2]` (bewusst, dokumentiert) |
-| 23 | Analytics | **PASS** | nur feste Ereignisnamen/Labels (`rechner-konsistenz` Analytics-Suite); `price_calculated`/`roi_calculated` getrennt von `cta_demo_click`; keine Werte in URL/Event; Consent-Gate unverändert (`trackEvent` prüft `analytics === 'granted'`) |
-| 24 | Core Web Vitals | **NOT VERIFIED** | keine Labor- oder Feldmessung in diesem Durchgang; nichts Gegenteiliges behauptet |
-| 25 | Tatsächlich geprüfte Preview-URLs | **NONE** | Netzwerk gesperrt; alle URL-Prüfungen gegen `wrangler pages dev dist` auf 127.0.0.1 |
+| 5 | `test-seo-consistency`, `test-prerender-output`, `test-pages-routing` (inkl. HEAD-Matrix und 301), `test-deploy-cache-headers`, `test-public-theme`, `test-browser-hydration` | **PASS** | alle Exit 0 gegen den frischen Build |
+| 6 | GET/HEAD, echte 404, 301 ohne Kette | **PASS (lokal)** / **NOT VERIFIED (Edge)** | `test-pages-routing` gegen wrangler: HEAD = GET-Status, kein Shell-Error, kein Body; `/webdesign-agentur-deutschland` → 301 `/webdesign` (beide Formen, `dist/_redirects` 77–78), Ziel 200, keine Kette; 0 interne Links auf die alte URL; nicht in Sitemap |
+| 7 | Canonical genau einmal, Produktionspfad, Robots, eine H1 | **PASS** | Prerender der 8 URLs (7 Dokumente + Redirect): je eine H1, `rel=canonical` auf `https://cogniiq.de/<pfad>`, `index, follow`, 0 Treffer `pages.dev` |
+| 8 | Title/Description | **PASS** | Descriptions: Arzt 158, Kosten 165, Zahnarzt 166 (unverändert), Flagship 155, Praxen 151, Webdesign 145, Regensburg 162 (unverändert) Zeichen; Titel unverändert außer keinem – Regensburg-Titel bleibt die Fassung vom 23.10. |
+| 9 | Preise konsistent mit der zentralen Quelle | **PASS** | eine Quelle `TARIFE`/`EINRICHTUNG`/`SPRACHEN_PREISE`; auf allen 7 Dokumenten 0 Treffer „1.490/2.490/3.490", 0 Treffer „0,39", 0 Treffer „gedeckelt/kostet es nie mehr"; „angegebene Obergrenze" Kosten 13×, Praxen 2×, Arzt 1×, Flagship 1×; JSON-LD nur Monats-Offers 300/500/800 |
+| 10 | Markt- vs. Cogniiq-Preise getrennt | **PASS** | Kostenseite: Markttabelle ohne Zahlen, Cogniiq-Zeile ausdrücklich „unser Modell", Hinweis „die Zeilen darüber beschreiben Marktmodelle, keine Cogniiq-Preise" |
+| 11 | Rechner: keine Zeit-als-Geld-Rechnung, keine Amortisation ohne Einmalbetrag, offene Posten nie 0 | **PASS** | Kern ohne `ersteJahrSaldoEur`/`amortisationMonate`; `offeneKosten = ["einrichtung","anbindung"]`; Tests „Baustein A/B/C", „Geldsaldo" |
+| 12 | Blaue Details | **PASS (Code)** / **NOT VERIFIED (visuell)** | `PubButton.primary` + `CTA_PRIMARY_CLASS` + 36 handgerollte Buttons in `bg-pub-signal`; Prerender: Arzt 7, Kosten 16, Zahnarzt 5, Flagship 13, Praxen 18, Webdesign 3, Regensburg 7 Signal-Vorkommen; verbleibende schwarze Fläche: die Chat-Blase des Gesprächsbeispiels auf dem Flagship (kein Button) – bewusst; `RechnerCta` und der Stimmprobe-Play-Button ebenfalls auf Signal. Kontrast weiß/Signal 6,27:1. Keine Screenshots, keine Prüfung bei 360/390/768/1440 |
+| 13 | Claims | **PASS (Repo)** | keine neuen Garantien; Notfall nur als konfigurierte Weiterleitung; Zeit-/Kostenersparnis nur qualifiziert (Bausteine A/B/C) |
+| 14 | Gewinnerdiffs | **PASS** | Dental: 1 Zeile (Finder-String vom 23.10., kein Inhalt); Regensburg: 0 Zeilen in diesem Durchgang; beide erhalten nur die gemeinsame Button-Farbe und gemeinsame Copy-Sätze |
+| 15 | Interne Links / CTAs | **PASS (statisch)** | `test-prerender-output` (eingehende Links, nur Manifest-Ziele); Praxen-Router → Arzt/Zahnarzt/Therapie; Praxen → Kosten (Preise, Vertrag); Arzt → Kosten/Rechneranker |
+| 16 | Formulare | **NOT VERIFIED (bewusst)** | kein Versand ausgelöst |
+| 17 | Mobile 360/390/768, Desktop 1440, 200 % Zoom | **NOT VERIFIED** | kein Screenshot-Lauf möglich; statisch: Tabellen `overflow-x-auto`, Beträge `break-words` |
+| 18 | Core Web Vitals | **NOT VERIFIED** | keine Messung |
+| 19 | Tatsächlich geprüfte Preview-/Produktions-URLs | **NONE** | Netzwerk gesperrt; alle URL-Prüfungen gegen `127.0.0.1` (wrangler) |
 
-## Verbleibende Release-Blocker
+## Verbleibende Deploy-Blocker
 
-1. Tarifregeln J1–J8 (`OWNER-INPUT.md`) – ohne sie bleibt jede Preissumme eine Teilsumme und die
-   Zuordnungsregel eine veröffentlichte, aber vertraglich ungedeckte Zusage.
-2. Edge-Verifikation des HEAD-Fixes und der Preview-/Produktions-Robots-Header nach dem Deploy der
-   Preview (Punkte 5, 10).
-3. Mobile-Rendering 360/390/768 (Punkt 17) vor der Freigabe manuell prüfen.
+1. **J10 Einrichtungsbetrag** (oder ausdrückliche Freigabe, die Einrichtung öffentlich ohne Betrag
+   zu nennen) sowie J11–J13 (Obergrenze, Mehrminuten, Sonderintegration) – `OWNER-INPUT.md`.
+2. Edge-Verifikation von HEAD/Robots-Headern und Mobile-Rendering nach dem Preview-Deploy.
+
+Nichts gemergt, nichts deployt.

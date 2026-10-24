@@ -398,3 +398,39 @@ und nicht an Analysedienste gemeldet." Der Code hält das ein (nur feste
 Ereignisnamen, keine Werte in URL oder Event; geprüft durch
 `rechner-konsistenz.test.tsx`). Bitte bestätigen, dass kein weiteres Tag-Setup
 (GTM, Ads) Formularfelder oder Seitenzustand mitliest.
+
+## Nachtrag 24.10.2026 — Einrichtung, Mehrminuten, Obergrenze (Umsetzung der Inhaber-Klarstellung)
+
+Umgesetzt im Branch `claude/seo-design-pricing-2026-10`:
+
+- Die drei Monatspreise und Kontingente bleiben wie vorgegeben (300 € / 500 Min, 500 € / 1.000 Min,
+  800 € / 2.000 Min). Die Anrufzahlen 250 / 500 / 1.000 stehen überall als „ungefähr, bei rund
+  zwei Minuten je Anruf", nie als Zusicherung.
+- Die nach Tarifnamen gestaffelte Einrichtung (1.490 / 2.490 / 3.490 €) ist überall entfernt –
+  aus `TARIFE`, Preiskarten, Rechner, FAQ, JSON-LD. Die Einrichtung heißt jetzt „Standardaufwand,
+  bei allen drei Tarifen gleich; Betrag im Angebot" (`EINRICHTUNG` in `telefonassistent-copy.ts`).
+- Kein Minutenpreis mehr: „0,39 € je weitere Minute" und jede Deckelungs-Rechnung sind aus Copy
+  und Rechner entfernt. Die Obergrenzen 500 / 800 / 1.400 € stehen als **angegebene** Werte mit
+  dem Zusatz „Geltungsbereich laut Angebot" – nie als garantierter Höchstbetrag der Monatsrechnung.
+- Der Rechner nennt den kleinsten Tarif, dessen Kontingent das Aufkommen trägt; oberhalb des
+  größten Kontingents „individuell". Erstjahreskosten und Amortisation zeigt er nicht mehr, weil
+  der Einrichtungsbetrag fehlt.
+
+### J10 · Betrag der einheitlichen Standard-Einrichtung (BLOCKIEREND für Preisangaben)
+Welcher Betrag trägt Kosten (ElevenLabs, n8n, Claude, Arbeitszeit der acht Schritte) und
+Zielmarge? Ist 1.490 € dieser Betrag? Ohne Antwort bleibt die Einrichtung „im Angebot" und der
+Rechner ohne Erstjahr/Amortisation. Es wurde keine Marge geschätzt und kein Preis gesetzt.
+
+### J11 · Bedeutung der angegebenen Obergrenze
+Ist sie ein Höchstbetrag für Monatspreis + Mehrminuten, eine Kapazitätsgrenze oder etwas anderes?
+Bis zur Antwort wird sie nur „angegeben" und nicht erklärt.
+
+### J12 · Mehrminuten
+Werden Minuten über dem Kontingent berechnet (Satz, Staffel) oder führt dauerhaft höheres
+Aufkommen zum Tarifwechsel? Bis zur Antwort: „Konditionen im Angebot".
+
+### J13 · Sonderintegration
+Wie wird Mehraufwand für aufwendige, nicht verfügbare oder neu zu bauende Anbindungen bepreist
+(Stundensatz, Pauschale nach Prüfung)? Bis zur Antwort: „nach Prüfung getrennt im Angebot", ohne Betrag.
+
+Offen bleiben weiterhin J1–J9 (Steuerbasis, 20-%-Bezug, Preisgarantie-Umfang, Sprachpaket).

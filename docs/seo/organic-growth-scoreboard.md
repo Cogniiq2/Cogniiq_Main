@@ -1572,3 +1572,13 @@ vergleichbaren 28-Tage-Fenster; bei < 100 Impressionen verlängern.
 | `/ki-telefonassistent-arzt` | Patientensicht-Dopplung entfernt, Claims korrigiert, Description mit Kalenderweg-Bedingung | kein Verlust; CTR-Effekt der Description beobachten | Pos. auf „ki telefonassistent arztpraxis"; CTR | Title-Änderung aus dem SEO-Branch wirkt gleichzeitig | Abschnitt zurück, wenn Impressionen –50 % **und** Praxen gewinnt dieselbe Query |
 | `/ki-telefonassistent`, `/kosten-ki-telefonassistent` | Rechner: drei Bausteine, Tarifvergleich, keine Zeitwert-Amortisation; Descriptions korrigiert | Vertrauen/Conversion, kein Rankingziel | `price_calculated`, `roi_calculated`, `cta_demo_click`, `lead_submitted` getrennt | — | keiner (Richtigkeit) |
 | `/ki-telefonassistent-zahnarztpraxis` | **keine Änderung** | Schutz; Pos. 8,9 ist Seitenmittel, keine Top-10 für das Hauptkeyword | Dental-Queries einzeln | — | nicht automatisch bei Pos. > 12 (85 Impr. zu schwach); nur bei nachhaltiger Verschlechterung vergleichbarer Queries die additiven Absätze vom 23.10. (SEO-Branch) zurücknehmen |
+
+## Durchgang 24.10.2026 (Branch `claude/seo-design-pricing-2026-10`)
+
+| URL | Änderung | Hypothese | Signal | Rollback |
+|---|---|---|---|---|
+| `/kosten-ki-telefonassistent` | Einrichtungsstaffel entfernt, kein Minutenpreis, Obergrenze „angegeben", Setup-Offers aus dem Schema, Description ohne „gedeckelt/Garantie" | Preiswahrheit; Head bleibt bis auf Description gleich | CTR auf „ki telefonassistent kosten/preise", Rich-Result-Fehler = 0 | Description zurück; Inhalte nicht (Richtigkeit) |
+| `/praxen` | Tarifkarten → Kurzliste mit Link; M19/M16 → Kurzfassung mit Link | Hub dupliziert Kosten- und Produktseite nicht mehr | Impressionen Hub stabil; Kosten-Seite gewinnt Preis-Queries | Blöcke zurück, falls Hub –50 % bei stabilen Segmenten |
+| `/ki-telefonassistent-arzt` | 2 FAQ (Kosten, Dauer) entfernt, weil Abschnitte sie beantworten; Links in Akzentblau | Weniger Dopplung, gleiche Antworten | Position „ki telefonassistent arztpraxis" | FAQ zurück |
+| sitewide | Primäre CTAs in Signalblau (`PubButton.primary`, `CTA_PRIMARY_CLASS`, 36 handgerollte Buttons) | Kein Rankingziel; Orientierung/Conversion | `cta_*`-Events, `lead_submitted` | `PublicUI` Variante zurück |
+| `/ki-telefonassistent-zahnarztpraxis`, `/regensburg/website-relaunch` | nur gemeinsame Komponenten (Button-Farbe, `GRENZEN`-Satz, `KOMPAKT_KOSTEN.text`) | geschützt | wie oben | — |
