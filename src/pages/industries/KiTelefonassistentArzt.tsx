@@ -586,6 +586,7 @@ export function KiTelefonassistentArzt() {
             <p>
               {FAKTEN.nichtProBehandler} {FAKTEN.preisgarantie} {EINRICHTUNG.standard}
             </p>
+            <p>{FAKTEN.steuerbasisPraxis}</p>
             <p>
               <Link to="/kosten-ki-telefonassistent" className={`${LINK} ${STRONG}`}>
                 Alle Tarife und Kontingente für Praxen

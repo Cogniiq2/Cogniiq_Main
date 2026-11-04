@@ -48,6 +48,18 @@ export const FAKTEN = {
   /** Numerischer Zwilling — Rechner lesen nur diesen, nie den Anzeigetext. */
   mehrpreisProMinuteEur: 0.5,
   /*
+    STEUERBASIS — verbindliche Inhaber-Entscheidung J8 vom 04.11.2026: Alle
+    Tarifpreise, Mehrminuten, Zusatzsprachen und Einrichtungsgebühren sind
+    Nettopreise zuzüglich der gesetzlichen Umsatzsteuer (derzeit 19 %). Jede
+    Euro-Konstante in dieser Datei ist ein Nettobetrag. Ändert sich der
+    gesetzliche Satz, werden NUR diese zwei Felder angepasst; ein Test hält
+    Zahl und Anzeigeform gleich.
+  */
+  umsatzsteuerSatz: 0.19,
+  umsatzsteuerProzent: `19\u00A0%`,
+  /** Kurzer Zusatz direkt an einer Preisangabe (Karten, Tabellen, Rechner). */
+  nettoZusatz: `netto zzgl. 19\u00A0% USt.`,
+  /*
     Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
 
     Kanonische Bedeutung: 14 KALENDERTAGE ab dem Start, und sie laufen bis zur
@@ -103,18 +115,24 @@ export const FAKTEN = {
   gleichzeitigeAnrufeKurz: "Mehrere Anrufe zur selben Zeit",
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
+  /** J8 in einem Satz — steht an jedem Preisblock. */
+  steuerbasis: `Alle Preise sind Nettopreise zuzüglich der gesetzlichen Umsatzsteuer (derzeit 19\u00A0%).`,
+  /** J8 für Arztpraxen: unmissverständlich, mit der Folge für Praxen ohne
+   *  Vorsteuerabzug. Keine Steuerberatung, kein Versprechen über den
+   *  Steuerstatus einer einzelnen Praxis. */
+  steuerbasisPraxis: `Für Arztpraxen ausdrücklich: Alle genannten Beträge – Monatspreis, Mehrminuten, Zusatzsprachen und Einrichtung – gelten zuzüglich 19\u00A0% Umsatzsteuer. Kann Ihre Praxis keine Vorsteuer abziehen, wie es bei umsatzsteuerfreien heilberuflichen Leistungen üblich ist, sind die Bruttobeträge Ihre tatsächlichen Kosten; die Einordnung für Ihre Praxis trifft Ihre Steuerberatung.`,
   /** Die Abrechnungsregel in einem Satz: Kontingent, Mehrminutensatz, kein Deckel. */
-  abrechnung: `Der Monatspreis enthält das Minutenkontingent Ihres Tarifs. Jede darüber hinausgehende abrechenbare Minute kostet zusätzlich 0,50\u00A0€ – in allen drei Tarifen. Einen Preisdeckel gibt es nicht: Überschreiten Sie das Kontingent, steigt die Monatsrechnung um die Mehrminuten.`,
+  abrechnung: `Der Monatspreis enthält das Minutenkontingent Ihres Tarifs. Jede darüber hinausgehende abrechenbare Minute kostet zusätzlich 0,50\u00A0€ netto – in allen drei Tarifen. Einen Preisdeckel gibt es nicht: Überschreiten Sie das Kontingent, steigt die Monatsrechnung um die Mehrminuten.`,
 
   /** Was auf der Monatsrechnung steht und was daneben ausgewiesen wird. Nennt
    *  bewusst KEIN Dashboard und keine Warnmeldung: Eine Nutzungsauswertung im
    *  Kundenbereich und Hinweise bei 80/100 % des Kontingents sind noch nicht
    *  implementiert (OWNER-INPUT J14). */
   abrechnungGeltung:
-    "Mehrminuten weisen wir auf der Monatsrechnung nachvollziehbar aus: Grundgebühr, enthaltene und abgerechnete Minuten, Anzahl der Mehrminuten und ihr Betrag zu 0,50\u00A0€. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten stehen als eigene Positionen daneben, soweit sie anfallen.",
+    "Mehrminuten weisen wir auf der Monatsrechnung nachvollziehbar aus: Grundgebühr, enthaltene und abgerechnete Minuten, Anzahl der Mehrminuten und ihr Betrag zu 0,50\u00A0€ netto. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten stehen als eigene Positionen daneben, soweit sie anfallen. Auf die Nettosumme kommt die gesetzliche Umsatzsteuer, getrennt ausgewiesen.",
 
   /** Kurzform für Kacheln und Tabellen. */
-  abrechnungKurz: "Festes Kontingent, Mehrminuten 0,50\u00A0€",
+  abrechnungKurz: "Festes Kontingent, Mehrminuten 0,50\u00A0€ netto",
 
   /** Tarifwahl. Nennt die Rechenregel, sagt keinen Tarifwechsel zu, den der
    *  Vertrag nicht regelt. */
@@ -426,7 +444,7 @@ export const ANLIEGEN_IMMER_MENSCH: string[] = [
 /** M10 · Planbare Kosten — Vorhersehbarkeit vor Preishöhe. */
 export const PLANBARE_KOSTEN = {
   headline: "Ein Kontingent, ein Mehrminutensatz",
-  text: `${FAKTEN.abrechnung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Standard-Einrichtung von 990\u00A0€ dazu. ${FAKTEN.preisgarantie}`,
+  text: `${FAKTEN.abrechnung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Standard-Einrichtung von 990\u00A0€ netto dazu. ${FAKTEN.preisgarantie} ${FAKTEN.steuerbasis}`,
 };
 
 /**
@@ -654,9 +672,9 @@ export const EINRICHTUNG = {
   eur: 990,
   anzeige: "990\u00A0€",
   /** Kurzform für Tarifkarten und Rechner. */
-  kurz: "990\u00A0€ einmalig",
+  kurz: "990\u00A0€ netto, einmalig",
   standard:
-    "Die Standard-Einrichtung kostet in allen drei Tarifen einmalig 990\u00A0€, weil der Aufwand derselbe ist: Ihr Empfang wird nach Ihren Angaben aufgebaut, getestet und zur Freigabe übergeben.",
+    "Die Standard-Einrichtung kostet in allen drei Tarifen einmalig 990\u00A0€ netto, weil der Aufwand derselbe ist: Ihr Empfang wird nach Ihren Angaben aufgebaut, getestet und zur Freigabe übergeben.",
   sonder:
     "Ist eine Systemanbindung nach unserer Prüfung deutlich aufwendiger oder wird sie nicht unterstützt, sodass eine Sonderlösung nötig ist, bieten wir diesen Mehraufwand separat an – mit beschriebenem Umfang und Preis vor der Beauftragung. Wir behaupten nicht, dass jede Anbindung möglich ist.",
 };
@@ -687,7 +705,7 @@ export const TARIFE: Tarif[] = [
 
 /** Vierter Tarif ohne Kachel — bewusst als Fließtextzeile (Inhaber-Entscheidung). */
 export const TARIF_ENTERPRISE =
-  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000\u00A0€ im Monat.";
+  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000\u00A0€ netto im Monat.";
 /** Numerischer Zwilling der Enterprise-Untergrenze — der Rechner weist ab hier
  *  auf ein individuelles Kontingent hin, statt nur Mehrminuten aufzuaddieren. */
 export const TARIF_ENTERPRISE_AB_EUR = 5000;
@@ -762,7 +780,7 @@ export const SPRACHEN_PREISE = {
 
 export const SPRACHEN = {
   headline: "Weitere Sprachen",
-  text: "Deutsch ist enthalten und kostet nichts extra. Eine weitere Sprache kostet 79\u00A0€ im Monat. Ab zwei zusätzlichen Sprachen gilt ein Paketpreis, dessen genaue Staffelung wir Ihnen im schriftlichen Angebot nennen — wir setzen hier keinen Betrag ein, den wir nicht für jede Konstellation belegen können. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+  text: "Deutsch ist enthalten und kostet nichts extra. Eine weitere Sprache kostet 79\u00A0€ netto im Monat. Ab zwei zusätzlichen Sprachen gilt ein Paketpreis, dessen genaue Staffelung wir Ihnen im schriftlichen Angebot nennen — wir setzen hier keinen Betrag ein, den wir nicht für jede Konstellation belegen können. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
 };
 
 /**
@@ -1000,6 +1018,11 @@ export const VERTRAG = {
       wert: FAKTEN.preisgarantie,
     },
     {
+      // J8, Inhaber-Entscheidung 04.11.2026.
+      label: "Umsatzsteuer",
+      wert: FAKTEN.steuerbasis,
+    },
+    {
       label: "Zahlung der Einrichtung",
       wert: "50\u00A0% bei Vertragsabschluss, 50\u00A0% nach dem Go-live.",
     },
@@ -1102,7 +1125,7 @@ export const KOMPAKT_SAEULEN: KompaktBlock & { punkte: string[] } = {
 export const KOMPAKT_KOSTEN: KompaktBlock & { text: string } = {
   modul: "M10",
   headline: "Ein Kontingent, ein Monatspreis, ein Mehrminutensatz",
-  text: FAKTEN.abrechnung,
+  text: `${FAKTEN.abrechnung} ${FAKTEN.steuerbasis}`,
   mehr: {
     label: "Alle Tarife und Kontingente",
     href: "/kosten-ki-telefonassistent",

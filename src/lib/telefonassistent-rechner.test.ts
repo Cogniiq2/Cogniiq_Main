@@ -23,6 +23,7 @@ import {
   tarifPreis,
   tarifVergleich,
   waehleSzenario,
+  mitUmsatzsteuer,
   OFFEN,
   type NutzenEingabe,
 } from "./telefonassistent-rechner";
@@ -457,5 +458,72 @@ describe("Geldsaldo — nur Geld, nur bekannte Kosten", () => {
         }
       }
     }
+  });
+});
+
+/*
+  J8 · Umsatzsteuer (Inhaber-Entscheidung 04.11.2026). Alles netto gerechnet,
+  die Steuer genau einmal auf die Summe, Brutto = Netto + ausgewiesene Steuer.
+  Handgerechnete Erwartungswerte bei 19 %.
+*/
+describe("J8 · Umsatzsteuer: netto rechnen, einmal ausweisen", () => {
+  it.each([
+    [300, 57, 357],
+    [500, 95, 595],
+    [800, 152, 952],
+    [990, 188.1, 1178.1],
+    [79, 15.01, 94.01],
+    [600, 114, 714], // Praxis mit 200 Mehrminuten
+    [300.25, 57.05, 357.3], // 500,5 Minuten im Basis-Tarif
+  ])("%s € netto → %s € USt. → %s € brutto", (netto, ust, brutto) => {
+    const s = mitUmsatzsteuer(netto);
+    expect(s.nettoEur).toBe(netto);
+    expect(s.umsatzsteuerEur).toBe(ust);
+    expect(s.bruttoEur).toBe(brutto);
+    expect(s.nettoEur + s.umsatzsteuerEur).toBeCloseTo(s.bruttoEur, 10);
+  });
+
+  it("negative oder unsinnige Eingaben ergeben keinen negativen Steuerbetrag", () => {
+    expect(mitUmsatzsteuer(-5)).toEqual({ nettoEur: 0, umsatzsteuerEur: 0, bruttoEur: 0 });
+    expect(mitUmsatzsteuer(Number.NaN)).toEqual({ nettoEur: 0, umsatzsteuerEur: 0, bruttoEur: 0 });
+  });
+
+  it("die Tarifpreise selbst bleiben netto — keine Steuer im Monatspreis", () => {
+    for (const t of TARIFE) expect(tarifPreis(t, t.minuten).monatlichEur).toBe(t.monatlichEur);
+    expect(tarifPreis(PRAXIS, 1200).monatlichEur).toBe(600);
+  });
+
+  it("weist die Steuer einmal auf die Monatssumme aus, inklusive Zusatzsprache", () => {
+    const p = berechnePreis({ anrufeProMonat: 250, minutenProAnruf: 2 }, 1);
+    expect(p.monatlichGesamtEur).toBe(379); // 300 + 79, netto
+    expect(p.steuer.monatlich).toEqual({ nettoEur: 379, umsatzsteuerEur: 72.01, bruttoEur: 451.01 });
+    // Nicht doppelt: Brutto ist 1,19 × Netto, nicht 1,19² × Netto.
+    expect(p.steuer.monatlich !== UNBEKANNT && p.steuer.monatlich.bruttoEur).toBeCloseTo(379 * 1.19, 2);
+  });
+
+  it("Einrichtung und erstes Jahr: netto summiert, dann einmal besteuert", () => {
+    const p = berechnePreis({ anrufeProMonat: 250, minutenProAnruf: 2 }, 0);
+    expect(p.einrichtungEur).toBe(990);
+    expect(p.ersteJahrBekannteKostenEur).toBe(12 * 300 + 990);
+    expect(p.steuer.einrichtung).toEqual({ nettoEur: 990, umsatzsteuerEur: 188.1, bruttoEur: 1178.1 });
+    expect(p.steuer.ersteJahr).toEqual({ nettoEur: 4590, umsatzsteuerEur: 872.1, bruttoEur: 5462.1 });
+  });
+
+  it("offener Sprachaufschlag: keine Steuer auf eine unvollständige Summe", () => {
+    const p = berechnePreis({ anrufeProMonat: 250, minutenProAnruf: 2 }, 2);
+    expect(p.steuer.monatlich).toBe(UNBEKANNT);
+    expect(p.steuer.ersteJahr).toBe(UNBEKANNT);
+    expect(p.steuer.einrichtung.bruttoEur).toBe(1178.1);
+  });
+
+  it("Geldsaldo: netto für Betriebe mit, Steuer einmal abgezogen für Betriebe ohne Vorsteuerabzug", () => {
+    const p = berechnePreis({ anrufeProMonat: 250, minutenProAnruf: 2 }, 0);
+    const n = berechneNutzen(p, mitKosten(400));
+    expect(n.cash.saldoProMonatEur).toBe(100); // 400 − 300
+    expect(n.cash.saldoOhneVorsteuerabzugEur).toBe(43); // 400 − 357
+    const ohne = berechneNutzen(p, NICHTS);
+    expect(ohne.cash.saldoOhneVorsteuerabzugEur).toBe(UNVOLLSTAENDIG);
+    const offen = berechneNutzen(berechnePreis({ anrufeProMonat: 250, minutenProAnruf: 2 }, 2), mitKosten(400));
+    expect(offen.cash.saldoOhneVorsteuerabzugEur).toBe(UNBEKANNT);
   });
 });

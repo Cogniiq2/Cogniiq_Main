@@ -56,7 +56,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       ],
     },
     warumCogniiq: [
-      `Festes Minutenkontingent zum festen Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}`,
+      `Festes Minutenkontingent zum festen Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}; ${FAKTEN.nettoZusatz}`,
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
       "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",
       "Ihre Anrufe werden auf die vereinbarte Nummer umgeleitet – was dafür an Ihrem Anschluss nötig ist, sehen wir uns vor dem Angebot an",
@@ -87,7 +87,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Kann ich die Inhalte des Assistenten selbst anpassen?", answer: "Ja. Öffnungszeiten, Urlaubsansagen und aktuelle Hinweise ändern Sie selbst über ein Dashboard – auch kurzfristig vor Feiertagen. Für Änderungen an Gesprächslogik und Regeln haben Sie einen festen Ansprechpartner." },
       { question: "Worauf müssen Sie bei DSGVO und KI Telefonassistent achten?", answer: "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis nach § 203 StGB verpflichtet. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen. Bei der Dokumentation für Ihren Datenschutzbeauftragten unterstützen wir." },
       { question: "Welche Betriebe profitieren am meisten?", answer: "Betriebe, bei denen Telefon und eigentliche Arbeit um dieselben Hände konkurrieren: Arzt- und Zahnarztpraxen, Therapiepraxen, Gastronomie, Sportanlagen, Handwerk und lokale Dienstleister mit regelmäßigem Anrufaufkommen." },
-      { question: "Was kostet der KI Telefonassistent?", answer: `${FAKTEN.abrechnung} ${FAKTEN.tarifzuordnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot, in dem auch Einmalposten wie die Einrichtung offen ausgewiesen sind.` },
+      { question: "Was kostet der KI Telefonassistent?", answer: `${FAKTEN.abrechnung} ${FAKTEN.steuerbasis} ${FAKTEN.tarifzuordnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot, in dem auch Einmalposten wie die Einrichtung offen ausgewiesen sind.` },
       { question: "Wie schnell ist der Empfang einsatzbereit?", answer: `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} Enthalten sind Erstgespräch, Ihre Vorgaben, der Aufbau und zwei Tage Testphase. ${FAKTEN.freigabeNachUebergabe} ${FAKTEN.pruefzeitNeutral}` },
       { question: "Was unterscheidet den Assistenten von einem Telefonmenü oder Chatbot?", answer: "Ein Telefonmenü zwingt Anrufer in starre Optionen und Tastennavigation. Der Assistent arbeitet mit gesprochener Sprache: Er erfragt das Anliegen, beantwortet freigegebene Fragen und nimmt alles andere strukturiert auf – ohne dass sich jemand durch ein Menü drücken muss." },
       { question: "Können mehrere Anrufe gleichzeitig ankommen?", answer: "Ja. Der Assistent nimmt mehrere Anrufe zur selben Zeit an, statt sie in eine Warteschleife zu stellen; die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen. Das ist gerade zu Stoßzeiten der eigentliche Unterschied zum klassischen Empfang mit einer Leitung." },
@@ -442,7 +442,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       ],
     },
     warumCogniiq: [
-      `Festes Minutenkontingent zum festen Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}`,
+      `Festes Minutenkontingent zum festen Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}; ${FAKTEN.nettoZusatz}`,
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
       // Keine pauschale Übergabe-Zusage: ob Kalender, CRM oder Buchungssystem
       // angebunden werden können, entscheidet die Prüfung des konkreten Systems
@@ -476,7 +476,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Kann er Anrufe auf verschiedene Mitarbeiter weiterleiten?", answer: "Ja. Weiterleitungsregeln werden nach Thema, Uhrzeit und Verfügbarkeit konfiguriert – Sie legen fest, welches Anliegen bei wem landet." },
       { question: "Worauf müssen Sie bei DSGVO und KI Telefonassistent achten?", answer: "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis nach § 203 StGB verpflichtet. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen. Bei der Dokumentation für Ihren Datenschutzbeauftragten unterstützen wir." },
       { question: "Können wir den Assistenten vor der Entscheidung hören?", answer: "Ja. Im unverbindlichen Erstgespräch zeigen wir eine Beispielkonfiguration für Ihren Anwendungsfall. Vor dem Start testen Sie mit echten Szenarien – live geht der Assistent erst nach Ihrer Freigabe." },
-      { question: "Was kostet der KI Telefonassistent?", answer: `${FAKTEN.abrechnung} ${FAKTEN.tarifzuordnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot, in dem auch Einmalposten offen ausgewiesen sind.` },
+      { question: "Was kostet der KI Telefonassistent?", answer: `${FAKTEN.abrechnung} ${FAKTEN.steuerbasis} ${FAKTEN.tarifzuordnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot, in dem auch Einmalposten offen ausgewiesen sind.` },
       { question: "Wie unterscheidet sich der Assistent von einer klassischen Telefonanlage?", answer: "Eine Anlage leitet weiter und zeichnet auf – ohne das Anliegen zu erfassen. Der Assistent erfragt das Anliegen in gesprochener Sprache, beantwortet freigegebene Fragen, trägt Termine nach Ihren Regeln ein und übergibt alles andere strukturiert – ohne Tastenmenü und starre Optionen." },
       { question: "Kann der Assistent auch auf Englisch sprechen?", answer: "Für Betriebe mit internationalem Publikum – Tourismus, Universität, Technologie – sind mehrsprachige Konfigurationen möglich, üblicherweise Deutsch und Englisch. Den konkreten Umfang klären wir im Erstgespräch." },
       // Siehe Bayreuth: keine Zusage bestehender Anbindungen.
@@ -810,7 +810,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       ],
     },
     warumCogniiq: [
-      `Festes Minutenkontingent zum festen Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}`,
+      `Festes Minutenkontingent zum festen Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}; ${FAKTEN.nettoZusatz}`,
       "Mehrsprachige Konfiguration möglich: üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage",
       "Vollständige Remote-Einrichtung – persönliche Termine im Raum München auf Anfrage",
       "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",
@@ -838,7 +838,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     faq: [
       { question: "Kann der Assistent auf Englisch mit internationalen Kunden sprechen?", answer: "Mehrsprachige Konfigurationen sind möglich – üblicherweise Deutsch und Englisch. Wie die Sprachwahl im Gespräch abläuft und welche Sprachen Sie brauchen, klären wir im Erstgespräch und testen es vor dem Start." },
       { question: "Betreut Cogniiq Projekte in München vollständig remote?", answer: "Ja. Alle Projektphasen – Aufnahmegespräch, Ansagen, Testphase, laufende Anpassung – funktionieren remote. Persönliche Termine im Raum München sind auf Anfrage möglich." },
-      { question: "Was kostet der KI Telefonassistent für ein Münchner Unternehmen?", answer: `Dieselben Konditionen wie überall: ${FAKTEN.abrechnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot mit allen Posten.` },
+      { question: "Was kostet der KI Telefonassistent für ein Münchner Unternehmen?", answer: `Dieselben Konditionen wie überall: ${FAKTEN.abrechnung} ${FAKTEN.steuerbasis} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot mit allen Posten.` },
       { question: "Kommen unsere Kunden mit einer Computerstimme klar?", answer: "Nicht alle sofort – das nehmen wir ernst. Sie wählen die Stimme, formulieren den Begrüßungssatz und legen die Formulierungen fest. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln." },
       { question: "Was passiert bei mehreren Anrufen gleichzeitig?", answer: "Mehrere Anrufe werden zur selben Zeit angenommen, statt in eine Warteschleife zu laufen; die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen. Gerade zu Stoßzeiten wie Messen oder Ferienbeginn ist das der Unterschied zu einer einzelnen Leitung." },
       { question: "Wie schnell ist die Einrichtung?", answer: `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} Enthalten sind Erstgespräch, Ihre Vorgaben, der Aufbau und zwei Tage Testphase. ${FAKTEN.freigabeNachUebergabe} ${FAKTEN.pruefzeitNeutral}` },

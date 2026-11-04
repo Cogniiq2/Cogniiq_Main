@@ -32,8 +32,13 @@
 //     Quelle sagt nicht, worauf er sich bemisst. Er wird deshalb als Regel
 //     angezeigt, nicht als Rechenweg.
 //
-//   • Steuern. Ob die Preise netto oder brutto gelten, ist nicht bestätigt
-//     (OWNER-INPUT J8); der Rechner nennt Beträge wie die Preisliste.
+// UMSATZSTEUER (OWNER-INPUT J8, verbindlich seit 04.11.2026). Alle Beträge
+// aus der Preisliste sind NETTO. Gerechnet wird ausschließlich netto; die
+// Umsatzsteuer kommt an GENAU EINER Stelle hinzu — `mitUmsatzsteuer()` — und
+// nur auf Summen, nie auf Teilpositionen, die danach noch einmal summiert
+// werden. So kann sie nicht doppelt anfallen. Gerundet wird dabei nur der
+// Geldbetrag auf volle Cent (Netto, dann Steuer); die Minutenrundung bleibt
+// offen (J15).
 //
 //   • Kosten einer kundenspezifischen Anbindung oder Sonderlösung, inklusive
 //     Gebühren Dritter. Sie stehen erst nach der technischen Prüfung fest und
@@ -78,6 +83,29 @@ export interface VolumenEingabe {
  * mit. `3` bedeutet „drei oder mehr".
  */
 export type Zusatzsprachen = 0 | 1 | 2 | 3;
+
+// ── Umsatzsteuer ────────────────────────────────────────────────────────────
+
+/** Ein Nettobetrag mit ausgewiesener Umsatzsteuer und Bruttobetrag. */
+export interface Steuerausweis {
+  nettoEur: number;
+  umsatzsteuerEur: number;
+  bruttoEur: number;
+}
+
+const aufCent = (v: number) => Math.round((v + Number.EPSILON) * 100) / 100;
+
+/**
+ * Netto → Steuer → Brutto. Erwartet einen NETTObetrag; ein Bruttobetrag
+ * hier hinein wäre die doppelte Besteuerung, deshalb gibt es keinen zweiten
+ * Weg. Brutto ist exakt Netto + ausgewiesene Steuer, damit die angezeigten
+ * Zeilen sich auf den Cent addieren.
+ */
+export function mitUmsatzsteuer(nettoEur: number): Steuerausweis {
+  const netto = aufCent(Math.max(0, Number.isFinite(nettoEur) ? nettoEur : 0));
+  const umsatzsteuer = aufCent(netto * FAKTEN.umsatzsteuerSatz);
+  return { nettoEur: netto, umsatzsteuerEur: umsatzsteuer, bruttoEur: aufCent(netto + umsatzsteuer) };
+}
 
 // ── Ergebnisse ──────────────────────────────────────────────────────────────
 
@@ -128,6 +156,13 @@ export interface PreisErgebnis {
   individuellPruefen: boolean;
   /** Steht immer erst nach der technischen Prüfung fest. */
   anbindungEur: typeof UNBEKANNT;
+  /** Umsatzsteuer-Ausweis der netto gerechneten Summen. `UNBEKANNT`, solange
+   *  die Nettosumme offen ist. */
+  steuer: {
+    monatlich: Steuerausweis | typeof UNBEKANNT;
+    einrichtung: Steuerausweis;
+    ersteJahr: Steuerausweis | typeof UNBEKANNT;
+  };
 }
 
 // ── Preislogik ──────────────────────────────────────────────────────────────
@@ -214,6 +249,14 @@ export function berechnePreis(
       gesamt === UNBEKANNT ? UNBEKANNT : gesamt * MONATE_PRO_JAHR + EINRICHTUNG.eur,
     individuellPruefen: empfehlung.monatlichEur >= TARIF_ENTERPRISE_AB_EUR,
     anbindungEur: UNBEKANNT,
+    steuer: {
+      monatlich: gesamt === UNBEKANNT ? UNBEKANNT : mitUmsatzsteuer(gesamt),
+      einrichtung: mitUmsatzsteuer(EINRICHTUNG.eur),
+      ersteJahr:
+        gesamt === UNBEKANNT
+          ? UNBEKANNT
+          : mitUmsatzsteuer(gesamt * MONATE_PRO_JAHR + EINRICHTUNG.eur),
+    },
   };
 }
 
@@ -250,8 +293,8 @@ export function berechnePreis(
   Geldsaldo je Monat = B + C(realisierbar) − bekannte laufende Kosten.
 
   KEINE Amortisationsdauer: Eine Monatszahl bis „Einrichtung hereingeholt"
-  hinge an der offenen Anbindung und an Steuerfragen (OWNER-INPUT J8), und
-  sie würde Nutzenannahmen wie Kassenstände behandeln. Der Rechner zeigt
+  hinge an der offenen Anbindung und am Steuerstatus des Betriebs
+  (Vorsteuerabzug ja/nein), und sie würde Nutzenannahmen wie Kassenstände behandeln. Der Rechner zeigt
   stattdessen die bekannten Erstjahreskosten im Preisblock. Offene Kosten
   (Anbindung, Drittanbieter) sind in keiner Summe und machen jede Summe zu
   einer Teilsumme; die Oberfläche beschriftet das.
@@ -361,6 +404,11 @@ export interface CashErgebnis {
    *  `UNVOLLSTAENDIG`, solange ein aktiver Geldbaustein unvollständig ist oder
    *  kein Baustein aktiv ist. */
   saldoProMonatEur: Wirtschaftsbetrag;
+  /** Derselbe Saldo für einen Betrieb OHNE Vorsteuerabzug (typisch für
+   *  umsatzsteuerfreie Arztpraxen): Die Umsatzsteuer auf die laufenden Kosten
+   *  ist dann echter Aufwand und wird einmal abgezogen. Nur, wenn der
+   *  Nettosaldo eine Zahl ist; sonst derselbe Status wie dieser. */
+  saldoOhneVorsteuerabzugEur: Wirtschaftsbetrag;
   /** Positionen, die in keiner Summe stehen und deshalb jede Summe zu einer
    *  Teilsumme machen. */
   offeneKosten: readonly ["anbindung"];
@@ -504,6 +552,7 @@ export function berechneNutzen(preis: PreisErgebnis, eingabe: NutzenEingabe): Nu
       cash: {
         ...basis,
         saldoProMonatEur: UNBEKANNT,
+        saldoOhneVorsteuerabzugEur: UNBEKANNT,
         kapazitaetskonflikt,
       },
     };
@@ -518,6 +567,7 @@ export function berechneNutzen(preis: PreisErgebnis, eingabe: NutzenEingabe): Nu
       cash: {
         ...basis,
         saldoProMonatEur: UNVOLLSTAENDIG,
+        saldoOhneVorsteuerabzugEur: UNVOLLSTAENDIG,
         kapazitaetskonflikt,
       },
     };
@@ -541,6 +591,7 @@ export function berechneNutzen(preis: PreisErgebnis, eingabe: NutzenEingabe): Nu
     cash: {
       ...basis,
       saldoProMonatEur: saldo,
+      saldoOhneVorsteuerabzugEur: saldo - mitUmsatzsteuer(laufendZahl).umsatzsteuerEur,
       kapazitaetskonflikt,
     },
   };

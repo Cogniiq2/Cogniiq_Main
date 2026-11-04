@@ -455,9 +455,8 @@ Fassung dieses Dokuments (Nachtrag oben, „Betrag im Angebot", „angegebene Ob
 
 Weiter offen und für den Release relevant:
 
-### J8 · Steuerbasis (weiter offen)
-Netto oder brutto? Die Website nennt die Beträge ohne Zusatz und behauptet weder netto noch
-brutto. Vor dem Go-live klären und dann zentral in `FAKTEN` ergänzen.
+### J8 · Steuerbasis — BEANTWORTET am 04.11.2026
+~~Netto oder brutto?~~ Siehe Nachtrag 04.11.2026 unten.
 
 ### J14 · Monatlicher Nutzungsbericht und Alarme (Produktfunktion – NICHT implementiert)
 Im Repository gibt es keine Minutenerfassung, keine Abrechnungstabellen, keinen Import der
@@ -476,3 +475,36 @@ runden (empfohlen, kundenfreundlich, transparent) – oder je Gespräch auf voll
 (teurer für den Kunden, muss dann ausdrücklich im Vertrag und auf der Website stehen). Bis dahin
 rechnet der Rechner ohne Rundung und sagt: „Wie Gesprächssekunden in der Abrechnung zu Minuten
 werden, legt Ihr Vertrag fest."
+
+## Nachtrag 04.11.2026 — J8 Steuerbasis verbindlich beantwortet
+
+**Inhaber-Entscheidung:** Sämtliche Cogniiq-Tarifpreise und Einrichtungsgebühren sind
+**Nettopreise zuzüglich der gesetzlichen Umsatzsteuer (aktuell 19 %)**.
+
+| Position | netto | zzgl. 19 % USt. | brutto |
+|---|---|---|---|
+| Basis / Monat (500 Min.) | 300,00 € | 57,00 € | 357,00 € |
+| Praxis / Monat (1.000 Min.) | 500,00 € | 95,00 € | 595,00 € |
+| MVZ / Monat (2.000 Min.) | 800,00 € | 152,00 € | 952,00 € |
+| Mehrminute | 0,50 € | – | – (Steuer auf die Monatssumme) |
+| Standard-Einrichtung, einmalig | 990,00 € | 188,10 € | 1.178,10 € |
+| eine Zusatzsprache / Monat | 79,00 € | 15,01 € | 94,01 € |
+
+Umgesetzt in Branch `claude/release-fixes-2026-11`:
+
+- Eine Quelle: `FAKTEN.umsatzsteuerSatz` (0,19), `umsatzsteuerProzent`, `nettoZusatz`,
+  `steuerbasis`, `steuerbasisPraxis` in `src/lib/telefonassistent-copy.ts`. Ändert sich der
+  gesetzliche Satz, wird nur dort angepasst.
+- Rechner (`mitUmsatzsteuer()` in `telefonassistent-rechner.ts`): gerechnet wird netto; die Steuer
+  kommt genau einmal auf die Summe (Monat, Einrichtung, erstes Jahr), nicht auf Teilpositionen.
+  Geldbeträge werden dabei auf Cent gerundet (Netto, dann Steuer); die Minutenrundung bleibt J15.
+  Der Nutzenrechner zeigt zusätzlich einen Geldsaldo „ohne Vorsteuerabzug" (laufende Kosten
+  brutto), weil umsatzsteuerfreie Arztpraxen die Steuer in der Regel nicht abziehen können.
+- Kennzeichnung: Kostenseite (Karten „netto zzgl. 19 % USt.", Rechenbeispiel netto/USt./brutto,
+  Vertragsblock „Umsatzsteuer", FAQ, Meta-Description „Ab 300 € netto … zzgl. USt."), JSON-LD
+  `valueAddedTaxIncluded: false` an allen Offers; Praxen-Hub, Arzt-Seite und Kostenseite mit dem
+  ausdrücklichen Arztpraxis-Hinweis; Flagship, Kompaktblöcke, Stadtseiten, Praxis-Seite,
+  KI-Agentur-FAQ mit Steuerbasis.
+
+Die Website gibt **keine** Steuerberatung zum Status einer einzelnen Praxis; sie verweist auf die
+Steuerberatung. Weiter offen: J15 (Minutenrundung), J5, J4, J7/H3 – keiner davon blockiert.

@@ -41,7 +41,7 @@ import {
   GENERISCH_ABRECHNUNG,
 } from "@/lib/telefonassistent-copy";
 import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
-import { tarifPreis } from "@/lib/telefonassistent-rechner";
+import { mitUmsatzsteuer, tarifPreis } from "@/lib/telefonassistent-rechner";
 
 const base = BUSINESS_INFO.website;
 const url = `${base}/kosten-ki-telefonassistent`;
@@ -74,7 +74,7 @@ const faqItems = [
   {
     question: "Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
     answer:
-      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen bei rund zwei Minuten je Anruf ungefähr ${TARIFE[0].anrufeCa} Anrufen – eine Annahme, keine Zusicherung. Dazu kommt einmalig die Standard-Einrichtung Ihres Empfangs; ${EINRICHTUNG.standard.charAt(0).toLowerCase()}${EINRICHTUNG.standard.slice(1)}`,
+      `${TARIFE.map((t) => `${t.monatlich} netto im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen bei rund zwei Minuten je Anruf ungefähr ${TARIFE[0].anrufeCa} Anrufen – eine Annahme, keine Zusicherung. Dazu kommt einmalig die Standard-Einrichtung Ihres Empfangs; ${EINRICHTUNG.standard.charAt(0).toLowerCase()}${EINRICHTUNG.standard.slice(1)} ${FAKTEN.steuerbasisPraxis}`,
   },
   {
     question: "Was kostet die Einrichtung – und warum ist sie in jedem Tarif gleich?",
@@ -99,12 +99,12 @@ const faqItems = [
   {
     question: "Was kostet ein KI Telefonassistent pro Minute?",
     answer:
-      `Innerhalb des Kontingents nichts extra — die Minuten sind im Monatspreis enthalten. Rechnerisch ergibt das im kleinsten Tarif ${(TARIFE[0].monatlichEur / TARIFE[0].minuten).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} je Kontingentminute (${TARIFE[0].monatlich} für ${TARIFE[0].minuten.toLocaleString("de-DE")}\u00A0Minuten). Jede abrechenbare Minute über dem Kontingent kostet ${FAKTEN.mehrpreisProMinute}, in allen drei Tarifen und ohne Deckel. Vergleichen Sie deshalb immer den Spitzenmonat, nicht den Minutenpreis – der Rechner oben zeigt, ab welchem Aufkommen ein größerer Tarif günstiger ist.`,
+      `Innerhalb des Kontingents nichts extra — die Minuten sind im Monatspreis enthalten. Rechnerisch ergibt das im kleinsten Tarif ${(TARIFE[0].monatlichEur / TARIFE[0].minuten).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} je Kontingentminute (${TARIFE[0].monatlich} für ${TARIFE[0].minuten.toLocaleString("de-DE")}\u00A0Minuten). Jede abrechenbare Minute über dem Kontingent kostet ${FAKTEN.mehrpreisProMinute} netto, in allen drei Tarifen und ohne Deckel. Vergleichen Sie deshalb immer den Spitzenmonat, nicht den Minutenpreis – der Rechner oben zeigt, ab welchem Aufkommen ein größerer Tarif günstiger ist.`,
   },
   {
     question: "Gibt es versteckte Kosten?",
     answer:
-      `Keine Kostenposition wird still weggelassen: Grundgebühr, Kontingent, Mehrminutensatz von ${FAKTEN.mehrpreisProMinute}, Einrichtung von ${EINRICHTUNG.anzeige} und Zusatzsprachen stehen auf dieser Seite. Zwei Posten stehen bewusst als offen da, weil sie von Ihrem System abhängen: die Anbindung an Ihre Praxissoftware und Gebühren, die Dritte für eine Schnittstelle verlangen. Beides prüfen wir vor dem Angebot und nennen es dort — nicht danach. ${FAKTEN.abrechnungGeltung}`,
+      `Keine Kostenposition wird still weggelassen: Grundgebühr, Kontingent, Mehrminutensatz von ${FAKTEN.mehrpreisProMinute}, Einrichtung von ${EINRICHTUNG.anzeige} und Zusatzsprachen stehen auf dieser Seite. Zwei Posten stehen bewusst als offen da, weil sie von Ihrem System abhängen: die Anbindung an Ihre Praxissoftware und Gebühren, die Dritte für eine Schnittstelle verlangen. Beides prüfen wir vor dem Angebot und nennen es dort — nicht danach. ${FAKTEN.abrechnungGeltung} ${FAKTEN.steuerbasis}`,
   },
   {
     question: "Lohnt sich ein KI Telefonassistent für eine kleine Praxis?",
@@ -151,12 +151,14 @@ const schema = {
         ...TARIFE.map((t) => ({
           "@type": "Offer",
           name: `Tarif ${t.name}`,
-          description: `${t.minuten}\u00A0Inklusivminuten im Monat; jede weitere Minute ${FAKTEN.mehrpreisProMinute}. Bei durchschnittlich rund zwei Minuten je Anruf ungefähr ${t.anrufeCa} Anrufe.`,
+          description: `${t.minuten}\u00A0Inklusivminuten im Monat; jede weitere Minute ${FAKTEN.mehrpreisProMinute}. Bei durchschnittlich rund zwei Minuten je Anruf ungefähr ${t.anrufeCa} Anrufe. ${FAKTEN.steuerbasis}`,
           url,
           priceSpecification: {
             "@type": "UnitPriceSpecification",
             price: t.monatlichEur,
             priceCurrency: "EUR",
+            // J8: Nettopreis, Umsatzsteuer kommt hinzu.
+            valueAddedTaxIncluded: false,
             unitCode: "MON",
             billingDuration: 1,
             billingIncrement: 1,
@@ -165,12 +167,13 @@ const schema = {
         {
           "@type": "Offer",
           name: "Standard-Einrichtung (alle Tarife)",
-          description: `${EINRICHTUNG.standard} ${EINRICHTUNG.sonder}`,
+          description: `${EINRICHTUNG.standard} ${EINRICHTUNG.sonder} ${FAKTEN.steuerbasis}`,
           url,
           priceSpecification: {
             "@type": "PriceSpecification",
             price: EINRICHTUNG.eur,
             priceCurrency: "EUR",
+            valueAddedTaxIncluded: false,
           },
         },
       ],
@@ -181,6 +184,7 @@ const schema = {
 /** Rechenbeispiel für die Abrechnungsregel — aus dem Rechenkern, nicht getippt. */
 const BEISPIEL_MINUTEN = 1200;
 const BEISPIEL = tarifPreis(TARIFE[1], BEISPIEL_MINUTEN);
+const BEISPIEL_STEUER = mitUmsatzsteuer(BEISPIEL.monatlichEur);
 const euro = (v: number) =>
   v.toLocaleString("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 2 });
 
@@ -205,7 +209,7 @@ export function KostenKiTelefonassistent() {
     <>
       <PageSEO
         title="Was kostet ein KI Telefonassistent? Preise | Cogniiq"
-        description="Was kostet ein KI Telefonassistent für Praxen? Ab 300 € im Monat mit 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €. Mit Rechner."
+        description="Was kostet ein KI Telefonassistent für Praxen? Ab 300 € netto im Monat mit 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €, zzgl. USt."
         canonical={url}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -280,13 +284,21 @@ export function KostenKiTelefonassistent() {
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4 border-t border-gray-200 dark:border-gray-700 pt-2.5 font-semibold">
-                  <dt className="text-gray-900 dark:text-gray-100">Monatssumme</dt>
-                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL.monatlichEur)}</dd>
+                  <dt className="text-gray-900 dark:text-gray-100">Monatssumme netto</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL_STEUER.nettoEur)}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt>zzgl. {FAKTEN.umsatzsteuerProzent} Umsatzsteuer</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL_STEUER.umsatzsteuerEur)}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-gray-200 dark:border-gray-700 pt-2.5 font-semibold">
+                  <dt className="text-gray-900 dark:text-gray-100">Rechnungsbetrag brutto</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL_STEUER.bruttoEur)}</dd>
                 </div>
               </dl>
               <p className="text-[15px] text-gray-500 dark:text-gray-500 mt-3">
                 Beispiel mit {BEISPIEL_MINUTEN.toLocaleString("de-DE")} abgerechneten Minuten in einem
-                Monat, ohne Zusatzsprachen. Die Einrichtung ({EINRICHTUNG.anzeige}) fällt einmalig an
+                Monat, ohne Zusatzsprachen. Die Einrichtung ({EINRICHTUNG.anzeige} netto) fällt einmalig an
                 und steht nicht auf der Monatsrechnung.
               </p>
               <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-6">
@@ -317,7 +329,7 @@ export function KostenKiTelefonassistent() {
                   <p className="text-[30px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-none mb-1">
                     {t.monatlich}
                   </p>
-                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">im Monat</p>
+                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">im Monat, {FAKTEN.nettoZusatz}</p>
                   <dl className="space-y-2.5 text-[16px]">
                     <div className="flex justify-between gap-3">
                       <dt className="text-gray-500 dark:text-gray-500">Kontingent</dt>
@@ -347,6 +359,9 @@ export function KostenKiTelefonassistent() {
                 </div>
               ))}
             </div>
+
+            {/* J8 · Steuerbasis direkt unter den Preisen, ausdrücklich für Praxen */}
+            <p className={`${PROSE} mt-8`}>{FAKTEN.steuerbasisPraxis}</p>
 
             {/* 3 · Enterprise als Textzeile, ohne Kachel */}
             <p className={`${PROSE} mt-8`}>{TARIF_ENTERPRISE}</p>

@@ -569,9 +569,9 @@ export function PraxenPage() {
                     {t.name}
                   </p>
                   <p className={PROSE}>
-                    {t.minuten.toLocaleString("de-DE")} Inklusivminuten im Monat für {t.monatlich}; bei
+                    {t.minuten.toLocaleString("de-DE")} Inklusivminuten im Monat für {t.monatlich} netto; bei
                     durchschnittlich rund zwei Minuten je Anruf ungefähr{" "}
-                    {t.anrufeCa.toLocaleString("de-DE")} Anrufe. Jede weitere Minute {FAKTEN.mehrpreisProMinute}.
+                    {t.anrufeCa.toLocaleString("de-DE")} Anrufe. Jede weitere Minute {FAKTEN.mehrpreisProMinute} netto.
                   </p>
                 </li>
               ))}
@@ -580,6 +580,7 @@ export function PraxenPage() {
               {EINRICHTUNG.standard} Rechenbeispiele, Zusatzsprachen und Vertragsrahmen stehen
               auf der Kostenseite.
             </p>
+            <p className={`${PROSE} mt-6`}>{FAKTEN.steuerbasisPraxis}</p>
             <p className={`${PROSE} mt-6`}>{TARIF_ENTERPRISE}</p>
 
             <div className={`${CARD} mt-8`}>

@@ -150,7 +150,7 @@ const FAQ_ITEMS = [
     // Aus der einen Preisquelle zusammengesetzt (telefonassistent-copy.ts). Bis
     // 04.11.2026 stand hier eine frei formulierte Staffel („ab ca. 99 € …
     // 199–399 € … ab 499 €"), die den Tarifen widersprach – auch im FAQPage-JSON-LD.
-    answer: `Die veröffentlichten Tarife beginnen bei ${TARIFE[0].monatlich} im Monat mit ${TARIFE[0].minuten.toLocaleString("de-DE")} Inklusivminuten (${TARIFE[0].name}); ${TARIFE[1].name} kostet ${TARIFE[1].monatlich} mit ${TARIFE[1].minuten.toLocaleString("de-DE")} Minuten, ${TARIFE[2].name} ${TARIFE[2].monatlich} mit ${TARIFE[2].minuten.toLocaleString("de-DE")} Minuten. Jede weitere Minute kostet ${FAKTEN.mehrpreisProMinute}, die Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}. Alle Positionen und einen Rechner finden Sie auf der Kosten-Seite.`,
+    answer: `Die veröffentlichten Tarife beginnen bei ${TARIFE[0].monatlich} netto im Monat mit ${TARIFE[0].minuten.toLocaleString("de-DE")} Inklusivminuten (${TARIFE[0].name}); ${TARIFE[1].name} kostet ${TARIFE[1].monatlich} mit ${TARIFE[1].minuten.toLocaleString("de-DE")} Minuten, ${TARIFE[2].name} ${TARIFE[2].monatlich} mit ${TARIFE[2].minuten.toLocaleString("de-DE")} Minuten. Jede weitere Minute kostet ${FAKTEN.mehrpreisProMinute}, die Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}. ${FAKTEN.steuerbasis} Alle Positionen und einen Rechner finden Sie auf der Kosten-Seite.`,
   },
   {
     question: "Kann Cogniiq bestehende Telefonsysteme integrieren?",

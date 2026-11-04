@@ -74,10 +74,12 @@ function ohneKommentare(quelltext: string): string {
 describe("Preis-Meta-Description stimmt mit der zentralen Preisquelle überein", () => {
   const eur = (n: number) => `${n.toLocaleString("de-DE")} €`;
   const erwartet = [
-    `Ab ${eur(TARIFE[0].monatlichEur)} im Monat`,
+    // J8 (04.11.2026): Nettopreise, Umsatzsteuer kommt hinzu.
+    `Ab ${eur(TARIFE[0].monatlichEur)} netto im Monat`,
     `${TARIFE[0].minuten} Inklusivminuten`,
     `jede weitere Minute ${FAKTEN.mehrpreisProMinute.replace("\u00A0", " ")}`,
     `Einrichtung einmalig ${EINRICHTUNG.anzeige.replace("\u00A0", " ")}`,
+    "zzgl. USt.",
   ];
   it.each([
     "src/lib/routing/publicRoutes.ts",
@@ -282,6 +284,68 @@ describe("Zwei-Wochen-Garantie bleibt widerspruchsfrei", () => {
     }
     for (const datei of CLUSTER) {
       expect(ohneKommentare(lies(datei))).not.toMatch(VERTRAGSVERWEIS);
+    }
+  });
+});
+
+/*
+  J8 · Steuerbasis (Inhaber-Entscheidung 04.11.2026): Alle Tarifpreise,
+  Mehrminuten, Zusatzsprachen und Einrichtungsgebühren sind Nettopreise
+  zuzüglich der gesetzlichen Umsatzsteuer (derzeit 19 %). Diese Tests halten
+  fest, dass jede Seite mit Preisen das sagt, dass Arztpraxen es ausdrücklich
+  lesen und dass das Schema keine Bruttopreise behauptet.
+*/
+describe("J8 · Preise sind netto zzgl. Umsatzsteuer", () => {
+  it("Satz und Anzeigeform sind dieselbe Zahl", () => {
+    expect(FAKTEN.umsatzsteuerSatz).toBe(0.19);
+    const prozent = `${Math.round(FAKTEN.umsatzsteuerSatz * 100)}\u00A0%`;
+    expect(FAKTEN.umsatzsteuerProzent).toBe(prozent);
+    expect(FAKTEN.nettoZusatz).toContain(prozent);
+    expect(FAKTEN.steuerbasis).toContain(prozent);
+    expect(FAKTEN.steuerbasis).toMatch(/Nettopreise zuzüglich der gesetzlichen Umsatzsteuer/);
+    expect(FAKTEN.steuerbasisPraxis).toMatch(/^Für Arztpraxen ausdrücklich:/);
+    expect(FAKTEN.steuerbasisPraxis).toContain(prozent);
+  });
+
+  it("die verbindlichen Nettobeträge bleiben unverändert", () => {
+    expect(TARIFE.map((t) => t.monatlichEur)).toEqual([300, 500, 800]);
+    expect(TARIFE.map((t) => t.minuten)).toEqual([500, 1000, 2000]);
+    expect(FAKTEN.mehrpreisProMinuteEur).toBe(0.5);
+    expect(EINRICHTUNG.eur).toBe(990);
+  });
+
+  it("die Kernsätze mit Beträgen nennen die Steuerbasis", () => {
+    expect(FAKTEN.abrechnung).toContain(`${FAKTEN.mehrpreisProMinute} netto`);
+    expect(FAKTEN.abrechnungKurz).toContain("netto");
+    expect(EINRICHTUNG.standard).toContain(`${EINRICHTUNG.anzeige} netto`);
+    expect(EINRICHTUNG.kurz).toContain("netto");
+    expect(VERTRAG.fakten.find((f) => f.label === "Umsatzsteuer")?.wert).toBe(FAKTEN.steuerbasis);
+  });
+
+  it.each([
+    ["src/pages/costs/KostenKiTelefonassistent.tsx", "FAKTEN.steuerbasisPraxis"],
+    ["src/pages/PraxenPage.tsx", "FAKTEN.steuerbasisPraxis"],
+    ["src/pages/industries/KiTelefonassistentArzt.tsx", "FAKTEN.steuerbasisPraxis"],
+    ["src/components/TelefonRechner.tsx", "FAKTEN.steuerbasis"],
+    ["src/pages/KiTelefonassistentPage.tsx", "FAKTEN.steuerbasis"],
+    ["src/pages/pillars/KiAgenturDeutschland.tsx", "FAKTEN.steuerbasis"],
+    ["src/lib/standorte-service-configs.ts", "FAKTEN.steuerbasis"],
+  ])("%s weist die Steuerbasis aus", (datei, konstante) => {
+    expect(ohneKommentare(lies(datei))).toContain(konstante);
+  });
+
+  it("das Offer-Schema der Kostenseite behauptet keine Bruttopreise", () => {
+    const quelltext = ohneKommentare(lies("src/pages/costs/KostenKiTelefonassistent.tsx"));
+    const preisangaben = quelltext.match(/priceCurrency: "EUR",/g) ?? [];
+    const netto = quelltext.match(/valueAddedTaxIncluded: false,/g) ?? [];
+    expect(preisangaben.length).toBeGreaterThan(0);
+    expect(netto.length).toBe(preisangaben.length);
+    expect(quelltext).not.toMatch(/valueAddedTaxIncluded: true/);
+  });
+
+  it("keine Stelle nennt die Preise brutto oder inklusive Umsatzsteuer", () => {
+    for (const datei of [...CLUSTER, "src/lib/telefonassistent-copy.ts"]) {
+      expect(ohneKommentare(lies(datei)), datei).not.toMatch(/inkl(\.|usive)\s+(MwSt|Mehrwertsteuer)|Bruttopreise sind|Preise (sind|verstehen sich) brutto/);
     }
   });
 });

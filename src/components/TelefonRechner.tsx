@@ -44,6 +44,7 @@ import {
   berechneNutzen,
   berechnePreis,
   eur,
+  mitUmsatzsteuer,
   zahl,
   type FehlendeAngabe,
   type NutzenEingabe,
@@ -601,7 +602,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         <p className={`${HINT} mb-5`}>
           Sofort, ohne E-Mail. Grundgebühr, Mehrminuten und Einrichtung stehen
           getrennt; was vor der technischen Prüfung nicht feststeht, steht als
-          offen in der Liste – nicht als Null.
+          offen in der Liste – nicht als Null. Alle Beträge sind netto; die
+          Umsatzsteuer ({FAKTEN.umsatzsteuerProzent}) weisen wir getrennt aus.
         </p>
 
         {!volumenVollstaendig ? (
@@ -614,20 +616,20 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         {kompakt && (
           <div className="mb-6 grid gap-6 border-b border-gray-100 pb-6 dark:border-gray-800 sm:grid-cols-2 sm:gap-8">
             <Betrag
-              label="Pro Monat"
+              label="Pro Monat, netto"
               wert={eur(s.monatlichEur, 2)}
               betrag={s.monatlichEur}
               format={(n) => eur(n, 2)}
-              hinweis={
+              hinweis={`${
                 s.mehrminuten > 0
                   ? `Tarif ${s.tarif.name}: ${s.tarif.monatlich} Grundgebühr + ${zahl(s.mehrminuten, 1)} Mehrminuten × ${FAKTEN.mehrpreisProMinute}.`
                   : `Tarif ${s.tarif.name}: ${s.tarif.monatlich} Grundgebühr, ${zahl(s.inklusivMinuten)} Minuten enthalten.`
-              }
+              } Zzgl. ${FAKTEN.umsatzsteuerProzent} USt.: ${eur(mitUmsatzsteuer(s.monatlichEur).bruttoEur, 2)} brutto.`}
             />
             <Betrag
-              label="Einmalige Einrichtung"
+              label="Einmalige Einrichtung, netto"
               wert={EINRICHTUNG.anzeige}
-              hinweis="Standardumfang, in jedem Tarif gleich. Nicht im Monatspreis enthalten."
+              hinweis={`Standardumfang, in jedem Tarif gleich. Nicht im Monatspreis enthalten. Zzgl. ${FAKTEN.umsatzsteuerProzent} USt.: ${eur(preis.steuer.einrichtung.bruttoEur, 2)} brutto.`}
             />
           </div>
         )}
@@ -680,7 +682,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         )}
         {!kompakt && (
           <Zeile
-            label="Monatsrechnung (bekannte Positionen)"
+            label="Monatsrechnung netto (bekannte Positionen)"
             wert={
               preis.monatlichGesamtEur !== UNBEKANNT
                 ? eur(preis.monatlichGesamtEur, 2)
@@ -694,18 +696,35 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             }
           />
         )}
+        {!kompakt && preis.steuer.monatlich !== UNBEKANNT && (
+          <>
+            <Zeile
+              label={`zzgl. ${FAKTEN.umsatzsteuerProzent} Umsatzsteuer`}
+              wert={eur(preis.steuer.monatlich.umsatzsteuerEur, 2)}
+              hinweis="Auf die Nettosumme, einmal – nicht auf jede Position einzeln."
+            />
+            <Zeile
+              label="Monatsrechnung brutto"
+              wert={eur(preis.steuer.monatlich.bruttoEur, 2)}
+              stark
+              hinweis="Für Betriebe ohne Vorsteuerabzug – das betrifft viele Arztpraxen – ist das der tatsächliche Monatsbetrag."
+            />
+          </>
+        )}
         {!kompakt && (
           <Zeile
-            label="Einmalige Standard-Einrichtung"
+            label="Einmalige Standard-Einrichtung, netto"
             wert={EINRICHTUNG.anzeige}
-            hinweis={`${EINRICHTUNG.standard} ${EINRICHTUNG.sonder}`}
+            hinweis={`Brutto ${eur(preis.steuer.einrichtung.bruttoEur, 2)} (inkl. ${eur(preis.steuer.einrichtung.umsatzsteuerEur, 2)} USt.). ${EINRICHTUNG.standard} ${EINRICHTUNG.sonder}`}
           />
         )}
         {!kompakt && preis.ersteJahrBekannteKostenEur !== UNBEKANNT && (
           <Zeile
-            label="Erstes Jahr, bekannte Kosten"
+            label="Erstes Jahr, bekannte Kosten, netto"
             wert={eur(preis.ersteJahrBekannteKostenEur, 2)}
-            hinweis={`12 × ${eur(preis.monatlichGesamtEur as number, 2)} + ${EINRICHTUNG.anzeige} Einrichtung, bei gleichbleibendem Aufkommen. Ohne Anbindung, ohne Aufschlag für monatliche Kündbarkeit.`}
+            hinweis={`12 × ${eur(preis.monatlichGesamtEur as number, 2)} + ${EINRICHTUNG.anzeige} Einrichtung, bei gleichbleibendem Aufkommen${
+              preis.steuer.ersteJahr !== UNBEKANNT ? `; brutto ${eur(preis.steuer.ersteJahr.bruttoEur, 2)}` : ""
+            }. Ohne Anbindung, ohne Aufschlag für monatliche Kündbarkeit.`}
           />
         )}
 
@@ -735,7 +754,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                     <th scope="col" className="py-2 pr-4 font-semibold">Tarif</th>
                     <th scope="col" className="py-2 pr-4 font-semibold">Grundgebühr</th>
                     <th scope="col" className="py-2 pr-4 font-semibold">Mehrminuten</th>
-                    <th scope="col" className="py-2 font-semibold">Monat</th>
+                    <th scope="col" className="py-2 font-semibold">Monat (netto)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -771,7 +790,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             {FAKTEN.laufzeit} Wie sich dieser Aufschlag im Einzelnen bemisst,
             steht in Ihrem Angebot; diese Rechnung bildet ihn deshalb nicht ab,
             statt ihn zu raten. {FAKTEN.preisgarantie} Beträge wie in unserer
-            Preisliste; die Steuerbasis nennt Ihr Angebot.
+            Preisliste. {FAKTEN.steuerbasis}
           </span>
         </p>
           </>
@@ -902,7 +921,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             <div className="grid sm:grid-cols-2 gap-6 mb-5">
               <Zahlenfeld
                 label="Monatliche Ausgaben, die durch den Assistenten tatsächlich entfallen"
-                hinweis="Nur echte Posten: der Rechnungsbetrag eines externen Telefonservices, bezahlte Überstunden am Telefon, eine Einstellung, die dadurch nicht nötig wird. Bleibt Ihr Team beschäftigt, ist 0 die richtige Antwort – und eine gültige."
+                hinweis="Nur echte Posten: der Rechnungsbetrag eines externen Telefonservices, bezahlte Überstunden am Telefon, eine Einstellung, die dadurch nicht nötig wird. Bleibt Ihr Team beschäftigt, ist 0 die richtige Antwort – und eine gültige. Tragen Sie ein, was Sie tatsächlich weniger zahlen: mit Vorsteuerabzug netto, ohne Vorsteuerabzug brutto."
                 wert={entfallend}
                 onChange={setEntfallend}
                 min={0} max={50000} step={10} einheit="€ / Monat" schieber={false} platzhalter="z. B. 0"
@@ -1064,9 +1083,9 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               </div>
 
               <Zeile
-                label="Bekannte laufende Kosten Cogniiq"
+                label="Bekannte laufende Kosten Cogniiq, netto"
                 wert={`− ${eur(nutzen.cash.bekannteKostenProMonatEur as number, 2)}`}
-                hinweis="Monatspreis plus Zusatzsprachen. Zuzüglich offener Einrichtung und Anbindung – siehe unten."
+                hinweis="Monatspreis plus Zusatzsprachen, ohne Umsatzsteuer. Zuzüglich offener Einrichtung und Anbindung – siehe unten."
               />
               <Zeile
                 label={`Geldsaldo pro Monat${umfangText}`}
@@ -1075,13 +1094,20 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 hinweis={
                   (saldo as number) < 0
                     ? "Negativ: Mit den gewählten Geldbausteinen decken die entfallenden Ausgaben und realisierbaren Termine die bekannten laufenden Kosten nicht. Zeitgewinn und Erreichbarkeit sind damit nicht bewertet – sie werden hier aber auch nicht in Euro umgedeutet."
-                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten. Der Zeitwert aus A ist nicht enthalten; Einrichtung und Anbindung stehen darunter getrennt."
+                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten (netto). Gilt so für Betriebe mit Vorsteuerabzug. Der Zeitwert aus A ist nicht enthalten; Einrichtung und Anbindung stehen darunter getrennt."
                 }
               />
+              {typeof nutzen.cash.saldoOhneVorsteuerabzugEur === "number" && (
+                <Zeile
+                  label="Geldsaldo ohne Vorsteuerabzug"
+                  wert={eur(nutzen.cash.saldoOhneVorsteuerabzugEur)}
+                  hinweis={`Wer keine Vorsteuer abziehen kann – wie viele umsatzsteuerfreie Arztpraxen –, trägt die ${FAKTEN.umsatzsteuerProzent} Umsatzsteuer auf die laufenden Kosten selbst. Sie ist hier einmal abgezogen. Welche Zeile für Sie gilt, klärt Ihre Steuerberatung.`}
+                />
+              )}
               <Zeile
-                label="Einmalige Standard-Einrichtung"
+                label="Einmalige Standard-Einrichtung, netto"
                 wert={EINRICHTUNG.anzeige}
-                hinweis="Einmalig, nicht Teil des Monatssaldos. Eine Amortisationsdauer zeigen wir nicht: Sie hinge an der offenen Anbindung und an Annahmen, die wir nicht für Sie treffen."
+                hinweis="Einmalig, zzgl. Umsatzsteuer, nicht Teil des Monatssaldos. Eine Amortisationsdauer zeigen wir nicht: Sie hinge an der offenen Anbindung und an Annahmen, die wir nicht für Sie treffen."
               />
               <Zeile
                 label="Anbindung an Ihr System"

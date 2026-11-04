@@ -63,7 +63,7 @@ const config: NationalIndustryPageConfig = {
     "Wiederkehrende Fragen zu Zeiten, Anfahrt oder Unterlagen beantwortet der Assistent nach Ihren Vorgaben",
     "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
     "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
-    `Festes Minutenkontingent zum festen Monatspreis – jede weitere Minute ${FAKTEN.mehrpreisProMinute}`,
+    `Festes Minutenkontingent zum festen Monatspreis – jede weitere Minute ${FAKTEN.mehrpreisProMinute}; ${FAKTEN.nettoZusatz}`,
   ],
   workflow: {
     title: "So läuft ein Terminanruf in der Therapiepraxis ab",

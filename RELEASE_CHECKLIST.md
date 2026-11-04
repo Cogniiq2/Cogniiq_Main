@@ -65,3 +65,22 @@ Cloudflare-Preview waren aus dem Container erneut nicht erreichbar (Proxy 403 / 
 
 HEAD/GET, `X-Robots-Tag` und Rendering auf der echten Cloudflare-Edge (Preview und Produktion),
 Core Web Vitals/Lighthouse im Feld, Formularversand, GA4/Ads-Tags nach Einwilligung.
+
+---
+
+# Nachtrag 04.11.2026 (2) — J8 Steuerbasis umgesetzt
+
+Inhaber-Entscheidung: alle Preise netto zzgl. gesetzlicher USt. (19 %). Umsetzung und Brutto-
+Tabelle: `OWNER-INPUT.md`, Nachtrag 04.11.2026.
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| Rechenkern: Steuer einmal auf die Summe, Brutto = Netto + USt. auf den Cent | PASS (Tests für 300/500/800/990/79/600/300,25 €, Sprache, erstes Jahr, offene Summe) |
+| Keine Doppelbesteuerung (Brutto = 1,19 × Netto, Tarifpreise bleiben netto) | PASS |
+| Saldo mit/ohne Vorsteuerabzug | PASS (400 € Ersparnis bei Basis: 100 € / 43 €) |
+| Kennzeichnung auf allen Preisseiten, Arztpraxis-Hinweis auf Kosten/Praxen/Arzt | PASS (Quelltext-Tests + Prerender) |
+| JSON-LD: alle Offers `valueAddedTaxIncluded: false` | PASS |
+| Titles und H1 unverändert; einzige Head-Änderung: Kosten-Description | PASS |
+
+Damit ist **kein Owner-Input mehr deploy-blockierend**. Ergebnisse des Gesamtlaufs stehen im
+Abschlussbericht des Commits.

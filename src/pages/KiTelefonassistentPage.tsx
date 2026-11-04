@@ -214,7 +214,7 @@ const faqItems = [
   },
   {
     question: "Was kostet ein KI Telefonassistent?",
-    answer: `${FAKTEN.abrechnung} Einmalig kommt die Standard-Einrichtung von ${EINRICHTUNG.anzeige} dazu, in jedem Tarif gleich. Details finden Sie auf der Kostenseite.`,
+    answer: `${FAKTEN.abrechnung} Einmalig kommt die Standard-Einrichtung von ${EINRICHTUNG.anzeige} netto dazu, in jedem Tarif gleich. ${FAKTEN.steuerbasis} Details finden Sie auf der Kostenseite.`,
   },
 ];
 
@@ -660,7 +660,7 @@ function HeroCallPanel() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Festes Minutenkontingent", detail: `Fester Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}` },
+    { label: "Festes Minutenkontingent", detail: `Fester Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; ${FAKTEN.nettoZusatz}` },
     { label: "Rufumleitung", detail: "Anrufe laufen auf die vereinbarte Nummer" },
     { label: "Termine im Gespräch", detail: "Gebucht, verschoben oder storniert — bei eingerichteter Anbindung" },
     // „Europäische Server" ist eine Aussage zum Verarbeitungsort und damit

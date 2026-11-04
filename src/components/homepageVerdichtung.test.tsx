@@ -79,7 +79,8 @@ describe('Rechner — kompakt zeigt den Preis, voll zeigt alles', () => {
     rechner('kompakt');
     // Standard-Einrichtung 990 € einmalig in allen Tarifen (24.10.2026):
     // genau eine Zeile, getrennt vom Monatsbetrag, keine alte Staffel.
-    expect(screen.getAllByText('Einmalige Einrichtung')).toHaveLength(1);
+    // Seit J8 (04.11.2026) als Nettobetrag beschriftet.
+    expect(screen.getAllByText('Einmalige Einrichtung, netto')).toHaveLength(1);
     expect(screen.getAllByText(/^990\s€$/)).toHaveLength(1);
     expect(screen.queryByText(/1\.490|2\.490|3\.490/)).toBeNull();
   });
