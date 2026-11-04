@@ -1584,3 +1584,14 @@ vergleichbaren 28-Tage-Fenster; bei < 100 Impressionen verlängern.
 | `/ki-telefonassistent-zahnarztpraxis`, `/regensburg/website-relaunch` | nur gemeinsame Komponenten (Button-Farbe, `GRENZEN`-Satz, `KOMPAKT_KOSTEN.text`) | geschützt | wie oben | — |
 | `/kosten-ki-telefonassistent` (Nachtrag 2) | verbindliche Preise: 0,50 €/Mehrminute, 990 € Einrichtung, kein Deckel; Description „Ab 300 € … 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €" (158 Z.) | konkrete Preise in der Description heben die CTR auf Preis-Queries | CTR „ki telefonassistent kosten/preise" nach 28 Tagen ≥ Vorperiode; Misserfolg: CTR −30 % bei gleicher Position | Description-Fassung vom 23.10. |
 | TA-Cluster (Nachtrag 2) | blaue Markendetails (Eyebrows, Icons, Marker, Links, Slider) – nur Klassen | kein Rankingziel | `cta_*`/`price_calculated`-Events stabil oder steigend | Klassen zurück |
+
+## Release-Prüfung 04.11.2026 (Branch `claude/release-fixes-2026-11`, von `claude/seo-design-pricing-2026-10` @ `2936360`)
+
+Datenbasis: GSC-Werte aus dem Auftrag (Produktion, Branch nicht live; „KI Telefonassistent" 42,84 ·
+„… Arztpraxis" 39,48 · „… Kosten" 18,40 · „… Preise" 16,17). Kein Query×Page. Baseline = erstes
+vergleichbares 28-Tage-Fenster nach dem Deploy; frühestes Urteil nach erneutem Crawl.
+
+| URL | Änderung | Hypothese | Signal | Rollback |
+|---|---|---|---|---|
+| `/ki-agentur-deutschland` | FAQ „Was kostet ein KI-Telefonassistent monatlich?" (auch FAQPage-JSON-LD): eigene Staffel „ab ca. 99 € … 199–399 € … ab 499 €" ersetzt durch die Tarife aus `TARIFE`/`FAKTEN`/`EINRICHTUNG` | Preiswahrheit; die Seite konkurriert nicht mehr mit falschen Beträgen gegen `/kosten-ki-telefonassistent` | Rich-Result-Fehler = 0; Impressionen der Seite für „ki telefonassistent kosten" nicht steigend (Eigentümer bleibt die Kosten-Seite) | keiner (Richtigkeit) |
+| `/kosten-ki-telefonassistent` | Vertragsblock: Satz „Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht." entfernt (widersprach Mehrminuten ohne Deckel) | kein Rankingeffekt; Head unverändert | — | keiner (Richtigkeit) |

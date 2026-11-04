@@ -11,7 +11,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { EINRICHTUNG, FAKTEN, ZWEI_WOCHEN_GARANTIE, TARIFE } from "./telefonassistent-copy";
+import { EINRICHTUNG, FAKTEN, ZWEI_WOCHEN_GARANTIE, TARIFE, VERTRAG } from "./telefonassistent-copy";
 
 const ROOT = join(__dirname, "..", "..");
 
@@ -36,6 +36,8 @@ const CLUSTER = [
   "src/components/TelefonassistentKompaktSection.tsx",
   "src/components/TelefonassistentBeweiskette.tsx",
   "src/components/NationalIndustryPage.tsx",
+  // Seit 04.11.2026: Die FAQ dort nannte eine eigene Preisstaffel (ab 99 €).
+  "src/pages/pillars/KiAgenturDeutschland.tsx",
 ];
 
 /**
@@ -129,6 +131,26 @@ describe("Kernaussagen liegen an genau einer Stelle", () => {
     expect(FAKTEN.laufzeit).toContain(String(FAKTEN.laufzeitMonate));
     expect(FAKTEN.laufzeit).toContain(FAKTEN.monatlichAufschlag);
     expect(FAKTEN.preisgarantie).toContain(String(FAKTEN.preisgarantieMonate));
+  });
+});
+
+/*
+  Korrektur 04.11.2026. Mit Mehrminuten ohne Deckel schwankt die Monatsrechnung
+  mit dem Verbrauch. Ein Satz, der einen gleichbleibenden Monatsbetrag zusagt,
+  widerspricht der Abrechnungsregel derselben Seite. Und keine Seite außerhalb
+  von TARIFE darf eigene Monatsbeträge für den Telefonassistenten nennen.
+*/
+describe("Monatsbeträge kommen nur aus TARIFE", () => {
+  it("die Preisgarantie verspricht keinen konstanten Monatsbetrag", () => {
+    for (const f of VERTRAG.fakten) {
+      expect(f.wert).not.toMatch(/Monatsbetrag\s+nicht|ändert sich Ihr Monatsbetrag/);
+    }
+  });
+
+  it("die KI-Agentur-FAQ nennt die Tarife aus der Preisquelle, keine eigene Staffel", () => {
+    const quelltext = ohneKommentare(lies("src/pages/pillars/KiAgenturDeutschland.tsx"));
+    expect(quelltext).not.toMatch(/\b(99|199|399|499)\s?(\u00A0)?€/u);
+    expect(quelltext).toContain("TARIFE[0].monatlich");
   });
 });
 

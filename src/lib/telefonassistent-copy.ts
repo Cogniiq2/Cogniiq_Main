@@ -994,7 +994,10 @@ export const VERTRAG = {
     },
     {
       label: "Preisgarantie",
-      wert: `${FAKTEN.preisgarantie} Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht.`,
+      // Bis 04.11.2026 folgte hier „Innerhalb dieser Zeit ändert sich Ihr
+      // Monatsbetrag nicht." – falsch, seit Mehrminuten ohne Deckel abgerechnet
+      // werden. Was die Garantie genau umfasst, ist OWNER-INPUT J5.
+      wert: FAKTEN.preisgarantie,
     },
     {
       label: "Zahlung der Einrichtung",

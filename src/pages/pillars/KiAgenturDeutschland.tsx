@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Phone, CircleCheck as CheckCircle2, ChevronRight, Building2, Lightbulb, Zap, Shield, Clock, Users, TrendingUp } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { EINRICHTUNG, FAKTEN, TARIFE } from "@/lib/telefonassistent-copy";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -146,7 +147,10 @@ const FAQ_ITEMS = [
   },
   {
     question: "Was kostet ein KI-Telefonassistent monatlich?",
-    answer: "Einfachere Setups beginnen ab ca. 99 €/Monat. Mittlere Konfigurationen mit Kalenderintegration und mehreren Szenarien 199–399 €/Monat. Komplexere Lösungen für große Praxen oder Unternehmensgruppen ab 499 €/Monat. Genaue Preise auf der Kosten-Seite.",
+    // Aus der einen Preisquelle zusammengesetzt (telefonassistent-copy.ts). Bis
+    // 04.11.2026 stand hier eine frei formulierte Staffel („ab ca. 99 € …
+    // 199–399 € … ab 499 €"), die den Tarifen widersprach – auch im FAQPage-JSON-LD.
+    answer: `Die veröffentlichten Tarife beginnen bei ${TARIFE[0].monatlich} im Monat mit ${TARIFE[0].minuten.toLocaleString("de-DE")} Inklusivminuten (${TARIFE[0].name}); ${TARIFE[1].name} kostet ${TARIFE[1].monatlich} mit ${TARIFE[1].minuten.toLocaleString("de-DE")} Minuten, ${TARIFE[2].name} ${TARIFE[2].monatlich} mit ${TARIFE[2].minuten.toLocaleString("de-DE")} Minuten. Jede weitere Minute kostet ${FAKTEN.mehrpreisProMinute}, die Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}. Alle Positionen und einen Rechner finden Sie auf der Kosten-Seite.`,
   },
   {
     question: "Kann Cogniiq bestehende Telefonsysteme integrieren?",

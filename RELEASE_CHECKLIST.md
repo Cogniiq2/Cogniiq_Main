@@ -30,3 +30,38 @@ erreichbar**; alles, was nur dort prüfbar ist, steht als NOT VERIFIED.
 3. Sichtprüfung der Cloudflare-Preview durch den Inhaber (Blau, Mobil).
 
 Nichts gemergt, nichts deployt.
+
+---
+
+# Release-Prüfung 04.11.2026 — Branch `claude/release-fixes-2026-11`
+
+Basis: `claude/seo-design-pricing-2026-10` @ `2936360` (10 Commits vor `origin/main` @ `ed0f8e4`,
+0 dahinter → konfliktfrei mergebar). Der Ausgangsbranch bleibt unverändert. Umgebung: Node 22,
+`VITE_SUPABASE_*` als Platzhalter, Playwright-Chromium gegen den lokalen Build. **Produktion und
+Cloudflare-Preview waren aus dem Container erneut nicht erreichbar (Proxy 403 / DNS gesperrt).**
+
+## Korrekturen
+
+| Prio | Datei | Ursache | Status |
+|---|---|---|---|
+| P1 | `src/pages/pillars/KiAgenturDeutschland.tsx` | FAQ + FAQPage-JSON-LD nannte „ab ca. 99 € … 199–399 € … ab 499 €/Monat" – widerspricht 300/500/800 € (bestand schon auf `main`) | behoben: Antwort aus `TARIFE`/`FAKTEN`/`EINRICHTUNG` |
+| P1 | `src/lib/telefonassistent-copy.ts` (`VERTRAG`) | Kostenseite: „Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht." widerspricht Mehrminuten ohne Deckel | behoben: Satz entfernt, Garantieumfang bleibt J5 |
+| – | `src/lib/telefonassistent-copy.test.ts` | Regressionstests (rot auf altem Code, grün danach); Seite in den Kernzahl-Scan aufgenommen | neu |
+
+## Ergebnisse (Fix-Branch)
+
+| Prüfung | Ergebnis |
+|---|---|
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS (0 Fehler, 34 Warnungen, unverändert ggü. `main`) |
+| `npm test` | PASS – 115 Dateien, 2.811 bestanden, 1 übersprungen (Hydration-Datei läuft mit Build) |
+| `npm run build` | PASS – 89 Routen (86 indexierbar, 3 noindex), Arbeitsbaum nach Build sauber |
+| alle 34 Skripte aus `.github/workflows/build.yml` (u. a. SEO-Konsistenz, Prerender, Browser-Hydration mit 600 ms Verzögerung, Cache-Header, `wrangler pages dev`-Routing inkl. HEAD-Matrix, Public Theme) | PASS, 0 Fehler |
+| Browser 360/390/768/1440 px + 200 % Zoom, 9 Seiten | kein horizontaler Überlauf, je 1 H1, keine Konsolenfehler außer dem extern geladenen Spline-Modell (Netzsperre) |
+| Rechner im Browser | −5 → 0, 999.999 → 100.000, leer → kein Preis, 2,5 → 3 Anrufe; +1 Sprache 79 €; ab +2 keine Summe |
+| JSON-LD-Preise sitewide | nur Kosten-Seite mit Offers 300/500/800/990; keine abweichenden TA-Beträge mehr |
+
+## NOT VERIFIED
+
+HEAD/GET, `X-Robots-Tag` und Rendering auf der echten Cloudflare-Edge (Preview und Produktion),
+Core Web Vitals/Lighthouse im Feld, Formularversand, GA4/Ads-Tags nach Einwilligung.
