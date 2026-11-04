@@ -1,10 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// REGRESSION GUARD FOR THE FIVE FROZEN SEO EXPERIMENTS.
+// REGRESSION GUARD FOR FROZEN SEO EXPERIMENTS.
 //
-// /kosten-ki-telefonassistent was the sixth until 2026-09-12, when the owner
-// ended that experiment; see GRADUATED_EXPERIMENT_PATHS and the block above
-// PROTECTED_EXPERIMENT_PATHS for why, and note that its baseline entry was
-// removed by hand rather than by re-recording the fixture.
+// All six experiments have graduated (the cost page on 2026-09-12, the other
+// five on 2026-10-23); see GRADUATED_EXPERIMENT_PATHS and the block above
+// PROTECTED_EXPERIMENT_PATHS for why. Their baseline entries were removed by
+// hand rather than by re-recording the fixture. The guard stays armed for the
+// next experiment: add a path to PROTECTED_EXPERIMENT_PATHS, run
+// `npm run seo:baseline` once, commit the fixture.
 //
 // These routes are measuring live search performance. The measurement is only
 // valid while the crawled page stays identical, so this test re-renders each of
@@ -149,14 +151,11 @@ afterAll(() => {
 });
 
 describe('the frozen SEO experiments have not drifted', () => {
-  it('freezes exactly the five documented routes, all of them real', () => {
-    expect([...PROTECTED_EXPERIMENT_PATHS].sort()).toEqual([
-      '/bayreuth/webdesign',
-      '/bayreuth/website-relaunch',
-      '/ki-telefonassistent-arzt',
-      '/muenchen/webdesign-kosten',
-      '/regensburg/website-relaunch',
-    ]);
+  // Since 2026-10-23 every experiment has graduated, so the frozen set is empty.
+  // The assertion stays explicit: re-freezing a route is a deliberate act that
+  // must show up here as a diff, not slip in through a data file.
+  it('freezes exactly the documented routes, all of them real', () => {
+    expect([...PROTECTED_EXPERIMENT_PATHS].sort()).toEqual([]);
     for (const path of PROTECTED_EXPERIMENT_PATHS) {
       expect(PUBLIC_ROUTES.some((r) => r.path === path), `${path} is not a public route`).toBe(true);
     }

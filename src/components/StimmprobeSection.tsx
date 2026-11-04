@@ -84,7 +84,7 @@ export function StimmprobeSection() {
               type="button"
               onClick={toggle}
               aria-label={playing ? "Wiedergabe pausieren" : "Beispielanruf abspielen"}
-              className="w-12 h-12 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 flex items-center justify-center flex-shrink-0 hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="w-12 h-12 rounded-full bg-pub-signal text-white hover:bg-pub-signal-ink flex items-center justify-center flex-shrink-0 transition-colors"
             >
               {playing ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
             </button>

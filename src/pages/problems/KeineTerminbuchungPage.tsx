@@ -5,12 +5,12 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: ProblemPageConfig = {
   seo: {
     title: "Keine Online-Terminbuchung – was Unternehmen verlieren | Cogniiq",
-    description: "Unternehmen ohne Online-Terminbuchung verlieren täglich Kunden. Erfahren Sie, warum Online-Terminbuchung entscheidend ist und wie Sie es in wenigen Tagen einrichten.",
+    description: "Ohne Online-Terminbuchung buchen Kunden dort, wo es abends noch geht. Was eine Terminbuchung auf der Website leistet, was sie voraussetzt und wie sie eingerichtet wird.",
     canonical: `${BUSINESS_INFO.website}/keine-terminbuchung-online`,
   },
   h1: "Keine Online-Terminbuchung: Das kostet Ihr Unternehmen täglich",
   tagline: "Problem · Online-Terminbuchung · Kundenverlust",
-  intro: "Kunden möchten Termine wann und wie sie wollen buchen – nicht nur während Ihrer Öffnungszeiten. Ohne Online-Terminbuchung verlieren Sie täglich Kunden an Anbieter, die diese Bequemlichkeit bieten.",
+  intro: "Kunden möchten Termine wann und wie sie wollen buchen – nicht nur während Ihrer Öffnungszeiten. Ohne Online-Terminbuchung bleibt jeder Terminwunsch außerhalb Ihrer Öffnungszeiten ein Anruf am nächsten Morgen – oder er geht zu einem Anbieter, bei dem es sofort geht.",
   problem: {
     headline: "Warum Unternehmen ohne Online-Terminbuchung verlieren",
     points: [
@@ -27,11 +27,11 @@ const config: ProblemPageConfig = {
     points: [
       {
         title: "Verlorene Abendtermine",
-        description: "Ein großer Teil der Terminbuchungsabsichten entsteht abends nach Feierabend. Ohne Online-Buchung gehen diese Kunden zur Konkurrenz.",
+        description: "Terminwünsche entstehen oft dann, wenn Ihr Betrieb geschlossen hat – abends, am Wochenende. Ohne Online-Buchung wartet dieser Wunsch bis morgen oder wandert zur Konkurrenz.",
       },
       {
         title: "Höhere No-Show-Rate",
-        description: "Ohne automatische Erinnerungen erscheint ein spürbarer Teil der Kunden nicht zum Termin. Das kostet direkt Umsatz und blockiert den Kalender.",
+        description: "Ohne automatische Erinnerungen fallen Termine aus, an die niemand erinnert hat. Jeder davon kostet Umsatz und blockiert den Kalender.",
       },
       {
         title: "Personalzeit für Terminkoordination",

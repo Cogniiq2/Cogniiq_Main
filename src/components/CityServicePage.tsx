@@ -143,7 +143,7 @@ export function CityServicePage({ config }: CityServicePageProps) {
         additionalSchema={localBusinessSchema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         {/* M13 · Stimmprobe — nur Telefonassistent-Stadtseiten; asset-gated,
             rendert ohne Audiodatei nichts. */}
@@ -165,7 +165,7 @@ export function CityServicePage({ config }: CityServicePageProps) {
         <FAQSection config={config} />
         <RelatedPages config={config} />
         <CTASection config={config} />
-      </main>
+      </div>
     </>
   );
 }
@@ -225,7 +225,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
           <div className="flex flex-wrap gap-4">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
             >
               Kostenloses Erstgespräch
               <ArrowRight size={16} />
@@ -365,7 +365,7 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors whitespace-nowrap"
             >
               Gespräch vereinbaren
               <ArrowRight size={14} />
@@ -711,7 +711,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
             >
               {config.service} in {config.city} anfragen
               <ArrowRight size={16} />
@@ -727,9 +727,9 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-pub-ink-3 dark:text-gray-500">
             <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
             <span aria-hidden="true">·</span>
-            <Link to={config.legacyWebdesignLink ?? "/webdesign"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
+            <Link to="/webdesign" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
             <span aria-hidden="true">·</span>
-            <Link to={config.legacyAutomationLink ?? "/prozessautomatisierung"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
+            <Link to="/prozessautomatisierung" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
             <span aria-hidden="true">·</span>
             <Link to="/verpasste-anrufe-verlust" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Verpasste Anrufe</Link>
             <span aria-hidden="true">·</span>

@@ -3,17 +3,16 @@
 //
 // Baut NICHT mehr auf der generischen `CostPage` auf: Deren Form (Preisspannen,
 // Preisfaktoren, Beispielprojekte) kann die vorgeschriebene Reihenfolge aus
-// COPY-BRIEF-3 §5 nicht abbilden — vor allem nicht die Deckelung VOR der ersten
-// Zahl und die Einrichtung als Projekt statt als Gebühr. `CostPage` bleibt für
+// COPY-BRIEF-3 §5 nicht abbilden — vor allem nicht die Abrechnungsregel VOR der
+// ersten Zahl und die Einrichtung als Projekt statt als Gebühr. `CostPage` bleibt für
 // die beiden anderen Kostenseiten unverändert in Gebrauch.
 //
 // Alle Beträge stammen aus `telefonassistent-copy.ts`. Keine Zahl wird hier
 // erneut getippt — dieselbe Quelle speist Text und Offer-Schema.
 //
-// Zum Offer-Schema: Es trägt die Grundpreise in Googles strukturierte Daten.
-// Eine bedingte Obergrenze lässt sich in schema.org nicht ausdrücken, deshalb
-// steht die Deckelungslogik vollständig im sichtbaren Text und NICHT im Schema;
-// die Einrichtung ist ein eigenes, einmaliges Offer.
+// Zum Offer-Schema: Es trägt die Grundgebühren, den Mehrminutensatz und die
+// einmalige Standard-Einrichtung aus derselben Quelle wie der sichtbare Text.
+// Seit dem 24.10.2026 gibt es keine Obergrenze mehr, die im Schema fehlen könnte.
 // ─────────────────────────────────────────────────────────────────────────────
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
@@ -24,7 +23,8 @@ import {
   ABWICKLUNG,
   BETREUUNG,
   CTA,
-  DECKELUNG,
+  ABRECHNUNG,
+  EINRICHTUNG,
   FAKTEN,
   EINRICHTUNG_PROJEKT,
   ZWEI_WOCHEN_GARANTIE,
@@ -37,14 +37,19 @@ import {
   TARIF_ENTERPRISE,
   UMKEHRBARKEIT,
   VERTRAG,
+  ANBIETER_CHECKLISTE,
+  GENERISCH_ABRECHNUNG,
 } from "@/lib/telefonassistent-copy";
+import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
+import { mitUmsatzsteuer, tarifPreis } from "@/lib/telefonassistent-rechner";
 
 const base = BUSINESS_INFO.website;
 const url = `${base}/kosten-ki-telefonassistent`;
 
 /*
   Die numerischen Beträge des Angebots-Schemas kommen aus den numerischen
-  Zwillingen in TARIFE (`monatlichEur`, `einrichtungEur`).
+  Zwillingen in TARIFE (`monatlichEur`); die Einrichtung ist ein Standardaufwand
+  ohne freigegebenen Betrag (`EINRICHTUNG`) und steht deshalb nicht im Schema.
 
   Hier stand bis zum 11.09.2026 ein `toNumber`, das die ANZEIGESTRINGS zurück
   in Zahlen parste — Geschäftslogik, die an einer Tausenderpunkt-Formatierung
@@ -64,17 +69,17 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als der Tarif?",
     answer:
-      `Ja, aber nur bis zu einer festen Grenze. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung}`,
+      `Ja, wenn Sie das Kontingent überschreiten. ${FAKTEN.abrechnung} ${FAKTEN.abrechnungGeltung} ${FAKTEN.tarifzuordnung}`,
   },
   {
     question: "Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
     answer:
-      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen ungefähr ${TARIFE[0].anrufeCa} Anrufen. Dazu kommt einmalig die Einrichtung Ihres Empfangs, je nach Tarif ${TARIFE.map((t) => t.einrichtung).join(", ")}.`,
+      `${TARIFE.map((t) => `${t.monatlich} netto im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen bei rund zwei Minuten je Anruf ungefähr ${TARIFE[0].anrufeCa} Anrufen – eine Annahme, keine Zusicherung. Dazu kommt einmalig die Standard-Einrichtung Ihres Empfangs; ${EINRICHTUNG.standard.charAt(0).toLowerCase()}${EINRICHTUNG.standard.slice(1)} ${FAKTEN.steuerbasisPraxis}`,
   },
   {
-    question: "Warum kostet die Einrichtung so viel?",
+    question: "Was kostet die Einrichtung – und warum ist sie in jedem Tarif gleich?",
     answer:
-      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, Übergabe zur Freigabe und zwei Tage Testphase. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. ${FAKTEN.zahlungsaufteilung} ${FAKTEN.uebergabeGarantie}`,
+      `${EINRICHTUNG.standard} Sie ist kein Freischalten, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, Übergabe zur Freigabe und zwei Tage Testphase. ${EINRICHTUNG.sonder} ${FAKTEN.zahlungsaufteilung} ${FAKTEN.uebergabeGarantie}`,
   },
   {
     question: "Ist die Testphase kostenlos?",
@@ -92,6 +97,21 @@ const faqItems = [
       `${FAKTEN.laufzeit} ${FAKTEN.kuendigung} ${FAKTEN.preisgarantie}`,
   },
   {
+    question: "Was kostet ein KI Telefonassistent pro Minute?",
+    answer:
+      `Innerhalb des Kontingents nichts extra — die Minuten sind im Monatspreis enthalten. Rechnerisch ergibt das im kleinsten Tarif ${(TARIFE[0].monatlichEur / TARIFE[0].minuten).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} je Kontingentminute (${TARIFE[0].monatlich} für ${TARIFE[0].minuten.toLocaleString("de-DE")}\u00A0Minuten). Jede abrechenbare Minute über dem Kontingent kostet ${FAKTEN.mehrpreisProMinute} netto, in allen drei Tarifen und ohne Deckel. Vergleichen Sie deshalb immer den Spitzenmonat, nicht den Minutenpreis – der Rechner oben zeigt, ab welchem Aufkommen ein größerer Tarif günstiger ist.`,
+  },
+  {
+    question: "Gibt es versteckte Kosten?",
+    answer:
+      `Keine Kostenposition wird still weggelassen: Grundgebühr, Kontingent, Mehrminutensatz von ${FAKTEN.mehrpreisProMinute}, Einrichtung von ${EINRICHTUNG.anzeige} und Zusatzsprachen stehen auf dieser Seite. Zwei Posten stehen bewusst als offen da, weil sie von Ihrem System abhängen: die Anbindung an Ihre Praxissoftware und Gebühren, die Dritte für eine Schnittstelle verlangen. Beides prüfen wir vor dem Angebot und nennen es dort — nicht danach. ${FAKTEN.abrechnungGeltung} ${FAKTEN.steuerbasis}`,
+  },
+  {
+    question: "Lohnt sich ein KI Telefonassistent für eine kleine Praxis?",
+    answer:
+      "Das hängt an Ihrem Anrufaufkommen, nicht an Ihrer Größe. Der Rechner oben zeigt für Ihre Anrufe pro Monat Tarif, Monatsbetrag und Einrichtung; die Gegenrechnung — was eine nicht besetzte Leitung Sie kostet — kennen nur Sie. Wenn die Anmeldung zu Stoßzeiten regelmäßig nicht abnehmen kann, ist das der Fall, für den der Assistent gebaut ist; wenn Ihr Telefon selten klingelt, raten wir ab.",
+  },
+  {
     // Die Beträge stehen NUR in SPRACHEN. Hier stand bis zum 12.09.2026 eine
     // zweite, abgetippte Fassung, die einen Paketpreis als feststehend nannte —
     // während der Rechner dieselbe Konstellation schon als offen auswies.
@@ -101,10 +121,9 @@ const faqItems = [
 ];
 
 /**
- * Offer-Schema: nur Grundpreise mit `priceSpecification`, Einrichtung als
- * separates einmaliges Offer. Die Deckelung steht bewusst NICHT im Schema —
- * sie ist bedingt und wäre dort nur als nackter Preis darstellbar, also
- * unehrlicher als der sichtbare Text.
+ * Offer-Schema: Grundgebühren als monatliche Offers (Mehrminutensatz in der
+ * Beschreibung), die Standard-Einrichtung als ein einmaliges Offer für alle
+ * Tarife. Alle Werte aus `TARIFE`, `FAKTEN`, `EINRICHTUNG`.
  */
 // FAQPage wird von PageSEO aus `faqItems` erzeugt und steht deshalb NICHT
 // zusaetzlich hier — sonst laege derselbe Block zweimal im Dokument.
@@ -125,70 +144,79 @@ const schema = {
         Systemnamen: Was hier steht, steht auch auf der Seite.
       */
       description:
-        "KI-Telefonassistent für Praxen: Der Assistent nimmt Anrufe an, führt freigegebene Routineabläufe im Gespräch zu Ende — Termin buchen, verschieben, absagen, konfigurierte Fragen beantworten — und übergibt Ausnahmen an Ihr Team. Festes Minutenkontingent, gedeckelte Monatsrechnung, einmalige Einrichtung. Direkter Schreibzugriff auf ein Praxis- oder Kalendersystem setzt eine für dieses System eingerichtete und verifizierte Anbindung voraus.",
+        "KI-Telefonassistent für Praxen: Der Assistent nimmt Anrufe an, führt freigegebene Routineabläufe im Gespräch zu Ende — Termin buchen, verschieben, absagen, konfigurierte Fragen beantworten — und übergibt Ausnahmen an Ihr Team. Festes Minutenkontingent, Mehrminuten zu einem festen Satz, einmalige Einrichtung. Direkter Schreibzugriff auf ein Praxis- oder Kalendersystem setzt eine für dieses System eingerichtete und verifizierte Anbindung voraus.",
       url,
       provider: { "@type": "Organization", name: BUSINESS_INFO.name, url: base },
       offers: [
         ...TARIFE.map((t) => ({
           "@type": "Offer",
           name: `Tarif ${t.name}`,
-          description: `${t.minuten}\u00A0Minuten im Monat, entspricht ungefähr ${t.anrufeCa} Anrufen.`,
+          description: `${t.minuten}\u00A0Inklusivminuten im Monat; jede weitere Minute ${FAKTEN.mehrpreisProMinute}. Bei durchschnittlich rund zwei Minuten je Anruf ungefähr ${t.anrufeCa} Anrufe. ${FAKTEN.steuerbasis}`,
           url,
           priceSpecification: {
             "@type": "UnitPriceSpecification",
             price: t.monatlichEur,
             priceCurrency: "EUR",
+            // J8: Nettopreis, Umsatzsteuer kommt hinzu.
+            valueAddedTaxIncluded: false,
             unitCode: "MON",
             billingDuration: 1,
             billingIncrement: 1,
           },
         })),
-        ...TARIFE.map((t) => ({
+        {
           "@type": "Offer",
-          name: `Einrichtung Ihres Empfangs – Tarif ${t.name}`,
-          description:
-            "Einmalige Einrichtung in acht Schritten, zahlbar zur Hälfte bei Vertragsabschluss und zur Hälfte nach dem Go-live.",
+          name: "Standard-Einrichtung (alle Tarife)",
+          description: `${EINRICHTUNG.standard} ${EINRICHTUNG.sonder} ${FAKTEN.steuerbasis}`,
           url,
           priceSpecification: {
             "@type": "PriceSpecification",
-            price: t.einrichtungEur,
+            price: EINRICHTUNG.eur,
             priceCurrency: "EUR",
+            valueAddedTaxIncluded: false,
           },
-        })),
+        },
       ],
     },
   ],
 };
 
+/** Rechenbeispiel für die Abrechnungsregel — aus dem Rechenkern, nicht getippt. */
+const BEISPIEL_MINUTEN = 1200;
+const BEISPIEL = tarifPreis(TARIFE[1], BEISPIEL_MINUTEN);
+const BEISPIEL_STEUER = mitUmsatzsteuer(BEISPIEL.monatlichEur);
+const euro = (v: number) =>
+  v.toLocaleString("de-DE", { style: "currency", currency: "EUR", maximumFractionDigits: 2 });
+
 const SECTION = "py-24";
 const SECTION_ALT = "py-24 bg-gray-50 dark:bg-gray-900/40";
 const PROSE = "text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]";
-const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+const H2 =
+  "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6 before:block before:w-8 before:h-1 before:rounded-full before:bg-pub-accent dark:before:bg-blue-400 before:mb-4";
 const H3 = "text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5";
 const CARD =
   "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
 const CARD_ALT =
   "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
 const DOT =
-  "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
-const CTA_PRIMARY =
-  "inline-flex items-center gap-2 px-7 py-4 min-h-[44px] bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[16px] hover:bg-gray-700 dark:hover:bg-white transition-colors";
+  "mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0";
+const CTA_PRIMARY = CTA_PRIMARY_CLASS;
 const TEXT_LINK =
-  "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors";
+  "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors";
 
 export function KostenKiTelefonassistent() {
   return (
     <>
       <PageSEO
         title="Was kostet ein KI Telefonassistent? Preise | Cogniiq"
-        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie."
+        description="Was kostet ein KI Telefonassistent für Praxen? Ab 300 € netto im Monat mit 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €, zzgl. USt."
         canonical={url}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen bg-white dark:bg-gray-950">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         {/* ── Einstieg: Planbarkeit vor Betrag ── */}
         <section className="pt-32 pb-24">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -217,41 +245,64 @@ export function KostenKiTelefonassistent() {
             </h1>
             <p className={PROSE}>
               Bevor ein Betrag fällt, die Antwort auf die Frage, die dahintersteht:
-              Nein, die Rechnung kann nicht aus dem Ruder laufen. Wie weit sie
-              überhaupt steigen kann, steht im nächsten Absatz — und zwar
-              vollständig, nicht in einer Fußnote.
+              Wie setzt sich die Monatsrechnung zusammen? Aus der Grundgebühr
+              Ihres Tarifs und – nur wenn Sie das Kontingent überschreiten –
+              Mehrminuten zu einem festen Satz. Das steht im nächsten Abschnitt
+              vollständig, nicht in einer Fußnote, einschließlich dessen, was
+              nicht im Monatspreis enthalten ist.
             </p>
           </div>
         </section>
 
-        {/* ── 1 · Die Deckelung, vor der ersten Zahl ── */}
+        {/* ── 1 · Die Abrechnungsregel, vor der ersten Zahl ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{DECKELUNG.headline}</h2>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
-            {/* Der Geltungsbereich steht DIREKT hinter der Zusage, nicht als
-                Fußnote: Eine Obergrenze, deren Bezug erst drei Absätze später
-                kommt, wird als Gesamtdeckel gelesen. */}
-            <p className={`${PROSE} mb-6`}>{DECKELUNG.geltung}</p>
+            <h2 className={H2}>{ABRECHNUNG.headline}</h2>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.text}</p>
+            <p className={`${PROSE} mb-6`}>{ABRECHNUNG.geltung}</p>
             <div className={CARD}>
               <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {DECKELUNG.hinweis}
+                So steht ein Monat auf Ihrer Rechnung
               </p>
-              <ul className="space-y-2.5">
-                {TARIFE.map((t) => (
-                  <li
-                    key={t.name}
-                    className="flex justify-between gap-4 text-[17px] text-gray-600 dark:text-gray-400"
-                  >
-                    <span>Tarif {t.name}</span>
-                    <span className="tabular-nums text-gray-900 dark:text-gray-100 font-medium">
-                      Telefonie höchstens {t.obergrenze} im Monat
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              {/* Rechenbeispiel aus derselben Funktion, die der Rechner nutzt —
+                  nie getippt. Annahme direkt an der Zahl. */}
+              <dl className="space-y-2.5 text-[17px] text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between gap-4">
+                  <dt>Grundgebühr Tarif {BEISPIEL.tarif.name}</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{BEISPIEL.tarif.monatlich}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt>Enthaltene / abgerechnete Minuten</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">
+                    {BEISPIEL.inklusivMinuten.toLocaleString("de-DE")} / {BEISPIEL_MINUTEN.toLocaleString("de-DE")}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt>Mehrminuten × {FAKTEN.mehrpreisProMinute}</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">
+                    {BEISPIEL.mehrminuten.toLocaleString("de-DE")} × {FAKTEN.mehrpreisProMinute} = {euro(BEISPIEL.mehrminutenEur)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-gray-200 dark:border-gray-700 pt-2.5 font-semibold">
+                  <dt className="text-gray-900 dark:text-gray-100">Monatssumme netto</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL_STEUER.nettoEur)}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt>zzgl. {FAKTEN.umsatzsteuerProzent} Umsatzsteuer</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL_STEUER.umsatzsteuerEur)}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-gray-200 dark:border-gray-700 pt-2.5 font-semibold">
+                  <dt className="text-gray-900 dark:text-gray-100">Rechnungsbetrag brutto</dt>
+                  <dd className="tabular-nums text-gray-900 dark:text-gray-100">{euro(BEISPIEL_STEUER.bruttoEur)}</dd>
+                </div>
+              </dl>
+              <p className="text-[15px] text-gray-500 dark:text-gray-500 mt-3">
+                Beispiel mit {BEISPIEL_MINUTEN.toLocaleString("de-DE")} abgerechneten Minuten in einem
+                Monat, ohne Zusatzsprachen. Die Einrichtung ({EINRICHTUNG.anzeige} netto) fällt einmalig an
+                und steht nicht auf der Monatsrechnung.
+              </p>
               <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-6">
-                {DECKELUNG.tarifwechsel}
+                {ABRECHNUNG.tarifwechsel}
               </p>
             </div>
           </div>
@@ -263,8 +314,11 @@ export function KostenKiTelefonassistent() {
             <h2 className={H2}>Welcher Tarif passt zu wie vielen Anrufen?</h2>
             <p className={`${PROSE} mb-10`}>
               Praxen denken nicht in Minuten, deshalb steht neben jedem Kontingent,
-              wie vielen Anrufen es ungefähr entspricht. Ein Anruf dauert in dieser
-              Rechnung rund zwei Minuten.
+              wie vielen Anrufen es ungefähr entspricht – unter der Annahme von rund
+              zwei Minuten je Anruf, nicht als Zusicherung. Die Monatspreise
+              unterscheiden sich, weil die genutzten Minuten laufende Kosten
+              verursachen; eine unbegrenzte Nutzung zum festen Preis gibt es nicht.
+              Die Einrichtung ist in allen drei Tarifen gleich.
             </p>
             <div className="grid md:grid-cols-3 gap-5">
               {TARIFE.map((t) => (
@@ -275,7 +329,7 @@ export function KostenKiTelefonassistent() {
                   <p className="text-[30px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-none mb-1">
                     {t.monatlich}
                   </p>
-                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">im Monat</p>
+                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">im Monat, {FAKTEN.nettoZusatz}</p>
                   <dl className="space-y-2.5 text-[16px]">
                     <div className="flex justify-between gap-3">
                       <dt className="text-gray-500 dark:text-gray-500">Kontingent</dt>
@@ -290,15 +344,15 @@ export function KostenKiTelefonassistent() {
                       </dd>
                     </div>
                     <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Obergrenze</dt>
+                      <dt className="text-gray-500 dark:text-gray-500">jede weitere Minute</dt>
                       <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.obergrenze}
+                        {FAKTEN.mehrpreisProMinute}
                       </dd>
                     </div>
                     <div className="flex justify-between gap-3">
                       <dt className="text-gray-500 dark:text-gray-500">Einrichtung</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.einrichtung}
+                      <dd className="text-gray-700 dark:text-gray-300 text-right">
+                        {EINRICHTUNG.kurz}
                       </dd>
                     </div>
                   </dl>
@@ -306,13 +360,16 @@ export function KostenKiTelefonassistent() {
               ))}
             </div>
 
+            {/* J8 · Steuerbasis direkt unter den Preisen, ausdrücklich für Praxen */}
+            <p className={`${PROSE} mt-8`}>{FAKTEN.steuerbasisPraxis}</p>
+
             {/* 3 · Enterprise als Textzeile, ohne Kachel */}
             <p className={`${PROSE} mt-8`}>{TARIF_ENTERPRISE}</p>
 
             {/* 4 · Nicht pro Behandler */}
             <div className={`${CARD_ALT} mt-8`}>
               <h3 className={H3}>Nicht pro Behandler</h3>
-              <p className={PROSE}>{DECKELUNG.nichtProBehandler}</p>
+              <p className={PROSE}>{ABRECHNUNG.nichtProBehandler}</p>
             </div>
 
             <div className={`${CARD_ALT} mt-5`}>
@@ -330,7 +387,7 @@ export function KostenKiTelefonassistent() {
             Vertrag und „was nicht extra kostet". Wer „was kostet ein KI
             Telefonassistent" sucht, will genau diese eine Frage beantwortet
             haben — und zwar für den eigenen Betrieb, nicht erst nachdem er die
-            Vertragsbedingungen gelesen hat. Deckelung und Tarife stehen
+            Vertragsbedingungen gelesen hat. Abrechnungsregel und Tarife stehen
             weiterhin davor, damit die Zahlen im Rechner in einen Rahmen fallen,
             den der Leser schon kennt.
 
@@ -342,7 +399,7 @@ export function KostenKiTelefonassistent() {
           tone="alt"
           headline="Was kostet das bei Ihrem Anrufaufkommen?"
           intro={[
-            "Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den passenden Tarif, den Monatsbetrag und die einmalige Einrichtung — sofort, ohne E-Mail und ohne Verkaufsgespräch.",
+            "Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den günstigsten Tarif, Grundgebühr und Mehrminuten getrennt und den Monatsbetrag — sofort, ohne E-Mail und ohne Verkaufsgespräch. Die einmalige Standard-Einrichtung steht als eigene Zeile daneben, nicht im Monatsbetrag.",
             "Danach können Sie weiterrechnen, ob sich das für Ihren Betrieb trägt. Für die wirtschaftlichen Felder setzen wir bewusst keine Werte ein: Stundenkosten, Routineanteil und verpasste Anrufe kennen nur Sie. Solange etwas fehlt, nennt der Rechner das Zeitpotenzial und sagt, was noch fehlt — er rechnet kein Ergebnis aus einem halben Modell.",
             "Was vor der technischen Prüfung nicht feststeht, etwa die Anbindung an Ihr System, steht als offene Position in der Liste. Nicht als Null.",
           ]}
@@ -415,32 +472,119 @@ export function KostenKiTelefonassistent() {
           </div>
         </section>
 
-        {/* ── Begriffsklärung: hält „AI Rezeptionist" als Synonym auf der Seite ── */}
+        {/* ── Preismodelle am Markt: Muster, keine Anbieter (COPY-BRIEF §2.3) ── */}
         <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>Was kostet ein AI Rezeptionist im Vergleich?</h2>
+            <h2 className={H2}>Wie KI-Telefonassistenten am Markt abgerechnet werden</h2>
             <div className={`${PROSE} space-y-5`}>
               <p>
                 AI Rezeptionist, KI Telefonassistent, digitale Rezeption,
                 Telefonannahme mit KI — gemeint ist überall dasselbe Produkt, und
-                die Preisfrage stellt sich für alle diese Begriffe gleich.
+                die Preisfrage stellt sich für alle diese Begriffe gleich. Worin
+                sich Angebote tatsächlich unterscheiden, ist die Abrechnungsform.
+                Vier Muster sind verbreitet; keines davon ist an sich unseriös, aber
+                jedes verteilt das Mengenrisiko anders. Die Tabelle nennt Muster,
+                keine Anbieter und keine Fremdpreise — die ändern sich zu schnell,
+                um sie hier verlässlich zu nennen.
               </p>
+            </div>
+            <div className="mt-8 overflow-x-auto">
+              <table className="w-full text-left text-[16px] text-gray-700 dark:text-gray-300">
+                <caption className="sr-only">Abrechnungsmodelle für KI-Telefonassistenten im Vergleich</caption>
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800 text-[14px] uppercase tracking-wide text-gray-500">
+                    <th scope="col" className="py-3 pr-4 font-semibold">Modell</th>
+                    <th scope="col" className="py-3 pr-4 font-semibold">Was Sie zahlen</th>
+                    <th scope="col" className="py-3 pr-4 font-semibold">Risiko im Spitzenmonat</th>
+                    <th scope="col" className="py-3 font-semibold">Woran Sie es erkennen</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 align-top">
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Pro Minute, ohne Kontingent</th>
+                    <td className="py-4 pr-4">Jede Gesprächsminute wird berechnet, oft mit kleinem Grundpreis.</td>
+                    <td className="py-4 pr-4">Hoch: Infektwelle, Rückrufwelle oder Kampagne treiben jede Minute auf die Rechnung.</td>
+                    <td className="py-4">Preis „ab … Cent pro Minute“, kein Kontingent.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Pro Anruf</th>
+                    <td className="py-4 pr-4">Fester Betrag je angenommenem Gespräch, unabhängig von der Dauer.</td>
+                    <td className="py-4 pr-4">Hoch: Viele kurze Anrufe — Absagen, Nachfragen — kosten so viel wie lange.</td>
+                    <td className="py-4">Preis „pro Anruf“ oder „pro Vorgang“; Anrufe, die der Assistent nur weiterleitet, zählen oft mit.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Pauschale pro Behandler oder Nebenstelle</th>
+                    <td className="py-4 pr-4">Monatspreis je Person oder Leitung, Anrufe meist inklusive.</td>
+                    <td className="py-4 pr-4">Gering im Monat, aber der Preis wächst mit dem Team statt mit dem Anrufaufkommen.</td>
+                    <td className="py-4">Preis „pro Nutzer“, „pro Arbeitsplatz“ oder „pro Behandler“.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Kontingent plus fester Mehrminutensatz — unser Modell</th>
+                    <td className="py-4 pr-4">Fester Monatspreis für ein Minutenkontingent; jede Minute darüber {FAKTEN.mehrpreisProMinute}.</td>
+                    <td className="py-4 pr-4">Planbar innerhalb des Kontingents; darüber steigt die Rechnung linear, ohne Deckel. Der Rechner zeigt, ab wann ein größerer Tarif günstiger ist.</td>
+                    <td className="py-4">Kontingent, Grundgebühr und Mehrminutensatz stehen zusammen auf einer Seite — wie oben. Die Zeilen darüber beschreiben Marktmodelle, keine Cogniiq-Preise.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className={`${PROSE} space-y-5 mt-8`}>
               <p>
-                {ABWICKLUNG.faehigkeit} Ein Routineanruf wird damit nicht zu einer
-                Aufgabe, die danach noch jemand erledigen muss. An einen Menschen
-                gehen die Fälle, die dorthin gehören: Notfälle, Beschwerden und
-                sensible Anliegen, fachliche Entscheidungen, alles außerhalb der
-                freigegebenen Abläufe und alles, was Sie bewusst menschlich halten
-                wollen.
+                {ABWICKLUNG.faehigkeit} Das ist der zweite Punkt, an dem Angebote
+                auseinandergehen: Ein System, das Anliegen nur notiert, erzeugt
+                nach jedem Anruf eine Aufgabe für Ihr Team — die Minute ist dann
+                billig, der Anruf nicht. {ABWICKLUNG.qualifikation}
               </p>
-              <p>{ABWICKLUNG.qualifikation}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Fragen an jeden Anbieter — die Kaufkriterien aus der Produktseite ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Welche Fragen Sie jedem Anbieter zum Preis stellen sollten</h2>
+            <p className={`${PROSE} mb-8`}>
+              Der Preis auf der Website ist selten der Preis auf der Rechnung. Diese
+              Fragen gelten für jedes Angebot — auch für unseres; die Antwort von
+              Cogniiq steht jeweils darunter.
+            </p>
+            <dl className="space-y-8">
+              {ANBIETER_CHECKLISTE.filter((k) =>
+                /Rechnung|Anbindung|Ansage|Aufgabe/.test(k.frage)
+              ).map((k) => (
+                <div key={k.frage}>
+                  <dt className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">{k.frage}</dt>
+                  <dd className={`${PROSE} mt-2`}>{k.warum}</dd>
+                  <dd className={`${PROSE} mt-2`}>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">Bei Cogniiq: </span>
+                    {k.cogniiq}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        {/* ── Generische Kostenquery: die Tariflogik gilt nicht nur für Praxen ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Gilt das auch außerhalb von Praxen?</h2>
+            <div className={`${PROSE} space-y-5`}>
               <p>
-                Worin sich Angebote tatsächlich unterscheiden, ist die
-                Abrechnungsform. Verbreitet ist die Abrechnung pro Anruf oder pro
-                Minute ohne Obergrenze — planbar ist das nicht, weil ausgerechnet
-                der Monat teuer wird, in dem besonders viel los ist. Unser Modell
-                setzt deshalb an derselben Stelle an: ein Kontingent, ein fester
-                Betrag, eine benannte Obergrenze.
+                Die Tarife auf dieser Seite sind für Praxen formuliert — Kontingente
+                in Patientenanrufen, Abrechnung pro Praxis, der Vergleichswert einer
+                MFA-Stelle. Die Preislogik dahinter ist dieselbe für jeden Betrieb mit
+                hohem Telefonaufkommen: {GENERISCH_ABRECHNUNG.text}
+              </p>
+              <p>{GENERISCH_ABRECHNUNG.geltung}</p>
+              <p>
+                Wie der Assistent in Handwerk, Kanzlei, Immobilienverwaltung oder
+                Gastronomie arbeitet und was dort anders ist, steht auf der{" "}
+                <Link to="/ki-telefonassistent" className={TEXT_LINK}>
+                  branchenoffenen Produktseite
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+                ; das Angebot für Ihren Betrieb nennt Kontingent und Einrichtung
+                konkret, nicht als Spanne.
               </p>
             </div>
           </div>
@@ -550,8 +694,20 @@ export function KostenKiTelefonassistent() {
                 </Link>
               </li>
               <li>
+                <Link to="/ki-telefonassistent-zahnarztpraxis" className={TEXT_LINK}>
+                  KI Telefonassistent in der Zahnarztpraxis
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+              </li>
+              <li>
                 <Link to="/ki-telefonassistent-praxis" className={TEXT_LINK}>
                   KI Telefonassistent für Therapiepraxen
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+              </li>
+              <li>
+                <Link to="/ki-telefonassistent-einfuehren" className={TEXT_LINK}>
+                  Einen KI Telefonassistenten in der Praxis einführen
                   <ArrowRight size={15} aria-hidden="true" />
                 </Link>
               </li>
@@ -564,7 +720,7 @@ export function KostenKiTelefonassistent() {
             </ul>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

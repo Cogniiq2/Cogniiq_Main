@@ -15,10 +15,9 @@
 // Kommerzieller Eigentümer der Praxis-Intention bleibt /praxen. Dieser Beitrag
 // verweist dorthin (Breadcrumb, Weiterlesen, Cogniiq-Abschnitt).
 //
-// Verweist absichtlich NICHT auf die eingefrorenen Experimentrouten des
-// Clusters (Arzt-Segmentseite, Preisseite): jeder neue Link dorthin würde deren
-// Messung verfälschen; siehe src/lib/routing/protectedExperiments.ts. Die Pfade
-// stehen hier auch nicht im Kommentar, weil der Schutz Quelltext-Vorkommen zählt.
+// Seit dem 2026-10-23 (Graduierung aller Experimente) verweist der Beitrag auch
+// auf die Arzt-Segmentseite und die Kostenseite — vorher hätte jeder neue Link
+// dorthin eine laufende Messung verfälscht.
 //
 // Keine Fremdstatistik, keine Anteile, keine Zahlen außer denen aus FAKTEN.
 // Die Aussagen über den Praxisalltag sind Beschreibungen, keine Erhebung, und
@@ -30,7 +29,7 @@ import { PageSEO } from "@/components/PageSEO";
 import { RedaktionelleVerantwortung, REDAKTION } from "@/components/RedaktionelleVerantwortung";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { canonicalFor } from "@/lib/routing/publicRoutes";
-import { ANBINDUNG, FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
+import { ANBINDUNG, DATENSCHUTZ_PUNKTE, FAKTEN, GRENZEN, KOMPAKT_KOSTEN } from "@/lib/telefonassistent-copy";
 
 /**
  * Die beiden Grenzen stammen wörtlich aus GRENZEN.points — derselben Quelle wie
@@ -39,7 +38,7 @@ import { ANBINDUNG, FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
  * Fassung derselben Zusage stehen bleibt.
  */
 const GRENZEN_TRIAGE = GRENZEN.points.find((p) => p.startsWith("Keine medizinische Einschätzung"));
-const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Notfälle werden erkannt"));
+const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Hinweise auf einen Notfall"));
 const GRENZEN_NICHT_ALLE = GRENZEN.points.find((p) => p.startsWith("Der Assistent übernimmt nicht alle Anrufe"));
 if (!GRENZEN_TRIAGE || !GRENZEN_NOTFALL || !GRENZEN_NICHT_ALLE) {
   throw new Error(
@@ -222,9 +221,10 @@ export function KiTelefonassistentZahnarztpraxis() {
     mainEntityOfPage: { "@type": "WebPage", "@id": `${CANONICAL}#webpage` },
   };
 
-  const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+  const H2 =
+    "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6 before:block before:w-8 before:h-1 before:rounded-full before:bg-pub-accent dark:before:bg-blue-400 before:mb-4";
   const PROSE = "text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]";
-  const LINK = "underline underline-offset-4 hover:no-underline";
+  const LINK = "text-pub-accent-ink dark:text-blue-400 underline underline-offset-4 decoration-pub-accent-line hover:no-underline";
 
   return (
     <div className="bg-white dark:bg-gray-950">
@@ -363,7 +363,7 @@ export function KiTelefonassistentZahnarztpraxis() {
                 key={a.anlass}
                 className="rounded-xl border border-gray-200 dark:border-gray-800 p-6"
               >
-                <p className="text-[15px] uppercase tracking-wide text-gray-500 dark:text-gray-500">
+                <p className="text-[15px] uppercase tracking-wide text-pub-accent-ink dark:text-blue-300">
                   {REGEL_LABEL[a.regel]}
                 </p>
                 <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mt-1">
@@ -403,7 +403,7 @@ export function KiTelefonassistentZahnarztpraxis() {
               gern selbst führt. Drei Muster kommen als Ausgangspunkt infrage; welches passt,
               hängt an Ihrer Besetzung.
             </p>
-            <ol className="space-y-3 list-decimal pl-6">
+            <ol className="space-y-3 list-decimal pl-6 marker:text-pub-accent marker:font-semibold dark:marker:text-blue-400">
               <li>
                 <strong className="font-semibold text-gray-900 dark:text-gray-100">
                   Überlauf.
@@ -443,7 +443,7 @@ export function KiTelefonassistentZahnarztpraxis() {
               Die Absage ist der Anruf mit dem größten Hebel in der Zahnarztpraxis – und der
               mit den meisten Regeln. Vier davon gehören vor dem Start festgelegt.
             </p>
-            <ul className="space-y-3 list-disc pl-6">
+            <ul className="space-y-3 list-disc pl-6 marker:text-pub-accent-soft dark:marker:text-blue-400">
               <li>
                 <strong className="font-semibold text-gray-900 dark:text-gray-100">
                   Berechtigung.
@@ -507,7 +507,7 @@ export function KiTelefonassistentZahnarztpraxis() {
               >
                 <span
                   aria-hidden="true"
-                  className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400"
+                  className="absolute left-0 top-[0.62em] w-2 h-0.5 rounded-full bg-pub-accent-soft dark:bg-blue-400"
                 />
                 {fall}
               </li>
@@ -528,7 +528,7 @@ export function KiTelefonassistentZahnarztpraxis() {
           </h2>
           <div className={`${PROSE} space-y-5`}>
             <p>{GRENZEN_TRIAGE}</p>
-            <ul className="space-y-3 list-disc pl-6">
+            <ul className="space-y-3 list-disc pl-6 marker:text-pub-accent-soft dark:marker:text-blue-400">
               <li>
                 Er entscheidet nicht, ob ein Schmerzpatient heute noch drankommt. Er erkennt
                 das Anliegen und übergibt.
@@ -573,6 +573,16 @@ export function KiTelefonassistentZahnarztpraxis() {
             <p>{FAKTEN.keineAnbindung}</p>
             <p>{FAKTEN.keineAufzeichnung}</p>
             <p>{FAKTEN.art50}</p>
+            <p>
+              {DATENSCHUTZ_PUNKTE[3]}. {DATENSCHUTZ_PUNKTE[4]}.
+            </p>
+            <p>
+              {KOMPAKT_KOSTEN.text} {FAKTEN.nichtProBehandler}{" "}
+              <Link to="/kosten-ki-telefonassistent" className={LINK}>
+                Alle Tarife, Kontingente und Mehrminuten
+              </Link>
+              .
+            </p>
             <p>
               Was der Empfang für Arzt-, Zahnarzt- und Therapiepraxen leistet, wie er
               eingerichtet wird und was er kostet, steht auf der{" "}
@@ -643,6 +653,30 @@ export function KiTelefonassistentZahnarztpraxis() {
             </li>
             <li>
               <Link
+                to="/ki-telefonassistent-arzt"
+                className={`${LINK} font-semibold text-gray-900 dark:text-gray-100`}
+              >
+                KI-Telefonassistent für Arztpraxen
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Akuttermin, Rezept, Überweisung, Befund – die Anrufanlässe der Hausarzt- und
+                Facharztpraxis und die Regel je Anlass.
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/kosten-ki-telefonassistent"
+                className={`${LINK} font-semibold text-gray-900 dark:text-gray-100`}
+              >
+                Was ein KI-Telefonassistent kostet
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Tarife mit Minutenkontingent und Mehrminutensatz, Einrichtung, Laufzeit – und ein
+                Rechner ohne Anmeldung.
+              </span>
+            </li>
+            <li>
+              <Link
                 to="/ki-telefonassistent/demo"
                 className={`${LINK} font-semibold text-gray-900 dark:text-gray-100`}
               >
@@ -654,7 +688,7 @@ export function KiTelefonassistentZahnarztpraxis() {
             </li>
           </ul>
 
-          <div className="mt-12 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
+          <div className="mt-12 rounded-2xl border border-pub-accent-line dark:border-blue-500/30 bg-pub-accent-wash/60 dark:bg-blue-500/5 p-8">
             <p className={PROSE}>
               Wenn Sie die Liste für Ihre Zahnarztpraxis durchgehen möchten: Wir nehmen Ihre
               Anrufanlässe auf und sagen Ihnen, was davon trägt und was nicht – auch dann,
@@ -662,7 +696,7 @@ export function KiTelefonassistentZahnarztpraxis() {
             </p>
             <Link
               to="/kontakt"
-              className="inline-block mt-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 text-[17px] font-semibold min-h-[44px]"
+              className="inline-block mt-6 rounded-xl bg-pub-signal text-white hover:bg-pub-signal-ink px-6 py-3 text-[17px] font-semibold min-h-[44px]"
             >
               Anrufanlässe gemeinsam durchgehen
             </Link>

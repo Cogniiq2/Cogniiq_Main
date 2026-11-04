@@ -41,7 +41,7 @@ import {
   EINRICHTUNG_SCHRITTE,
   FAKTEN,
   GENERISCH_DATENSCHUTZ_PUNKTE,
-  GENERISCH_DECKELUNG,
+  GENERISCH_ABRECHNUNG,
   GENERISCH_GRENZEN,
   GENERISCH_IMMER_MENSCH,
   GENERISCH_NICHT_PASSEND,
@@ -52,6 +52,7 @@ import {
   SPRACHEN,
   UMKEHRBARKEIT,
   WAS_IST,
+  EINRICHTUNG,
 } from "@/lib/telefonassistent-copy";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 
@@ -163,7 +164,7 @@ const faqItems = [
   {
     question: "Kommen Anrufer mit der Stimme eines Sprachassistenten zurecht?",
     answer:
-      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. In der Startphase werten wir Gespräche mit Ihnen aus und passen an, was nicht sitzt.",
+      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln.",
   },
   {
     question: "Was ändert sich an meinem Telefonanschluss?",
@@ -199,18 +200,12 @@ const faqItems = [
       "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und erfährt der Anrufer, dass ein KI-System spricht. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Und der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen.",
   },
   {
-    question: "Was passiert bei einem technischen Ausfall?",
-    // [[CLAIM: verify — Fallback-Mechanik (Weiterleitung auf Backup-Nummer / Ansage) technisch bestätigen]]
-    answer:
-      "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Wie dieser Weg aussieht, legen wir gemeinsam bei der Einrichtung fest.",
-  },
-  {
     question: "Wie aufwändig ist die Einrichtung für mich?",
     answer: `Ihr Aufwand konzentriert sich auf das Aufnahmegespräch: Sie beschreiben Ihre Anrufe, wir bauen daraus Regeln und Ansagen. Konfiguration, Anbindung und Tests übernehmen wir. ${FAKTEN.uebergabeGarantie} ${FAKTEN.freigabeNachUebergabe}`,
   },
   {
     question: "In welchen Sprachen spricht der Assistent?",
-    answer: `Deutsch ist enthalten. ${SPRACHEN.text} Welche Sprachen für Ihren Betrieb sinnvoll sind, legen Sie bei der Einrichtung fest.`,
+    answer: `${SPRACHEN.text} Welche Sprachen für Ihren Betrieb sinnvoll sind, legen Sie bei der Einrichtung fest.`,
   },
   {
     question: "Merken Anrufer, dass sie mit einer KI sprechen?",
@@ -219,7 +214,7 @@ const faqItems = [
   },
   {
     question: "Was kostet ein KI Telefonassistent?",
-    answer: `Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. ${FAKTEN.deckelung} Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.`,
+    answer: `${FAKTEN.abrechnung} Einmalig kommt die Standard-Einrichtung von ${EINRICHTUNG.anzeige} netto dazu, in jedem Tarif gleich. ${FAKTEN.steuerbasis} Details finden Sie auf der Kostenseite.`,
   },
 ];
 
@@ -260,7 +255,14 @@ const PROBLEMS = [
  * Bedingung im Abschnittsfuß — nicht in jeder einzelnen Karte, das läse sich
  * wie ein Haftungsausschluss.
  */
-const USE_CASES = [
+const USE_CASES: Array<{
+  icon: typeof Stethoscope;
+  industry: string;
+  desc: string;
+  /** Branchenseite, wenn es eine gibt; sonst endet die Karte bewusst ohne Link. */
+  href?: string;
+  linkLabel?: string;
+}> = [
   {
     icon: Wrench,
     industry: "Handwerk & Bau",
@@ -279,11 +281,15 @@ const USE_CASES = [
   {
     icon: UtensilsCrossed,
     industry: "Gastronomie & Hotellerie",
+    href: "/ki-telefonassistent-restaurant",
+    linkLabel: "Für Restaurants",
     desc: "Beantwortet wiederkehrende Fragen und wickelt Reservierungen samt Änderung und Absage ab, während der Service läuft. Sonderwünsche gehen an Sie.",
   },
   {
     icon: Stethoscope,
     industry: "Praxen & Gesundheit",
+    href: "/praxen",
+    linkLabel: "Für Arzt-, Zahnarzt- und Therapiepraxen",
     desc: "Bucht, verschiebt und storniert Termine nach Ihren Regeln und entlastet die Anmeldung zu Stoßzeiten. Medizinische Fragen und Notfälle nie — die gehen immer an Menschen.",
   },
   {
@@ -346,7 +352,7 @@ export function KiTelefonassistentPage() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         {/*
           Reihenfolge als Kaufentscheidung gelesen, nicht als Modulliste:
 
@@ -414,7 +420,7 @@ export function KiTelefonassistentPage() {
         <FAQSectionBlock />            {/* M11 FAQ */}
         <FinalCtaSection />            {/* M12 Nächster Schritt */}
         <InternalLinksSection />
-      </main>
+      </div>
     </>
   );
 }
@@ -426,7 +432,7 @@ function PrimaryCta({ className = "" }: { className?: string }) {
     <Link
       to={PRIMARY_CTA.to}
       onClick={() => trackEvent("cta_demo_click", PRIMARY_CTA.label)}
-      className={`inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg ${className}`}
+      className={`inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-pub-signal text-white rounded-xl font-semibold text-[15px] hover:bg-pub-signal-ink transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg ${className}`}
     >
       <Phone size={15} aria-hidden="true" />
       {PRIMARY_CTA.label}
@@ -458,7 +464,7 @@ function HeroSection() {
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_400px] gap-16 items-start">
           <motion.div className="cq-rise">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-widest uppercase mb-8 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-pub-accent-line dark:border-blue-500/30 bg-pub-accent-wash dark:bg-blue-500/10 text-pub-accent dark:text-blue-300 text-sm font-medium tracking-widest uppercase mb-8 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               Für Betriebe mit hohem Telefonaufkommen
             </div>
@@ -484,13 +490,11 @@ function HeroSection() {
               verschiebt sie, nimmt Absagen entgegen und beantwortet die Fragen,
               die Sie ihm vorgegeben haben. Auf Wunsch in mehreren Sprachen. Nur
               Ausnahmen und alles, was Sie ausgenommen haben, gehen an einen
-              Menschen.
+              Menschen. Schreibt ein Ablauf in Ihren Kalender oder Ihre
+              Branchensoftware, richten wir diese Anbindung vorher ein und
+              prüfen sie, bevor sie live geht.
             </p>
-            <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
-              Schreibt ein Ablauf direkt in Ihren Kalender oder Ihre
-              Branchensoftware, richten wir diese Anbindung für Ihr System ein
-              und verifizieren sie vorher.
-            </p>
+            <div className="mb-10" />
 
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <PrimaryCta />
@@ -498,7 +502,7 @@ function HeroSection() {
             </div>
             <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-5">
               Sie schildern kurz Ihre Anrufe, wir schlagen einen Termin für die
-              Demo vor. Kostenlos, unverbindlich, ca. 15&nbsp;Minuten.
+              Demo vor. Kostenlos und unverbindlich.
             </p>
 
             {/*
@@ -551,7 +555,7 @@ function HeroSection() {
                   variants={fadeUp}
                   className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                 >
-                  <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
+                  <CheckCircle2 size={12} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" aria-hidden="true" />
                   {item}
                 </motion.div>
               ))}
@@ -656,7 +660,7 @@ function HeroCallPanel() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Festes Minutenkontingent", detail: `Darüber ${FAKTEN.mehrpreisProMinute}/Min., gedeckelt auf die Obergrenze Ihres Tarifs` },
+    { label: "Festes Minutenkontingent", detail: `Fester Monatspreis, jede weitere Minute ${FAKTEN.mehrpreisProMinute}; ${FAKTEN.nettoZusatz}` },
     { label: "Rufumleitung", detail: "Anrufe laufen auf die vereinbarte Nummer" },
     { label: "Termine im Gespräch", detail: "Gebucht, verschoben oder storniert — bei eingerichteter Anbindung" },
     // „Europäische Server" ist eine Aussage zum Verarbeitungsort und damit
@@ -672,7 +676,7 @@ function CredentialStrip() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           {items.map((item) => (
             <div key={item.label} className="flex items-center gap-2.5">
-              <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
+              <CheckCircle2 size={13} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0" aria-hidden="true" />
               <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                 {item.label}
               </span>
@@ -707,7 +711,7 @@ function WasIstSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Grundlagen
             </p>
             <h2
@@ -759,7 +763,7 @@ function ProblemSection() {
           variants={fadeUp}
           className="max-w-2xl mb-14"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Das Problem
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -784,8 +788,8 @@ function ProblemSection() {
               variants={fadeUp}
               className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
             >
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
-                <item.icon size={17} className="text-pub-ink-3 dark:text-gray-500" aria-hidden="true" />
+              <div className="w-10 h-10 rounded-xl bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center mb-4">
+                <item.icon size={17} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
               </div>
               <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                 {item.title}
@@ -805,7 +809,7 @@ function SolutionSection() {
   const capabilities = [
     { icon: PhoneCall, label: "Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist" },
     { icon: Calendar, label: "Bucht Termine im Gespräch – im Rahmen der Regeln, die Sie freigeben" },
-    { icon: RotateCcw, label: "Verschiebt Termine und schließt Absagen ab; der Platz ist sofort wieder frei" },
+    { icon: RotateCcw, label: "Verschiebt Termine und schließt Absagen ab; der frei gewordene Platz ist wieder vergebbar" },
     { icon: MessageSquare, label: "Beantwortet Ihre konfigurierten Fragen selbst, statt sie weiterzureichen" },
     { icon: Languages, label: "Spricht auf Wunsch weitere Sprachen – und wechselt sie mitten im Gespräch" },
     { icon: Shield, label: "Leitet dringende Anrufe sofort an einen Menschen weiter" },
@@ -822,7 +826,7 @@ function SolutionSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Die Lösung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -859,8 +863,8 @@ function SolutionSection() {
                 key={feat.label}
                 className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
               >
-                <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0">
-                  <feat.icon size={14} className="text-gray-400 dark:text-gray-400" aria-hidden="true" />
+                <div className="w-8 h-8 rounded-lg bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <feat.icon size={14} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                 </div>
                 <span className="text-[17px] text-gray-700 dark:text-gray-300 leading-relaxed">
                   {feat.label}
@@ -916,7 +920,7 @@ function CallFlowSection() {
           variants={fadeUp}
           className="max-w-2xl mb-16"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Ablauf
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -942,12 +946,12 @@ function CallFlowSection() {
                 className="relative"
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-white dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0">
-                    <step.icon size={20} className="text-gray-500 dark:text-gray-400" aria-hidden="true" />
+                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <step.icon size={20} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                   </div>
                 </div>
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="text-sm font-bold tracking-[0.2em] text-pub-ink-3 dark:text-gray-600 uppercase">
+                  <span className="text-sm font-bold tracking-[0.2em] text-pub-accent dark:text-blue-400 uppercase">
                     {step.number}
                   </span>
                 </div>
@@ -981,7 +985,7 @@ function CallSummarySection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Der Ausnahmeweg
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -998,7 +1002,7 @@ function CallSummarySection() {
             <ul className="space-y-3">
               {GENERISCH_UEBERGABE.wasAnkommt.items.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400">
-                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0" />
                   {item}
                 </li>
               ))}
@@ -1017,7 +1021,7 @@ function CallSummarySection() {
             <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.25)]">
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
                 <div className="flex items-center gap-2.5">
-                  <FileText size={14} className="text-gray-400" aria-hidden="true" />
+                  <FileText size={14} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
                   <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wide uppercase">
                     Beispiel eines Dashboard-Eintrags
                   </span>
@@ -1105,9 +1109,9 @@ function KettenStile() {
   const CARD =
     "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
   const DOT =
-    "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
+    "mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0";
   const TEXT_LINK =
-    "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors";
+    "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors";
 
   return { PROSE, H2C, CARD, DOT, TEXT_LINK };
 }
@@ -1133,7 +1137,7 @@ function AnliegenKatalogSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Anliegen-Katalog
           </p>
           <h2
@@ -1164,7 +1168,7 @@ function AnliegenKatalogSection() {
             <ul className="space-y-3">
               {GENERISCH_UEBERNIMMT.map((item) => (
                 <li key={item} className={`flex items-start gap-2.5 ${PROSE}`}>
-                  <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-1.5" aria-hidden="true" />
+                  <CheckCircle2 size={13} className="text-pub-accent-soft dark:text-blue-400 flex-shrink-0 mt-1.5" aria-hidden="true" />
                   {item}
                 </li>
               ))}
@@ -1247,7 +1251,7 @@ function AnbieterCheckSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Auswahlhilfe
           </p>
           <h2
@@ -1277,7 +1281,7 @@ function AnbieterCheckSection() {
               <div className="p-7">
                 <div className="flex items-start gap-4">
                   <span
-                    className="flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-sm font-bold text-gray-500 dark:text-gray-400"
+                    className="flex-shrink-0 w-8 h-8 rounded-full bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center text-sm font-bold text-pub-accent dark:text-blue-400"
                     aria-hidden="true"
                   >
                     {i + 1}
@@ -1292,7 +1296,7 @@ function AnbieterCheckSection() {
                       </p>
                     </div>
                     <div className="lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-10">
-                      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-2.5">
+                      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-2.5">
                         Unsere Antwort
                       </p>
                       <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]">
@@ -1321,7 +1325,7 @@ function SetupSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
               Implementierung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -1348,7 +1352,7 @@ function SetupSection() {
               steht im{" "}
               <Link
                 to="/ki-telefonassistent-einfuehren"
-                className="underline underline-offset-4 hover:no-underline text-gray-700 dark:text-gray-300"
+                className="underline underline-offset-4 hover:no-underline text-pub-accent dark:text-blue-400"
               >
                 Leitfaden zur Einführung eines KI-Telefonassistenten
               </Link>
@@ -1366,8 +1370,8 @@ function SetupSection() {
                 variants={fadeUp}
                 className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/60"
               >
-                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
-                  <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{i + 1}</span>
+                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center">
+                  <span className="text-sm font-bold text-pub-accent dark:text-blue-400">{i + 1}</span>
                 </div>
                 <div>
                   <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100">{phase.title}</h3>
@@ -1400,7 +1404,7 @@ function GespraechSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Wie es klingt
           </p>
           <h2
@@ -1456,7 +1460,7 @@ function DreiWegeSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Das Ergebnis
           </p>
           <h2
@@ -1531,7 +1535,7 @@ function SprachenSection() {
   return (
     <section className="py-24 bg-white dark:bg-gray-950">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
           Mehrsprachig
         </p>
         <h2 className={H2C}>Wenn nicht jeder Anrufer Deutsch spricht</h2>
@@ -1588,15 +1592,15 @@ function RechnerSection() {
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* Statisch im HTML, damit Überschrift und Einordnung im Prerender
             stehen — der interaktive Teil darunter wird nachgeladen. */}
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
           Transparenz
         </p>
         <h2 id="rechner-heading" className={H2C}>
           Was das bei Ihrem Anrufaufkommen kostet — und ob es sich rechnet
         </h2>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.text}</p>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.geltung}</p>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.tarifwechsel}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_ABRECHNUNG.text}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_ABRECHNUNG.geltung}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_ABRECHNUNG.tarifwechsel}</p>
         <p className={`${PROSE} mb-10`}>
           Rechnen Sie es selbst durch. Keine E-Mail, keine Anmeldung, kein
           Ergebnis, das erst nach einem Klick erscheint — und jede Position
@@ -1684,7 +1688,7 @@ function NichtPassendSection() {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
           Ehrliche Beratung
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
@@ -1738,11 +1742,11 @@ function UseCasesSection() {
           variants={fadeUp}
           className="max-w-2xl mb-14"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             Anwendungsbereiche
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
-            Eingesetzt in Branchen mit
+            Geeignet für Branchen mit
             <br className="hidden sm:block" /> hohem Telefonaufkommen
           </h2>
           <p className="mt-4 text-gray-500 dark:text-gray-400 leading-[1.7]">
@@ -1763,8 +1767,8 @@ function UseCasesSection() {
               variants={fadeUp}
               className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <item.icon size={17} className="text-gray-400 dark:text-gray-400" aria-hidden="true" />
+              <div className="w-10 h-10 rounded-xl bg-pub-accent-wash dark:bg-blue-500/10 border border-pub-accent-line dark:border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <item.icon size={17} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
@@ -1773,6 +1777,14 @@ function UseCasesSection() {
                 <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                   {item.desc}
                 </p>
+                {"href" in item && item.href && (
+                  <Link
+                    to={item.href}
+                    className="inline-block mt-3 text-[15px] font-semibold text-pub-accent dark:text-blue-400 underline underline-offset-4 hover:no-underline"
+                  >
+                    {item.linkLabel}
+                  </Link>
+                )}
               </div>
             </motion.div>
           ))}
@@ -1795,7 +1807,7 @@ function FAQSectionBlock() {
           variants={fadeUp}
           className="mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-4">
             FAQ
           </p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1863,10 +1875,12 @@ function InternalLinksSection() {
     {
       heading: "Nach Branche",
       links: [
+        { label: "KI Telefonassistent für Praxen – Arzt, Zahnarzt, Therapie", href: "/praxen" },
         { label: "KI Telefonassistent für Arztpraxen", href: "/ki-telefonassistent-arzt" },
+        { label: "KI Telefonassistent in der Zahnarztpraxis", href: "/ki-telefonassistent-zahnarztpraxis" },
+        { label: "KI Telefonassistent für Therapiepraxen", href: "/ki-telefonassistent-praxis" },
         { label: "KI Telefonassistent für Restaurants", href: "/ki-telefonassistent-restaurant" },
         { label: "KI Telefonassistent für Hotels", href: "/ki-telefonassistent-hotel" },
-        { label: "Telefonassistent für medizinische Praxen", href: "/ki-telefonassistent-praxis" },
       ],
     },
     {
@@ -1896,13 +1910,13 @@ function InternalLinksSection() {
             gleichrangige h2 am Seitenende („Nach Branche", „Nach Region",
             „Verwandte Themen") hätten die Gliederung mit Navigationslabels
             beendet statt mit Inhalt. */}
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-7">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-accent dark:text-blue-400 mb-7">
           Weiterführende Seiten
         </h2>
         <div className="grid sm:grid-cols-3 gap-8">
           {cols.map((col) => (
             <div key={col.heading}>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-pub-ink-3 dark:text-gray-500 mb-3">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-pub-accent dark:text-blue-400 mb-3">
                 {col.heading}
               </h3>
               <ul className="space-y-2">
@@ -1915,7 +1929,7 @@ function InternalLinksSection() {
                       <ArrowRight
                         size={11}
                         aria-hidden="true"
-                        className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0"
+                        className="text-pub-accent-soft dark:text-blue-400 group-hover:text-pub-accent transition-colors flex-shrink-0"
                       />
                       {link.label}
                     </Link>
@@ -1969,7 +1983,7 @@ function FinalCtaSection() {
 
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-pub-ink-3 dark:text-gray-500 mb-6">
                 <span className="inline-flex items-center gap-1.5">
-                  <ListChecks size={12} aria-hidden="true" /> Ca. 15&nbsp;Minuten
+                  <ListChecks size={12} aria-hidden="true" /> Kein Verkaufsgespräch
                 </span>
                 <span>Kostenlos</span>
                 <span>Unverbindlich</span>

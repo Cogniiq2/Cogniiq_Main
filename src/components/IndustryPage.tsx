@@ -147,7 +147,7 @@ export function IndustryPage({ config }: IndustryPageProps) {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         <TrustStripSection config={config} />
         {config.engpaesse && config.engpaesse.length > 0 && (
@@ -167,7 +167,7 @@ export function IndustryPage({ config }: IndustryPageProps) {
         <InternalLinksSection config={config} />
         <FAQSection config={config} />
         <CTASection config={config} />
-      </main>
+      </div>
     </>
   );
 }
@@ -222,7 +222,7 @@ function HeroSection({
           <div className="flex flex-wrap gap-4">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
             >
               {config.hero.ctaLabel}
               <ArrowRight size={16} />
@@ -854,7 +854,7 @@ function CTASection({ config }: { config: IndustryPageConfig }) {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/kontakt"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
             >
               {config.hero.ctaLabel}
               <ArrowRight size={16} />

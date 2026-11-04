@@ -36,11 +36,29 @@
  */
 export const FAKTEN = {
   // ── Zahlen ──
-  mehrpreisProMinute: `0,39\u00A0€`,
-  /** Numerischer Zwilling von `mehrpreisProMinute` — für Rechenlogik, damit
-   *  niemand den Anzeigestring zurück in eine Zahl parsen muss. Gegen den
-   *  String abgesichert in `telefonassistent-copy.test.ts`. */
-  mehrpreisProMinuteEur: 0.39,
+  /*
+    MEHRMINUTEN — verbindliche Inhaber-Preisstruktur vom 24.10.2026 (zweite
+    Fassung des Tages). Jede abrechenbare Minute über dem Inklusivkontingent
+    kostet 0,50 €, in allen drei Tarifen. Es gibt KEINEN Preisdeckel und keine
+    „Obergrenze" mehr: Die Monatsrechnung steigt mit den Mehrminuten. Die
+    früheren Werte (0,39 €/Min. mit Deckel 500/800/1.400 €) sind ersatzlos
+    entfallen.
+  */
+  mehrpreisProMinute: `0,50\u00A0€`,
+  /** Numerischer Zwilling — Rechner lesen nur diesen, nie den Anzeigetext. */
+  mehrpreisProMinuteEur: 0.5,
+  /*
+    STEUERBASIS — verbindliche Inhaber-Entscheidung J8 vom 04.11.2026: Alle
+    Tarifpreise, Mehrminuten, Zusatzsprachen und Einrichtungsgebühren sind
+    Nettopreise zuzüglich der gesetzlichen Umsatzsteuer (derzeit 19 %). Jede
+    Euro-Konstante in dieser Datei ist ein Nettobetrag. Ändert sich der
+    gesetzliche Satz, werden NUR diese zwei Felder angepasst; ein Test hält
+    Zahl und Anzeigeform gleich.
+  */
+  umsatzsteuerSatz: 0.19,
+  umsatzsteuerProzent: `19\u00A0%`,
+  /** Kurzer Zusatz direkt an einer Preisangabe (Karten, Tabellen, Rechner). */
+  nettoZusatz: `netto zzgl. 19\u00A0% USt.`,
   /*
     Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
 
@@ -97,40 +115,29 @@ export const FAKTEN = {
   gleichzeitigeAnrufeKurz: "Mehrere Anrufe zur selben Zeit",
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
-  /** Deckelung. Nennt die Obergrenzen einzeln, weil die Regel „nie mehr als der
-   *  nächsthöhere Tarif" für MVZ nicht trägt (dort 1.400 €, Enterprise ab 5.000 €). */
-  deckelung: `Über dem Minutenkontingent kostet jede weitere Minute 0,39\u00A0€. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: Basis auf 500\u00A0€ im Monat, Praxis auf 800\u00A0€, MVZ auf 1.400\u00A0€.`,
+  /** J8 in einem Satz — steht an jedem Preisblock. */
+  steuerbasis: `Alle Preise sind Nettopreise zuzüglich der gesetzlichen Umsatzsteuer (derzeit 19\u00A0%).`,
+  /** J8 für Arztpraxen: unmissverständlich, mit der Folge für Praxen ohne
+   *  Vorsteuerabzug. Keine Steuerberatung, kein Versprechen über den
+   *  Steuerstatus einer einzelnen Praxis. */
+  steuerbasisPraxis: `Für Arztpraxen ausdrücklich: Alle genannten Beträge – Monatspreis, Mehrminuten, Zusatzsprachen und Einrichtung – gelten zuzüglich 19\u00A0% Umsatzsteuer. Kann Ihre Praxis keine Vorsteuer abziehen, wie es bei umsatzsteuerfreien heilberuflichen Leistungen üblich ist, sind die Bruttobeträge Ihre tatsächlichen Kosten; die Einordnung für Ihre Praxis trifft Ihre Steuerberatung.`,
+  /** Die Abrechnungsregel in einem Satz: Kontingent, Mehrminutensatz, kein Deckel. */
+  abrechnung: `Der Monatspreis enthält das Minutenkontingent Ihres Tarifs. Jede darüber hinausgehende abrechenbare Minute kostet zusätzlich 0,50\u00A0€ netto – in allen drei Tarifen. Einen Preisdeckel gibt es nicht: Überschreiten Sie das Kontingent, steigt die Monatsrechnung um die Mehrminuten.`,
 
-  /*
-    WORAUF SICH DIE OBERGRENZE BEZIEHT — Korrektur vom 12.09.2026.
+  /** Was auf der Monatsrechnung steht und was daneben ausgewiesen wird. Nennt
+   *  bewusst KEIN Dashboard und keine Warnmeldung: Eine Nutzungsauswertung im
+   *  Kundenbereich und Hinweise bei 80/100 % des Kontingents sind noch nicht
+   *  implementiert (OWNER-INPUT J14). */
+  abrechnungGeltung:
+    "Mehrminuten weisen wir auf der Monatsrechnung nachvollziehbar aus: Grundgebühr, enthaltene und abgerechnete Minuten, Anzahl der Mehrminuten und ihr Betrag zu 0,50\u00A0€ netto. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten stehen als eigene Positionen daneben, soweit sie anfallen. Auf die Nettosumme kommt die gesetzliche Umsatzsteuer, getrennt ausgewiesen.",
 
-    `deckelung` (oben) beschreibt die Regel korrekt: Der TARIF ist gedeckelt.
-    Daraus wurde an mehreren Stellen ein Satz über die GESAMTRECHNUNG —
-    „Mehr zahlen Sie in diesem Monat nicht", „Mehr als die ausgewiesene
-    Obergrenze kostet es nie". Das ist zu weit: Die Preislogik deckelt
-    nachweislich Grundpreis plus Mehrverbrauch. Ob Zusatzsprachen, der
-    Aufschlag für monatliche Kündbarkeit und individuell vereinbarte
-    Anbindungskosten INNERHALB dieser Grenze liegen, sagt unsere eigene
-    Quelle nicht — der Rechner weist sie deshalb seit jeher als eigene
-    Positionen aus, während die Prosa sie stillschweigend mit eingeschlossen
-    hat. Zwei Flächen, zwei Aussagen, und die großzügigere stand im Fließtext.
+  /** Kurzform für Kacheln und Tabellen. */
+  abrechnungKurz: "Festes Kontingent, Mehrminuten 0,50\u00A0€ netto",
 
-    `deckelungGeltung` benennt den Geltungsbereich, ohne die Gegenbehauptung
-    aufzustellen: Es steht hier NICHT, dass die Zusatzposten außerhalb der
-    Obergrenze liegen — auch das gäbe die Quelle nicht her. Es steht, dass
-    die Telefonie-Obergrenze allein die Endsumme nicht festlegt und das
-    Angebot die offenen Positionen schließt.
-  */
-  deckelungGeltung:
-    "Gedeckelt ist damit der Telefoniepreis — Grundpreis plus Mehrverbrauch. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten weisen wir separat aus, soweit sie anfallen; ob sie in die Obergrenze fallen, legt Ihr Angebot fest. Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme.",
-
-  /** Kurzform für Kacheln und Tabellen: nennt den Bezug mit, in vier Wörtern. */
-  deckelungKurz: "Telefonie gedeckelt: Grundpreis + Mehrverbrauch",
-
-  /** Tarifzuordnung. Beschreibt nicht nur den Rechner, sondern die Zusage an den
-   *  Kunden — siehe COPY-CLAIMS-TO-VERIFY F10. */
+  /** Tarifwahl. Nennt die Rechenregel, sagt keinen Tarifwechsel zu, den der
+   *  Vertrag nicht regelt. */
   tarifzuordnung:
-    "Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft — Sie zahlen den Zuschlag also nicht Monat für Monat.",
+    "Welcher Tarif bei Ihrem Aufkommen am wenigsten kostet, zeigt der Rechner – einschließlich Mehrminuten. Liegt Ihr Aufkommen regelmäßig über dem Kontingent, ist oft ein größerer Tarif günstiger; wann ein Wechsel möglich ist, regelt Ihr Vertrag.",
 
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler.",
@@ -281,9 +288,9 @@ export const SAEULEN: Array<{ title: string; description: string }> = [
       "Jedes Gespräch endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch. Der übliche Weg sieht heute so aus, dass Ihre MFA dieses Ergebnis anschließend ins Praxissystem überträgt. Vor der Einrichtung prüfen wir, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung möglich ist, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht möglich ist, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
   },
   {
-    title: "Ein Kontingent, ein Preis, eine Obergrenze",
+    title: "Ein Kontingent, ein Mehrminutensatz",
     description:
-      `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen. ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
+      `${FAKTEN.abrechnung} Eine Grippewelle erhöht Ihre Rechnung deshalb um die Mehrminuten – nachvollziehbar zu einem festen Satz. ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
 ];
 
@@ -373,7 +380,7 @@ export const TEAM_BLOCK = {
     "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Wiederkehrende Anliegen — Termin vergeben, verschieben, stornieren, freigegebene Fragen beantworten — sind erledigt, bevor der Anrufer auflegt; sie erscheinen als abgeschlossener Vorgang und nicht als Aufgabe. Auf der Liste Ihres Teams steht nur, was Sie ausgenommen haben: fachliche Fragen, Rezept- und Überweisungswünsche, strittige Fälle. Den Rahmen legen Sie fest, und Sie können ihn jederzeit ändern.",
   points: [
     "Weniger Unterbrechungen zu Stoßzeiten — der Tresen hat Vorrang",
-    "Mehrere Anrufe zur selben Zeit: niemand hört mehr ein Besetztzeichen, auch am Montagmorgen nicht",
+    "Mehrere Anrufe zur selben Zeit: deutlich seltener ein Besetztzeichen, auch am Montagmorgen",
     "Freigegebene Routineabläufe sind im Gespräch erledigt — sie landen gar nicht erst auf einer Liste",
     "Was übrig bleibt, kommt strukturiert an: Anliegen, Name, Rückrufnummer, Terminwunsch — statt Notizzettel",
     "Eine kurze Liste echter Ausnahmen statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
@@ -436,8 +443,8 @@ export const ANLIEGEN_IMMER_MENSCH: string[] = [
 
 /** M10 · Planbare Kosten — Vorhersehbarkeit vor Preishöhe. */
 export const PLANBARE_KOSTEN = {
-  headline: "Ein Kontingent, ein Preis, eine Obergrenze",
-  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Einrichtung Ihres Empfangs dazu; sie steht vor Vertragsschluss im Angebot. ${FAKTEN.preisgarantie}`,
+  headline: "Ein Kontingent, ein Mehrminutensatz",
+  text: `${FAKTEN.abrechnung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Standard-Einrichtung von 990\u00A0€ netto dazu. ${FAKTEN.preisgarantie} ${FAKTEN.steuerbasis}`,
 };
 
 /**
@@ -452,7 +459,7 @@ export const GRENZEN = {
   points: [
     "Keine medizinische Einschätzung, keine Triage, keine Beratung. Der Assistent beurteilt niemals, wie dringend ein gesundheitliches Anliegen ist – zu keinem Zeitpunkt, in keiner Konfiguration.",
     "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen – die Entscheidungen über Termine, Rückmeldungen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
-    "Notfälle werden erkannt und sofort weitergeleitet – an Ihr Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt.",
+    "Hinweise auf einen Notfall – Signalwörter und Formulierungen, die Sie festlegen – lösen keinen Routineablauf aus, sondern die hinterlegte Weiterleitung: an Ihr Team, den Bereitschaftsdienst oder die Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt, und eine Erkennung jedes Notfalls versprechen wir nicht.",
     "Beschwerden, emotionale Gespräche und alles, was Sie im Anliegen-Katalog als Chefsache markieren, landen immer bei einem Menschen.",
     `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch die einer Schnittstelle, die Dritte berechnen.`,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht – Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
@@ -488,8 +495,8 @@ export const PATIENTEN_SICHT = {
   ],
   stat: {
     value: "39\u00A0%",
-    text: "der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig.",
-    source: "GKV-Spitzenverband, Versichertenbefragung 2025",
+    text: "der befragten Versicherten bewerten die Erreichbarkeit medizinischer Versorgung außerhalb der üblichen Praxisöffnungszeiten als schwierig – eine Aussage über die Versorgung insgesamt, nicht über das Praxistelefon.",
+    source: "GKV-Spitzenverband, Versichertenbefragung 2025, n = 3.520",
   },
 };
 
@@ -632,11 +639,8 @@ export interface Tarif {
   /** Ungefähre Anrufzahl — Praxen denken nicht in Minuten (Brief III §5.2). */
   anrufeCa: number;
   monatlich: string;
-  /** Obergrenze inklusive Mehrverbrauch. */
-  obergrenze: string;
-  einrichtung: string;
   /*
-    NUMERISCHE ZWILLINGE der drei Beträge darüber.
+    NUMERISCHER ZWILLING des Monatsbetrags darüber.
 
     Warum additiv und nicht statt der Strings: Die Strings sind das, was auf der
     Seite steht, inklusive schmalem geschütztem Leerzeichen — und die Preisseite
@@ -652,9 +656,28 @@ export interface Tarif {
     eine Zahl von ihrem String ab, schlägt der Test an.
   */
   monatlichEur: number;
-  obergrenzeEur: number;
-  einrichtungEur: number;
 }
+
+/*
+  EINRICHTUNG — EIN STANDARD, EIN BETRAG (Inhaber-Entscheidung 24.10.2026).
+
+  Der normale Einrichtungsaufwand ist bei allen drei Tarifen gleich, deshalb
+  gilt für Basis, Praxis und MVZ dieselbe Standard-Einrichtung von 990 €
+  einmalig. Die frühere Staffel (1.490 / 2.490 / 3.490 €) ist ersatzlos
+  entfallen. Mehraufwand für eine nach Prüfung aufwendigere oder nicht
+  unterstützte Systemanbindung wird separat und vor Beauftragung mit
+  beschriebenem Umfang angeboten — dafür steht hier bewusst kein Betrag.
+*/
+export const EINRICHTUNG = {
+  eur: 990,
+  anzeige: "990\u00A0€",
+  /** Kurzform für Tarifkarten und Rechner. */
+  kurz: "990\u00A0€ netto, einmalig",
+  standard:
+    "Die Standard-Einrichtung kostet in allen drei Tarifen einmalig 990\u00A0€ netto, weil der Aufwand derselbe ist: Ihr Empfang wird nach Ihren Angaben aufgebaut, getestet und zur Freigabe übergeben.",
+  sonder:
+    "Ist eine Systemanbindung nach unserer Prüfung deutlich aufwendiger oder wird sie nicht unterstützt, sodass eine Sonderlösung nötig ist, bieten wir diesen Mehraufwand separat an – mit beschriebenem Umfang und Preis vor der Beauftragung. Wir behaupten nicht, dass jede Anbindung möglich ist.",
+};
 
 export const TARIFE: Tarif[] = [
   {
@@ -662,53 +685,41 @@ export const TARIFE: Tarif[] = [
     minuten: 500,
     anrufeCa: 250,
     monatlich: "300\u00A0€",
-    obergrenze: "500\u00A0€",
-    einrichtung: "1.490\u00A0€",
     monatlichEur: 300,
-    obergrenzeEur: 500,
-    einrichtungEur: 1490,
   },
   {
     name: "Praxis",
     minuten: 1000,
     anrufeCa: 500,
     monatlich: "500\u00A0€",
-    obergrenze: "800\u00A0€",
-    einrichtung: "2.490\u00A0€",
     monatlichEur: 500,
-    obergrenzeEur: 800,
-    einrichtungEur: 2490,
   },
   {
     name: "MVZ",
     minuten: 2000,
     anrufeCa: 1000,
     monatlich: "800\u00A0€",
-    obergrenze: "1.400\u00A0€",
-    einrichtung: "3.490\u00A0€",
     monatlichEur: 800,
-    obergrenzeEur: 1400,
-    einrichtungEur: 3490,
   },
 ];
 
 /** Vierter Tarif ohne Kachel — bewusst als Fließtextzeile (Inhaber-Entscheidung). */
 export const TARIF_ENTERPRISE =
-  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000\u00A0€ im Monat.";
+  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000\u00A0€ netto im Monat.";
+/** Numerischer Zwilling der Enterprise-Untergrenze — der Rechner weist ab hier
+ *  auf ein individuelles Kontingent hin, statt nur Mehrminuten aufzuaddieren. */
+export const TARIF_ENTERPRISE_AB_EUR = 5000;
 
 /**
- * M10 · Die Deckelung — steht auf der Preisseite VOR der ersten Zahl
- * (Brief III §5.1).
+ * M10 · Die Abrechnungsregel — steht auf der Preisseite VOR der ersten Zahl
+ * (Brief III §5.1). Seit dem 24.10.2026 ohne Deckel: Kontingent + 0,50 € je
+ * Mehrminute, monatlich ausgewiesen.
  */
-export const DECKELUNG = {
-  headline: "Zuerst die Obergrenze, dann der Preis",
-  text:
-    `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Grippewelle kann Ihre Telefonierechnung also bewegen, aber nicht sprengen.`,
-  /** Der Geltungsbereich steht direkt neben der Zusage, nicht im Kleingedruckten. */
-  geltung: FAKTEN.deckelungGeltung,
-  hinweis: "Für Grundpreis und Mehrverbrauch kostet es nie mehr als die ausgewiesene Obergrenze.",
-  tarifwechsel:
-    "Und Sie bleiben nicht im falschen Tarif sitzen: Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft. Wer Monat für Monat den Zuschlag zahlt, zahlt zu viel — dann gehört er in den nächsten Tarif.",
+export const ABRECHNUNG = {
+  headline: "Kontingent, Mehrminuten, Monatsrechnung – so rechnen wir ab",
+  text: FAKTEN.abrechnung,
+  geltung: FAKTEN.abrechnungGeltung,
+  tarifwechsel: FAKTEN.tarifzuordnung,
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler. Ob bei Ihnen zwei oder sieben Personen behandeln, ändert am Monatsbetrag nichts.",
 };
@@ -728,9 +739,9 @@ export const DECKELUNG = {
 
   NICHT abgebildet, weil der Satz es nicht eindeutig festlegt — siehe
   OWNER-INPUT: ob „bis zu fünf Sprachen gleichzeitig" Deutsch mitzählt, und ob
-  der Sprachaufschlag INNERHALB der Tarif-Obergrenze liegt oder daneben. Der
-  Rechner rät das nicht, sondern weist den Aufschlag als eigene Zeile aus und
-  sagt dazu, dass die Zuordnung zur Obergrenze im Angebot steht.
+  ab drei Sprachen ein Paketpreis gilt. Der Rechner rät das nicht, sondern
+  weist den Aufschlag als eigene Zeile aus (seit 24.10.2026 gibt es keinen
+  Preisdeckel mehr, dem er zugeordnet werden müsste).
 
   SICHTBARER TEXT UND RECHNER GEZOGEN, 12.09.2026 — OWNER-INPUT H3 offen.
 
@@ -769,7 +780,7 @@ export const SPRACHEN_PREISE = {
 
 export const SPRACHEN = {
   headline: "Weitere Sprachen",
-  text: "Deutsch ist enthalten und kostet nichts extra. Eine weitere Sprache kostet 79\u00A0€ im Monat. Ab zwei zusätzlichen Sprachen gilt ein Paketpreis, dessen genaue Staffelung wir Ihnen im schriftlichen Angebot nennen — wir setzen hier keinen Betrag ein, den wir nicht für jede Konstellation belegen können. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+  text: "Deutsch ist enthalten und kostet nichts extra. Eine weitere Sprache kostet 79\u00A0€ netto im Monat. Ab zwei zusätzlichen Sprachen gilt ein Paketpreis, dessen genaue Staffelung wir Ihnen im schriftlichen Angebot nennen — wir setzen hier keinen Betrag ein, den wir nicht für jede Konstellation belegen können. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
 };
 
 /**
@@ -781,7 +792,7 @@ export const SPRACHEN = {
 export const EINRICHTUNG_PROJEKT = {
   headline: "Einrichtung Ihres Empfangs",
   intro:
-    "Die Einrichtung ist kein Gebührenposten, sondern ein Projekt mit acht Schritten. Sie zahlen die Hälfte bei Vertragsabschluss und die zweite Hälfte nach dem Go-live.",
+    "Die Einrichtung ist kein Gebührenposten, sondern ein Projekt mit acht Schritten – bei allen drei Tarifen derselbe Standardaufwand. Sie zahlen die Hälfte bei Vertragsabschluss und die zweite Hälfte nach dem Go-live.",
   schritte: [
     {
       nummer: "1",
@@ -885,57 +896,18 @@ export const BETREUUNG_NACH_GOLIVE = {
  * heutigen Weg ohne Beschönigung (Inhaber-Antwort B).
  */
 /*
-  EINGEFROREN — WORTGLEICH LASSEN.
-
-  `UEBERGABE` wird von `TelefonassistentBeweiskette` gerendert und damit von
-  einer eingefrorenen Experimentroute. Jede Änderung an diesen Strings bewegt
-  deren gerenderte Bytes und zerstört die Messung; `protectedExperiments.test.tsx`
-  fängt das ab.
-
-  Inhaltlich ist die Fassung überholt: Ihr erster Satz beschreibt den ÜBLICHEN
-  WEG ANDERER SYSTEME („der Assistent nimmt an, Ihre MFA überträgt danach von
-  Hand") und wurde als Beschreibung DIESES Produkts gelesen. Die korrigierte
-  Fassung steht direkt darunter in `UEBERGABE_ABWICKLUNG` und wird von den
-  nicht eingefrorenen Seiten verwendet. Endet das Experiment, ersetzt sie diese
-  hier — notiert in docs/seo/post-experiment-opportunities.md.
+  Bis zum 2026-10-23 stand hier eine ältere Fassung, die wortgleich bleiben
+  musste, weil eine eingefrorene Experimentroute sie renderte. Das Experiment
+  ist graduiert; `UEBERGABE` ist seitdem ein Alias der korrigierten Fassung
+  `UEBERGABE_ABWICKLUNG` unten, damit kein Konsument mehr den überholten
+  „MFA tippt ab"-Normalfall ausliefert.
 */
-export const UEBERGABE = {
-  headline: "Und wer tippt das dann bei Ihnen ein?",
-  paragraphs: [
-    "Der übliche Weg sieht so aus: Der Assistent nimmt den Anruf an, und Ihre MFA überträgt das Ergebnis anschließend von Hand ins Praxissystem. Das ist der Grund, warum viele Praxen solche Systeme nach wenigen Wochen wieder abschalten — die Arbeit ist nicht verschwunden, sie ist nur umgezogen.",
-    "Wir prüfen vor der Einrichtung, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung technisch möglich ist, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht möglich ist, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
-  ],
-  wasAnkommt: {
-    headline: "Was nach jedem Anruf im Dashboard steht",
-    items: ["Anliegen", "Name", "Rückrufnummer", "Terminwunsch"],
-    hinweis:
-      "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet.",
-  },
-  // [[ASSET: Screenshot des Dashboards nach einem Anruf — Spezifikation in
-  // ASSETS-REQUIRED.md. Bis zur Lieferung bleibt der Bild-Slot ungerendert.]]
-};
-
-/**
- * Die korrigierte Praxis-Fassung von `UEBERGABE` — für alle NICHT eingefrorenen
- * Seiten (`/praxen`, `/integrationen`).
- *
- * Der Unterschied ist die Reihenfolge, und sie entscheidet, was der Leser für
- * das Produkt hält. `UEBERGABE` beginnt mit der Handübertragung durch die MFA;
- * gemeint war der übliche Weg ANDERER Systeme, gelesen wurde es als Normalfall
- * hier. Diese Fassung nennt zuerst, was im Normalbetrieb passiert — der Anruf
- * ist erledigt, bevor der Anrufer auflegt —, dann die Abgrenzung, dann die
- * Bedingung für Schreibzugriff auf ein Kundensystem.
- *
- * Die Übergabe bleibt vollständig beschrieben. Sie ist wertvoll, aber sie ist
- * der AUSNAHMEWEG: für fachliche Fragen, Ausnahmen und Abläufe, die eine
- * Schnittstelle nicht trägt.
- */
 export const UEBERGABE_ABWICKLUNG = {
   headline: "Und wer tippt das dann bei Ihnen ein?",
   paragraphs: [
-    "Im Normalfall niemand. Was Sie freigegeben haben, wickelt der Assistent im Gespräch ab: Termin vergeben, verschieben, absagen, freigegebene Fragen beantworten. Der Vorgang ist fertig, bevor der Anrufer auflegt — er wird nicht zu einer Aufgabe, die jemand später abtippt.",
+    "Für die freigegebenen Abläufe niemand. Was Sie freigegeben haben, wickelt der Assistent im Gespräch ab: Termin vergeben, verschieben, absagen, freigegebene Fragen beantworten. Der Vorgang ist fertig, bevor der Anrufer auflegt — er wird nicht zu einer Aufgabe, die jemand später abtippt.",
     "Das unterscheidet den Empfang von den Systemen, die viele Praxen nach wenigen Wochen wieder abschalten: Dort nimmt eine Maschine den Anruf an, und die Arbeit ist nicht verschwunden, sondern nur umgezogen — von der Anmeldung auf die Abendliste.",
-    "Die Bedingung dafür ist technisch und wird vorher geklärt: Wo ein Ablauf direkt in Ihr Praxissystem schreibt, prüfen wir dessen Schnittstelle vor der Einrichtung und verifizieren die Anbindung vor dem Go-live. Trägt sie einen Ablauf nicht, greift der Weg, den wir vorher gemeinsam festgelegt haben — dann steht der fertige Vorgang für Ihr Team bereit. Das ist der Rückfallweg, nicht der Normalfall, und Sie erfahren vor der Unterschrift, welcher Ihrer Abläufe welchen Weg nimmt.",
+    "Die Bedingung dafür ist technisch und wird vorher geklärt: Wo ein Ablauf direkt in Ihr Praxissystem schreibt, prüfen wir dessen Schnittstelle vor der Einrichtung und verifizieren die Anbindung vor dem Go-live. Trägt sie einen Ablauf nicht, greift der Weg, den wir vorher gemeinsam festgelegt haben — dann steht der fertige Vorgang für Ihr Team bereit. Welcher Ihrer Abläufe welchen Weg nimmt, erfahren Sie vor der Unterschrift – nicht danach.",
   ],
   wasAnkommt: {
     headline: "Was bei einer Übergabe im Dashboard steht",
@@ -944,6 +916,9 @@ export const UEBERGABE_ABWICKLUNG = {
       "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet. Abläufe, die durchlaufen, erscheinen als erledigt und nicht als Aufgabe.",
   },
 };
+
+/** Alias — siehe Kommentar oben. */
+export const UEBERGABE = UEBERGABE_ABWICKLUNG;
 
 /**
  * M18 · Betreuung — Antwort auf den dokumentierten Abbruchgrund (52 % nennen
@@ -1012,7 +987,7 @@ export const NICHT_EXTRA = {
   intro:
     "Diese Posten tauchen auf keiner Rechnung auf, weil sie im Monatsbetrag enthalten sind:",
   punkte: [
-    `Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
+    `Kleinere Änderungen an Ansagen, Anliegen und Regeln — umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
     `Ihr fester Ansprechpartner, erreichbar ${FAKTEN.erreichbarkeit}, Antwort ${FAKTEN.antwortzeit}`,
     `${FAKTEN.gleichzeitigeAnrufeKurz} — in jedem Tarif, auch im kleinsten`,
     "Deutsch als Sprache",
@@ -1037,7 +1012,15 @@ export const VERTRAG = {
     },
     {
       label: "Preisgarantie",
-      wert: `${FAKTEN.preisgarantie} Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht.`,
+      // Bis 04.11.2026 folgte hier „Innerhalb dieser Zeit ändert sich Ihr
+      // Monatsbetrag nicht." – falsch, seit Mehrminuten ohne Deckel abgerechnet
+      // werden. Was die Garantie genau umfasst, ist OWNER-INPUT J5.
+      wert: FAKTEN.preisgarantie,
+    },
+    {
+      // J8, Inhaber-Entscheidung 04.11.2026.
+      label: "Umsatzsteuer",
+      wert: FAKTEN.steuerbasis,
     },
     {
       label: "Zahlung der Einrichtung",
@@ -1138,13 +1121,13 @@ export const KOMPAKT_SAEULEN: KompaktBlock & { punkte: string[] } = {
   },
 };
 
-/** M10 · Planbare Kosten — die Deckelungsaussage, sonst nichts. */
+/** M10 · Planbare Kosten — die Abrechnungsregel, sonst nichts. */
 export const KOMPAKT_KOSTEN: KompaktBlock & { text: string } = {
   modul: "M10",
-  headline: "Ein Kontingent, ein Preis, eine Obergrenze",
-  text: FAKTEN.deckelung,
+  headline: "Ein Kontingent, ein Monatspreis, ein Mehrminutensatz",
+  text: `${FAKTEN.abrechnung} ${FAKTEN.steuerbasis}`,
   mehr: {
-    label: "Alle Tarife, Kontingente und Obergrenzen",
+    label: "Alle Tarife und Kontingente",
     href: "/kosten-ki-telefonassistent",
   },
 };
@@ -1456,8 +1439,8 @@ export const ANBIETER_CHECKLISTE: Array<{
   {
     frage: "Was steht am Monatsende auf der Rechnung?",
     warum:
-      "Minutenpreise ohne Obergrenze verschieben das Mengenrisiko auf Sie. Ein einzelner Ausnahmemonat — Rückrufwelle, Störung, Kampagne — kann eine Abrechnung sprengen, die im Normalbetrieb unauffällig war.",
-    cogniiq: `Jeder Tarif enthält ein festes Minutenkontingent und ist nach oben auf eine ausgewiesene Obergrenze gedeckelt. ${FAKTEN.preisgarantie} Die Zahlen stehen vollständig auf der Kostenseite, nicht erst im Gespräch.`,
+      "Ein einzelner Ausnahmemonat — Rückrufwelle, Störung, Kampagne — kann eine Abrechnung deutlich erhöhen. Fragen Sie, wie Minuten über ein Kontingent hinaus berechnet werden, ob es einen Deckel gibt und wie die Rechnung die Nutzung aufschlüsselt.",
+    cogniiq: `${FAKTEN.abrechnung} ${FAKTEN.abrechnungGeltung} ${FAKTEN.preisgarantie} Die Zahlen stehen vollständig auf der Kostenseite, nicht erst im Gespräch.`,
   },
   {
     frage: "Was passiert mit dem, was Anrufer sagen?",
@@ -1503,21 +1486,21 @@ export const GENERISCH_UEBERGABE = {
 };
 
 /**
- * Branchenoffene Fassung von DECKELUNG.
+ * Branchenoffene Fassung von ABRECHNUNG.
  *
- * `DECKELUNG.text` nennt eine Grippewelle als Lastspitze und
- * `DECKELUNG.nichtProBehandler` rechnet „pro Praxis, nicht pro Behandler" —
+ * `ABRECHNUNG.text` nennt eine Grippewelle als Lastspitze und
+ * `ABRECHNUNG.nichtProBehandler` rechnet „pro Praxis, nicht pro Behandler" —
  * beides sind Praxisaussagen. Die Abrechnungseinheit wird hier NICHT
  * verallgemeinert („pro Betrieb, nicht pro Mitarbeiter" wäre eine Aussage, die
  * der Inhaber so nicht getroffen hat); sie entfällt auf der generischen Seite
  * und steht weiterhin dort, wo sie belegt ist. Die Obergrenze selbst gilt
  * unabhängig von der Branche und bleibt deshalb wörtlich erhalten.
  */
-export const GENERISCH_DECKELUNG = {
-  headline: "Zuerst die Obergrenze, dann der Preis",
-  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Rückrufwelle oder eine Kampagne kann Ihre Telefonierechnung also bewegen, aber nicht sprengen.`,
-  geltung: FAKTEN.deckelungGeltung,
-  tarifwechsel: DECKELUNG.tarifwechsel,
+export const GENERISCH_ABRECHNUNG = {
+  headline: ABRECHNUNG.headline,
+  text: FAKTEN.abrechnung,
+  geltung: FAKTEN.abrechnungGeltung,
+  tarifwechsel: ABRECHNUNG.tarifwechsel,
   preisgarantie: FAKTEN.preisgarantie,
 };
 
@@ -1567,7 +1550,9 @@ export const GENERISCH_GRENZEN = {
     "Kein Ersatz für Ihr Team. Routineabläufe schließt der Assistent ab; Entscheidungen außerhalb der freigegebenen Regeln, Ausnahmen und alles Strittige bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
     "Keine fachliche Beratung und keine Bewertung von Dringlichkeit. Er erkennt die Signalwörter, die Sie festlegen, und leitet dann weiter — beurteilen tut er nicht.",
     "Er handelt nur innerhalb dessen, was Sie freigegeben haben. Welcher Anlass automatisch abgeschlossen wird und wo die Grenze liegt, entscheiden Sie im Anliegen-Katalog — nicht das System.",
-    `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch denen einer Schnittstelle, die Dritte berechnen.`,
+    // Branchenoffener Zwilling von FAKTEN.keineAnbindung: dieselbe Prüfung, ohne
+    // „Praxisverwaltungssystem" — das war der letzte Medizinbezug der Seite.
+    "Eine Standardanbindung, die auf jede Software sofort passt, gibt es nicht — deshalb prüfen wir Ihr konkretes System vor dem Angebot: ob es eine geeignete Schnittstelle gibt, ob wir dafür Zugang oder eine Freigabe bekommen, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren verlangen. Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch denen einer Schnittstelle, die Dritte berechnen.",
     FAKTEN.bestaetigungen,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht — Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
     "Der Assistent übernimmt nicht alle Anrufe. Was er vollständig abschließt, sind die Routineabläufe, die Sie freigegeben haben — nicht Ihre gesamte Telefonie. Wie groß dieser Anteil in Ihrem Betrieb ist, hängt an Ihren Anrufanlässen; wir nennen dafür keine Quote, die wir nicht gemessen haben.",

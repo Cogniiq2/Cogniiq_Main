@@ -43,14 +43,14 @@ export const BLOG_CATEGORIES = [
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "ki-automatisierung-kleine-unternehmen",
-    title: "KI-Automatisierung für kleine Unternehmen: Der komplette Leitfaden 2025",
-    metaTitle: "KI-Automatisierung für kleine Unternehmen 2025 | Leitfaden",
+    title: "KI-Automatisierung für kleine Unternehmen: Der komplette Leitfaden",
+    metaTitle: "KI-Automatisierung für kleine Unternehmen | Leitfaden",
     metaDescription:
       "KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.",
     category: "KI-Automatisierung",
     readingTime: 9,
-    publishedAt: "2025-01-20",
-    updatedAt: "2025-03-01",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Viele Inhaber kleiner Unternehmen verbringen einen erheblichen Teil ihrer Arbeitszeit mit Aufgaben, die eine KI in Sekunden erledigen könnte. Dieser Leitfaden zeigt, wo der Hebel am größten ist.",
     heroKeyword: "KI-Automatisierung kleine Unternehmen",
@@ -141,7 +141,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Wie lange dauert die Einrichtung eines Automatisierungssystems?",
         answer:
-          "Einfache Workflows sind in wenigen Tagen live. Komplexere Systeme benötigen zwei bis vier Wochen für Analyse, Aufbau und Testing.",
+          "Einfache Workflows lassen sich schnell einrichten; komplexere Systeme brauchen Zeit für Analyse, Aufbau und Testing – wie viel, hängt an den beteiligten Systemen und ihren Schnittstellen.",
       },
       {
         question: "Ist KI-Automatisierung DSGVO-konform?",
@@ -170,17 +170,17 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   },
   {
     slug: "ki-telefonassistent-arztpraxis",
-    title: "KI-Telefonassistent für Arztpraxen: was er übernimmt – und was beim Team bleibt",
-    metaTitle: "KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt | Cogniiq",
+    title: "Telefon in der Arztpraxis: welche Anrufe beim Team bleiben müssen – und welche nicht",
+    metaTitle: "Telefon in der Arztpraxis: was beim Team bleiben muss | Cogniiq",
     metaDescription:
-      "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
+      "Rezept, Befund, Akuttermin, Krankschreibung: welche Anrufe in einer Arztpraxis ein Mensch führen muss, welche ein Assistent erledigen kann – und woran die Praxissoftware-Anbindung hängt.",
     category: "KI-Telefonassistent",
     readingTime: 7,
-    publishedAt: "2025-01-28",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-09-05",
     excerpt:
       "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Ein KI-Telefonassistent übernimmt die Annahme und die strukturierte Aufnahme klar benennbarer Anliegen – auch außerhalb der Öffnungszeiten. Was eine Einschätzung verlangt, bleibt beim Team.",
-    heroKeyword: "KI-Telefonassistent Arztpraxis",
+    heroKeyword: "Telefon in der Arztpraxis",
     sections: [
       {
         type: "p",
@@ -250,7 +250,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was passiert bei Notfällen?",
         answer:
-          "Notfälle werden erkannt und sofort weitergeleitet – an das Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls durch das System findet nicht statt.",
+          "Hinweise auf einen Notfall – Signalwörter, die die Praxis festlegt – lösen die hinterlegte Weiterleitung aus: an das Team, den Bereitschaftsdienst oder die Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls durch das System findet nicht statt, und eine Erkennung jedes Notfalls kann kein System versprechen.",
       },
       {
         question: "Sprechen Patienten lieber mit einem Menschen?",
@@ -261,13 +261,22 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     relatedSlugs: [
       "ki-automatisierung-kleine-unternehmen",
       "verpasste-anrufe-kosten",
-      "ki-telefonassistent-restaurant",
     ],
     weiterfuehrend: [
       {
         to: "/praxen",
         label: "Der KI-Empfang für Arzt- und Zahnarztpraxen",
         text: "Was der Empfang übernimmt, was immer ein Mensch macht, wie er eingerichtet wird und was er kostet.",
+      },
+      {
+        to: "/ki-telefonassistent-arzt",
+        label: "KI-Telefonassistent für Arztpraxen",
+        text: "Die Anrufanlässe einer Arztpraxis einzeln: was der Assistent erledigt, was er aufnimmt, was immer ein Mensch führt.",
+      },
+      {
+        to: "/kosten-ki-telefonassistent",
+        label: "Was ein KI-Telefonassistent kostet",
+        text: "Tarife mit Minutenkontingent und festem Mehrminutensatz, Einrichtung, Laufzeit – und ein Rechner ohne Anmeldung.",
       },
       {
         to: "/ki-telefonassistent-einfuehren",
@@ -280,13 +289,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "webdesign-konversion-tipps",
     title: "Webdesign für mehr Anfragen: 8 Konversionsfaktoren, die wirklich zählen",
-    metaTitle: "Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps",
+    metaTitle: "Webdesign für mehr Anfragen & Konversion | 8 Tipps",
     metaDescription:
       "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate deutlich steigern können.",
     category: "Webdesign",
     readingTime: 8,
-    publishedAt: "2025-02-03",
-    updatedAt: "2025-03-05",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Die meisten Unternehmenswebsites sind Visitenkarten – keine Verkaufsmaschinen. Dieser Artikel erklärt, welche acht Design- und Inhaltsentscheidungen den größten Einfluss auf Anfragen haben.",
     heroKeyword: "Webdesign Konversion",
@@ -385,13 +394,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "lokales-seo-unternehmen",
     title: "Lokales SEO für Unternehmen: Wie Sie in Google Maps und lokalen Suchen erscheinen",
-    metaTitle: "Lokales SEO für Unternehmen 2025 | Google Maps & lokale Suche",
+    metaTitle: "Lokales SEO für Unternehmen | Google Maps & lokale Suche",
     metaDescription:
       "Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.",
     category: "Local SEO",
     readingTime: 10,
-    publishedAt: "2025-02-10",
-    updatedAt: "2025-03-10",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Wenn jemand 'Zahnarzt Bayreuth' oder 'Restaurant München Innenstadt' googelt, erscheinen die ersten drei Ergebnisse in einem Kartenblock. Wer dort nicht ist, existiert für diesen Suchenden nicht.",
     heroKeyword: "Lokales SEO Unternehmen",
@@ -496,7 +505,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Wie Sie den ROI einer Prozessautomatisierung berechnen: Formel, welche Kosten in die Rechnung gehören, Amortisationszeit statt Prozentwert und wann sich Automatisierung nicht rechnet.",
     category: "KI-Automatisierung",
     readingTime: 7,
-    publishedAt: "2025-02-17",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-09-17",
     excerpt:
       "Viele Unternehmen scheuen die Investition in Automatisierung, weil sie den Nutzen nicht greifbar machen können. Dieser Artikel zeigt, wie ein einfaches ROI-Modell in unter 30 Minuten aufgestellt werden kann.",
@@ -628,8 +637,8 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation zum Nachrechnen mit eigenen Zahlen – und wie ein KI-Telefonassistent dagegen hilft.",
     category: "KI-Telefonassistent",
     readingTime: 6,
-    publishedAt: "2025-02-24",
-    updatedAt: "2025-03-12",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-09-17",
     excerpt:
       "Was ein verpasster Anruf kostet, hängt vom Auftragswert ab – rechnen Sie mit Ihren eigenen Zahlen. Dieser Artikel zeigt, wie die Kalkulation funktioniert.",
     heroKeyword: "verpasste Anrufe Kosten",
@@ -714,13 +723,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent für Restaurants: Mehr Reservierungen, weniger Arbeit",
-    metaTitle: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
+    metaTitle: "KI-Telefonassistent Restaurant | Reservierungen automatisieren",
     metaDescription:
       "Wie Restaurants mit einem KI-Telefonassistenten Reservierungsanfragen auch in der Stoßzeit annehmen, was der Assistent übernimmt, was beim Team bleibt und woran die Anbindung an ein Reservierungssystem hängt.",
     category: "KI-Telefonassistent",
     readingTime: 6,
-    publishedAt: "2025-03-03",
-    updatedAt: "2025-03-14",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt die Anrufe an, die sonst verloren gingen – auch in der Stoßzeit.",
     heroKeyword: "KI-Telefonassistent Restaurant",
@@ -812,13 +821,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "website-ohne-anfragen",
     title: "Warum Ihre Website keine Anfragen bringt – und wie Sie das ändern",
-    metaTitle: "Website bringt keine Anfragen? Ursachen & Lösungen 2025",
+    metaTitle: "Website bringt keine Anfragen? Ursachen & Lösungen",
     metaDescription:
       "Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.",
     category: "Webdesign",
     readingTime: 7,
-    publishedAt: "2025-03-06",
-    updatedAt: "2025-03-15",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Eine Website zu haben und eine Website zu haben, die Anfragen bringt, sind zwei verschiedene Dinge. Die meisten Unternehmenswebsites gehören zur ersten Kategorie.",
     heroKeyword: "Website keine Anfragen",
@@ -905,13 +914,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "digitalisierung-mittelstand",
     title: "Digitalisierung im Mittelstand: Wo anfangen, was vermeiden",
-    metaTitle: "Digitalisierung Mittelstand 2025 | Wo anfangen & was vermeiden",
+    metaTitle: "Digitalisierung Mittelstand | Wo anfangen & was vermeiden",
     metaDescription:
       "Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.",
     category: "Digitalisierung",
     readingTime: 9,
-    publishedAt: "2025-03-10",
-    updatedAt: "2025-03-16",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Viele Mittelständler wissen, dass sie digitalisieren müssen – aber nicht, womit sie anfangen sollen. Dieser Leitfaden gibt eine klare Priorisierung.",
     heroKeyword: "Digitalisierung Mittelstand",
@@ -1003,13 +1012,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "webdesign-agentur-auswahl",
     title: "Webdesign-Agentur auswählen: 7 Kriterien, die wirklich zählen",
-    metaTitle: "Webdesign Agentur auswählen 2025 | 7 entscheidende Kriterien",
+    metaTitle: "Webdesign Agentur auswählen | 7 entscheidende Kriterien",
     metaDescription:
       "Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.",
     category: "Webdesign",
     readingTime: 7,
-    publishedAt: "2025-03-13",
-    updatedAt: "2025-03-16",
+    publishedAt: "2026-03-16",
+    updatedAt: "2026-10-23",
     excerpt:
       "Eine schlechte Wahl bei der Webdesign-Agentur kostet Zeit, Geld und Nerven. Diese sieben Kriterien helfen, die richtige Agentur zu finden – bevor der Vertrag unterschrieben ist.",
     heroKeyword: "Webdesign Agentur auswählen",

@@ -208,16 +208,11 @@ export function BlogPostPage() {
     description: article.metaDescription,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
-    author: {
-      "@type": "Organization",
-      name: "Cogniiq",
-      url: "https://cogniiq.de",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Cogniiq",
-      url: "https://cogniiq.de",
-    },
+    // Both reference the one Organization node LocalBusinessSchema emits on
+    // every page (logo, address, founders) instead of a second partial copy.
+    author: { "@id": "https://cogniiq.de/#organization" },
+    publisher: { "@id": "https://cogniiq.de/#organization" },
+    image: "https://cogniiq.de/og-image.png",
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": article.canonical,
@@ -416,7 +411,7 @@ export function BlogPostPage() {
                     Analysegespräch vereinbaren
                   </h3>
                   <p className="text-[12.5px] text-gray-500 dark:text-gray-400 leading-relaxed mb-5">
-                    30&nbsp;Minuten, in denen wir konkrete Potenziale für Ihr Unternehmen identifizieren.
+                    Ein Gespräch, in dem wir konkrete Potenziale für Ihr Unternehmen identifizieren – kostenlos und unverbindlich.
                   </p>
                   <Link
                     to="/kontakt"

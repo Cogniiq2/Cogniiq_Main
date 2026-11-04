@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Phone, CircleCheck as CheckCircle2, ChevronRight, Building2, Lightbulb, Zap, Shield, Clock, Users, TrendingUp } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { EINRICHTUNG, FAKTEN, TARIFE } from "@/lib/telefonassistent-copy";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -146,7 +147,10 @@ const FAQ_ITEMS = [
   },
   {
     question: "Was kostet ein KI-Telefonassistent monatlich?",
-    answer: "Einfachere Setups beginnen ab ca. 99 €/Monat. Mittlere Konfigurationen mit Kalenderintegration und mehreren Szenarien 199–399 €/Monat. Komplexere Lösungen für große Praxen oder Unternehmensgruppen ab 499 €/Monat. Genaue Preise auf der Kosten-Seite.",
+    // Aus der einen Preisquelle zusammengesetzt (telefonassistent-copy.ts). Bis
+    // 04.11.2026 stand hier eine frei formulierte Staffel („ab ca. 99 € …
+    // 199–399 € … ab 499 €"), die den Tarifen widersprach – auch im FAQPage-JSON-LD.
+    answer: `Die veröffentlichten Tarife beginnen bei ${TARIFE[0].monatlich} netto im Monat mit ${TARIFE[0].minuten.toLocaleString("de-DE")} Inklusivminuten (${TARIFE[0].name}); ${TARIFE[1].name} kostet ${TARIFE[1].monatlich} mit ${TARIFE[1].minuten.toLocaleString("de-DE")} Minuten, ${TARIFE[2].name} ${TARIFE[2].monatlich} mit ${TARIFE[2].minuten.toLocaleString("de-DE")} Minuten. Jede weitere Minute kostet ${FAKTEN.mehrpreisProMinute}, die Standard-Einrichtung einmalig ${EINRICHTUNG.anzeige}. ${FAKTEN.steuerbasis} Alle Positionen und einen Rechner finden Sie auf der Kosten-Seite.`,
   },
   {
     question: "Kann Cogniiq bestehende Telefonsysteme integrieren?",
@@ -230,7 +234,7 @@ export function KiAgenturDeutschland() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />
@@ -533,7 +537,7 @@ export function KiAgenturDeutschland() {
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />

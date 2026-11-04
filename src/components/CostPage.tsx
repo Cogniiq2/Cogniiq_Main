@@ -122,7 +122,7 @@ export function CostPage({ config }: CostPageProps) {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <section className="pt-32 pb-20 bg-white dark:bg-gray-950 transition-colors duration-300">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
@@ -151,7 +151,7 @@ export function CostPage({ config }: CostPageProps) {
               <div className="flex flex-wrap gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-pub-signal text-white rounded-xl font-semibold text-sm hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />
@@ -446,7 +446,7 @@ export function CostPage({ config }: CostPageProps) {
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />
@@ -464,7 +464,7 @@ export function CostPage({ config }: CostPageProps) {
             </motion.div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

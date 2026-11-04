@@ -30,20 +30,30 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { FAKTEN, SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
+import { EINRICHTUNG, FAKTEN, SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
 import { RECHNER_ANKER, RECHNER_LINK, RECHNER_ROUTE } from '@/lib/rechner-anker';
+import { PROTECTED_EXPERIMENT_PATHS } from '@/lib/routing/protectedExperiments';
 import {
   WOCHEN_PRO_MONAT,
   anrufeProMonatAusWoche,
+  berechneNutzen,
   berechnePreis,
-  berechneWirtschaftlichkeit,
-  kapazitaetsEingabe,
-  personalkostenEingabe,
   UNVOLLSTAENDIG,
   waehleSzenario,
+  type NutzenEingabe,
 } from '@/lib/telefonassistent-rechner';
 
 const REPO_ROOT = process.cwd();
+
+/** Quelle je Route, die jemals in PROTECTED_EXPERIMENT_PATHS stand. */
+const ROUTE_ZU_QUELLE: Record<string, string> = {
+  '/kosten-ki-telefonassistent': 'src/pages/costs/KostenKiTelefonassistent.tsx',
+  '/ki-telefonassistent-arzt': 'src/pages/industries/KiTelefonassistentArzt.tsx',
+  '/bayreuth/webdesign': 'src/components/CityServiceRoute.tsx',
+  '/bayreuth/website-relaunch': 'src/pages/cluster/bayreuth/WebsiteRelaunchBayreuth.tsx',
+  '/regensburg/website-relaunch': 'src/pages/cluster/regensburg/WebsiteRelaunchRegensburg.tsx',
+  '/muenchen/webdesign-kosten': 'src/pages/cluster/muenchen/WebdesignKostenMuenchen.tsx',
+};
 
 function sammle(dir: string, out: Map<string, string> = new Map()): Map<string, string> {
   for (const eintrag of readdirSync(dir)) {
@@ -128,34 +138,31 @@ describe('Preis — eine Quelle, ein Ergebnis', () => {
 
   it('leitet jeden Tarifbetrag aus TARIFE ab, nie aus einem eigenen Literal', () => {
     for (const tarif of TARIFE) {
-      // Ein Aufkommen knapp unter dem Kontingent trifft diesen Tarif genau dann,
-      // wenn kein kleinerer ihn unterbietet, ohne am Deckel zu laufen.
+      // Genau am Kontingent eines Tarifs ist dieser Tarif der günstigste, und
+      // sein Betrag ist exakt die Grundgebühr aus TARIFE.
       const szenario = waehleSzenario(tarif.minuten);
-      expect(szenario).not.toBeNull();
-      expect(szenario!.telefonieMonatlichEur).toBeLessThanOrEqual(szenario!.tarif.obergrenzeEur);
-      expect(TARIFE).toContain(szenario!.tarif);
+      expect(szenario.tarif.name).toBe(tarif.name);
+      expect(szenario.mehrminuten).toBe(0);
+      expect(szenario.monatlichEur).toBe(tarif.monatlichEur);
+      expect(TARIFE).toContain(szenario.tarif);
     }
   });
 
-  it('rechnet den Mehrverbrauch mit dem kanonischen Minutenpreis', () => {
+  it('rechnet Mehrminuten zum Satz aus FAKTEN — eine Minute über Basis kostet Grundgebühr + 0,50 €', () => {
     const einMinuteUeberBasis = TARIFE[0].minuten + 1;
-    const szenario = waehleSzenario(einMinuteUeberBasis)!;
-    // Basis ist bei einer Minute Mehrverbrauch noch der günstigste Tarif.
+    const szenario = waehleSzenario(einMinuteUeberBasis);
     expect(szenario.tarif.name).toBe(TARIFE[0].name);
-    expect(szenario.mehrverbrauchEur).toBeCloseTo(FAKTEN.mehrpreisProMinuteEur, 10);
+    expect(szenario.mehrminuten).toBe(1);
+    expect(szenario.monatlichEur).toBe(TARIFE[0].monatlichEur + FAKTEN.mehrpreisProMinuteEur);
   });
 
-  it('kippt jenseits der Tarifliste in den individuellen Modus statt in eine zu billige Zahl', () => {
+  it('rechnet jenseits des größten Kontingents linear weiter — kein Deckel, kein Abbruch', () => {
     const groesster = TARIFE[TARIFE.length - 1];
-    const weitDarueber =
-      groesster.minuten +
-      (groesster.obergrenzeEur - groesster.monatlichEur) / FAKTEN.mehrpreisProMinuteEur +
-      1;
-    expect(waehleSzenario(weitDarueber)).toBeNull();
+    const weitDarueber = groesster.minuten + 1000;
     const preis = berechnePreis({ anrufeProMonat: weitDarueber, minutenProAnruf: 1 }, 0);
-    expect(preis.modus).toBe('individuell');
-    expect(preis.monatlichGesamtEur).toBe('unbekannt');
-    expect(preis.einrichtungEur).toBe('unbekannt');
+    expect(preis.empfehlung.tarif.name).toBe(groesster.name);
+    expect(preis.monatlichGesamtEur).toBe(groesster.monatlichEur + 1000 * FAKTEN.mehrpreisProMinuteEur);
+    expect(preis.einrichtungEur).toBe(EINRICHTUNG.eur);
   });
 
   it('weist die Anbindung IMMER als unbekannt aus, nie als 0', () => {
@@ -192,231 +199,76 @@ describe('Preis — eine Quelle, ein Ergebnis', () => {
 
 // ── 2 · Die Wirtschaftlichkeit ist überall dieselbe ─────────────────────────
 
-describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
+describe('Nutzen — drei Bausteine, ein Geldsaldo', () => {
   const volumen = { anrufeProMonat: 400, minutenProAnruf: 2.5 };
   const preis = berechnePreis(volumen, 0);
-
-  /** Nichts beantwortet — die Rechnung ist unvollständig. */
-  const KEINE_CHANCEN = {
-    verpassteAnrufeProMonat: null,
-    davonChancenProzent: null,
-    abschlussquoteProzent: null,
-    deckungsbeitragEur: null,
-    rueckgewinnbarProzent: null,
+  const AUS: NutzenEingabe = {
+    zeit: { aktiv: false, anrufeHeuteVomTeam: null, minutenProAnrufTeam: null, uebernommenProzent: null, restaufwandProzent: null, stundenkostenEur: null },
+    kosten: { aktiv: false, entfallendeAusgabenEur: null },
+    termine: { aktiv: false, zusaetzlicheTermine: null, deckungsbeitragEur: null, freieKapazitaet: null },
   };
-  /** „Ich verpasse keine" — eine VOLLSTÄNDIGE Antwort mit Chancenwert 0. */
-  const KEINE_VERPASSTEN = { ...KEINE_CHANCEN, verpassteAnrufeProMonat: 0 };
-  const VOLLER_TRICHTER = {
-    verpassteAnrufeProMonat: 100,
-    davonChancenProzent: 50,
-    abschlussquoteProzent: 30,
-    deckungsbeitragEur: 200,
-    rueckgewinnbarProzent: 50,
-  };
-  const ZEIT = kapazitaetsEingabe(40, 60);
 
-  // ── Zustand 1: unvollständig ──────────────────────────────────────────
   /*
-    DER FEHLER, DEN DIESE GRUPPE VERHINDERT.
+    DER FEHLER, DEN DIESE GRUPPE VERHINDERT (Stand 23.10.2026).
 
-    Vorher ging ein fehlender Chancenwert als 0 in den Nettoeffekt ein. Die
-    Überschrift zeigte dann eine negative Zahl, bevor der Besucher zu dem
-    Posten befragt worden war, der in vielen Betrieben das Vorzeichen dreht —
-    und las sich als „Cogniiq rechnet sich nicht", wo sie „mir fehlen noch
-    Angaben" hätte sagen müssen.
+    Bis dahin ging „Telefonminuten × Routineanteil × Stundensatz" als Nutzen
+    gegen den Cogniiq-Preis und ergab einen „Nettoeffekt" samt Amortisation —
+    eine Cash-Rechnung aus einer Größe, die kein Geldzufluss ist. Jetzt gibt
+    es den Geldsaldo nur aus tatsächlich entfallenden Ausgaben und
+    realisierbaren Zusatzterminen; der Zeitwert steht daneben.
   */
-  it('zeigt ohne Chancenangaben KEINEN Nettoeffekt — auch keinen negativen', () => {
-    const r = berechneWirtschaftlichkeit(volumen, preis, ZEIT, KEINE_CHANCEN);
+  it('zeigt ohne gewählten Baustein KEINEN Saldo — auch keinen negativen', () => {
+    const r = berechneNutzen(preis, AUS);
     expect(r.vollstaendig).toBe(false);
-    expect(r.nettoProMonatEur).toBe(UNVOLLSTAENDIG);
-    expect(r.ersteJahrNettoEur).toBe(UNVOLLSTAENDIG);
-    expect(r.amortisationMonate).toBeNull();
-    expect(typeof r.nettoProMonatEur).not.toBe('number');
+    expect(r.cash.saldoProMonatEur).toBe(UNVOLLSTAENDIG);
   });
 
-  it('nennt genau die Felder, die noch fehlen', () => {
-    expect(
-      berechneWirtschaftlichkeit(volumen, preis, ZEIT, KEINE_CHANCEN).fehlendeAngaben
-    ).toEqual(['verpassteAnrufe']);
-
-    expect(
-      berechneWirtschaftlichkeit(
-        volumen,
-        preis,
-        kapazitaetsEingabe(null, null),
-        KEINE_CHANCEN
-      ).fehlendeAngaben
-    ).toEqual(['stundenkosten', 'routineanteil', 'verpassteAnrufe']);
-
-    expect(
-      berechneWirtschaftlichkeit(volumen, preis, ZEIT, {
-        ...VOLLER_TRICHTER,
-        abschlussquoteProzent: null,
-        deckungsbeitragEur: null,
-      }).fehlendeAngaben
-    ).toEqual(['abschlussquote', 'deckungsbeitrag']);
+  it('nennt genau die Felder, die ein aktiver Baustein noch braucht', () => {
+    const r = berechneNutzen(preis, { ...AUS, zeit: { ...AUS.zeit, aktiv: true, minutenProAnrufTeam: 3 } });
+    expect(r.zeit.fehlend).toEqual(['anrufeHeuteVomTeam', 'uebernommenProzent']);
+    expect(r.cash.saldoProMonatEur).toBe(UNVOLLSTAENDIG);
   });
 
-  it('zeigt das Zeitpotenzial auch dann, wenn die Gesamtrechnung noch fehlt', () => {
-    const r = berechneWirtschaftlichkeit(volumen, preis, ZEIT, KEINE_CHANCEN);
-    expect(r.arbeitsnutzenRechenbar).toBe(true);
-    expect(r.zeitwertProMonatEur).toBeGreaterThan(0);
-    expect(r.vollstaendig).toBe(false);
-  });
-
-  it('rechnet ohne Stundensatz und ohne Routineanteil gar nicht', () => {
-    const ohneSatz = berechneWirtschaftlichkeit(
-      volumen,
-      preis,
-      kapazitaetsEingabe(null, 60),
-      VOLLER_TRICHTER
-    );
-    expect(ohneSatz.arbeitsnutzenRechenbar).toBe(false);
-    expect(ohneSatz.zeitwertProMonatEur).toBeNull();
-    expect(ohneSatz.nettoProMonatEur).toBe(UNVOLLSTAENDIG);
-
-    const ohneAnteil = berechneWirtschaftlichkeit(
-      volumen,
-      preis,
-      kapazitaetsEingabe(40, null),
-      VOLLER_TRICHTER
-    );
-    expect(ohneAnteil.arbeitsnutzenRechenbar).toBe(false);
-    expect(ohneAnteil.nettoProMonatEur).toBe(UNVOLLSTAENDIG);
-  });
-
-  it('lässt die Chancenrechnung leer, solange ein einziges Feld fehlt', () => {
-    const r = berechneWirtschaftlichkeit(volumen, preis, ZEIT, {
-      ...KEINE_CHANCEN,
-      verpassteAnrufeProMonat: 40,
-      davonChancenProzent: 50,
+  it('der Zeitwert steht NIE im Geldsaldo', () => {
+    const nurZeit = berechneNutzen(preis, {
+      ...AUS,
+      zeit: { aktiv: true, anrufeHeuteVomTeam: 400, minutenProAnrufTeam: 3, uebernommenProzent: 100, restaufwandProzent: 0, stundenkostenEur: 40 },
     });
-    expect(r.chancenwertProMonatEur).toBeNull();
-    expect(r.vollstaendig).toBe(false);
+    expect(nurZeit.zeit.zeitwertEur).toBeCloseTo(800, 10);
+    expect(nurZeit.cash.saldoProMonatEur).toBeCloseTo(-(preis.monatlichGesamtEur as number), 10);
   });
 
-  // ── Zustand 2: vollständig positiv ────────────────────────────────────
-  it('zeigt das vollständige Ergebnis, sobald alle Angaben vorliegen', () => {
-    const r = berechneWirtschaftlichkeit(
-      volumen,
-      preis,
-      kapazitaetsEingabe(60, 80),
-      VOLLER_TRICHTER
-    );
-    expect(r.vollstaendig).toBe(true);
-    expect(r.fehlendeAngaben).toEqual([]);
-    expect(typeof r.nettoProMonatEur).toBe('number');
-    expect(r.nettoProMonatEur).toBeGreaterThan(0);
-    expect(r.amortisationMonate).toBeGreaterThan(0);
+  it('Potenzial ohne Kapazität ist kein Gewinn', () => {
+    const r = berechneNutzen(preis, { ...AUS, termine: { aktiv: true, zusaetzlicheTermine: 10, deckungsbeitragEur: 50, freieKapazitaet: null } });
+    expect(r.termine.potenzialEur).toBe(500);
+    expect(r.termine.realisierbarEur).toBeNull();
+    expect(r.cash.saldoProMonatEur).toBeCloseTo(-(preis.monatlichGesamtEur as number), 10);
   });
 
-  // ── Zustand 3: vollständig negativ ────────────────────────────────────
   it('zeigt ein vollständiges negatives Ergebnis unverändert an', () => {
-    /*
-      Der Gegentest zur Unvollständigkeits-Regel. Wer alles beantwortet hat und
-      wirtschaftlich schlecht dasteht, bekommt genau das zu sehen. Die Regel
-      schützt vor einer Zahl aus einem halben Modell — nicht vor der Wahrheit.
-    */
-    const r = berechneWirtschaftlichkeit(
-      volumen,
-      preis,
-      kapazitaetsEingabe(12, 5),
-      { ...VOLLER_TRICHTER, verpassteAnrufeProMonat: 1, deckungsbeitragEur: 10 }
-    );
+    const r = berechneNutzen(preis, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 50 } });
     expect(r.vollstaendig).toBe(true);
-    expect(r.nettoProMonatEur).toBeLessThan(0);
-    expect(r.ersteJahrNettoEur).toBeLessThan(0);
-    expect(r.amortisationMonate).toBeNull();
+    expect(r.cash.saldoProMonatEur).toBeLessThan(0);
   });
 
-  it('null verpasste Anrufe sind eine vollständige Angabe, keine Lücke', () => {
-    const r = berechneWirtschaftlichkeit(volumen, preis, ZEIT, KEINE_VERPASSTEN);
-    expect(r.chancenRechenbar).toBe(true);
-    expect(r.chancenwertProMonatEur).toBe(0);
-    expect(r.vollstaendig).toBe(true);
-    expect(r.fehlendeAngaben).toEqual([]);
-    expect(typeof r.nettoProMonatEur).toBe('number');
+  it('weist die Einrichtung als 990 € einmalig aus, aber ohne Amortisation – die Anbindung bleibt offen', () => {
+    const r = berechneNutzen(preis, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } });
+    expect(r.cash.einmaligeKostenEur).toBe(EINRICHTUNG.eur);
+    expect(r.cash).not.toHaveProperty('ersteJahrSaldoEur');
+    expect(r.cash).not.toHaveProperty('amortisationMonate');
+    expect(r.cash.offeneKosten).toEqual(['anbindung']);
   });
 
-  it('setzt einen verpassten Anruf NIE mit einem verlorenen Auftrag gleich', () => {
-    const r = berechneWirtschaftlichkeit(volumen, preis, ZEIT, VOLLER_TRICHTER);
-    // 100 × 50 % × 30 % × 200 € × 50 % = 1.500 €, nicht 100 × 200 € = 20.000 €.
-    expect(r.chancenwertProMonatEur).toBeCloseTo(1500, 6);
-    expect(r.chancenwertProMonatEur).toBeLessThan(
-      VOLLER_TRICHTER.verpassteAnrufeProMonat * VOLLER_TRICHTER.deckungsbeitragEur
-    );
+  it('rechnet sehr hohes Aufkommen zum Listenpreis ohne Deckel und markiert es zur individuellen Prüfung', () => {
+    // 25.000 Min: MVZ 800 € + 23.000 × 0,50 € = 12.300 € → Saldo 900 − 12.300 = −11.400 €.
+    const riesig = berechnePreis({ anrufeProMonat: 5000, minutenProAnruf: 5 }, 0);
+    expect(riesig.individuellPruefen).toBe(true);
+    expect(riesig.monatlichGesamtEur).toBe(12300);
+    expect(berechneNutzen(riesig, { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } }).cash.saldoProMonatEur).toBe(-11400);
   });
 
-  it('lässt die Einrichtung im ersten Jahr NICHT weg', () => {
-    const r = berechneWirtschaftlichkeit(
-      volumen,
-      preis,
-      kapazitaetsEingabe(60, 80),
-      VOLLER_TRICHTER
-    );
-    const ohneEinrichtung = (r.nettoProMonatEur as number) * 12;
-    expect(r.ersteJahrNettoEur).toBeCloseTo(ohneEinrichtung - (r.einrichtungEur as number), 6);
-    expect(r.ersteJahrKostenEur).toBeCloseTo(
-      (r.kostenProMonatEur as number) * 12 + (r.einrichtungEur as number),
-      6
-    );
-  });
-
-  it('gibt bei individuellem Tarif keinen Nettoeffekt aus, statt einen zu erfinden', () => {
-    const riesig = { anrufeProMonat: 5000, minutenProAnruf: 5 };
-    const r = berechneWirtschaftlichkeit(
-      riesig,
-      berechnePreis(riesig, 0),
-      kapazitaetsEingabe(50, 70),
-      VOLLER_TRICHTER
-    );
-    expect(r.nettoProMonatEur).toBe('unbekannt');
-    expect(r.amortisationMonate).toBeNull();
-  });
-
-  it('gibt bei offenem Sprachaufschlag keinen Nettoeffekt aus', () => {
-    const mitSprachen = berechnePreis(volumen, 3);
-    const r = berechneWirtschaftlichkeit(volumen, mitSprachen, ZEIT, VOLLER_TRICHTER);
-    expect(r.nettoProMonatEur).toBe('unbekannt');
-    expect(r.amortisationMonate).toBeNull();
-  });
-
-  /*
-    Der systematische Nachweis: Über eine Matrix aus Eingaben darf NIE eine
-    negative Zahl herauskommen, solange `vollstaendig` false ist. Diese Prüfung
-    ist wichtiger als jeder Einzelfall oben — sie hält die Regel auch dann,
-    wenn jemand später einen neuen Pfad durch die Funktion legt.
-  */
-  it('liefert über alle unvollständigen Kombinationen nie eine Zahl', () => {
-    const stundensaetze = [null, 0, 15, 90];
-    const anteile = [null, 0, 40, 100];
-    const chancenVarianten = [
-      KEINE_CHANCEN,
-      { ...KEINE_CHANCEN, verpassteAnrufeProMonat: 50 },
-      { ...VOLLER_TRICHTER, rueckgewinnbarProzent: null },
-      { ...VOLLER_TRICHTER, deckungsbeitragEur: null },
-      VOLLER_TRICHTER,
-      KEINE_VERPASSTEN,
-    ];
-    for (const stundenkostenEur of stundensaetze) {
-      for (const routineanteilProzent of anteile) {
-        for (const c of chancenVarianten) {
-          const r = berechneWirtschaftlichkeit(
-            volumen,
-            preis,
-            kapazitaetsEingabe(stundenkostenEur, routineanteilProzent),
-            c
-          );
-          if (r.vollstaendig) {
-            expect(typeof r.nettoProMonatEur).toBe('number');
-          } else {
-            expect(typeof r.nettoProMonatEur).not.toBe('number');
-            expect(typeof r.ersteJahrNettoEur).not.toBe('number');
-            expect(r.amortisationMonate).toBeNull();
-          }
-        }
-      }
-    }
+  it('gibt bei offenem Sprachaufschlag keinen Saldo aus', () => {
+    expect(berechneNutzen(berechnePreis(volumen, 3), { ...AUS, kosten: { aktiv: true, entfallendeAusgabenEur: 900 } }).cash.saldoProMonatEur).toBe('unbekannt');
   });
 });
 
@@ -460,14 +312,14 @@ describe('Beträge stehen an genau einer Stelle', () => {
       if (KANONISCHE_ZAHLENQUELLEN.has(pfad)) continue;
       expect(
         /0[.,]39/.test(inhalt),
-        `${pfad} tippt den Mehrpreis je Minute erneut; er steht in FAKTEN.mehrpreisProMinuteEur`
+        `${pfad} tippt einen Minutenpreis; seit dem 24.10.2026 gibt es keinen — Konditionen über dem Kontingent stehen im Angebot`
       ).toBe(false);
     }
   });
 
   it('tippt keinen Tarif-, Obergrenzen- oder Einrichtungsbetrag erneut', () => {
     const betraege = new Set(
-      TARIFE.flatMap((t) => [t.monatlichEur, t.obergrenzeEur, t.einrichtungEur])
+      [...TARIFE.map((t) => t.monatlichEur), EINRICHTUNG.eur]
     );
     /*
       Geprüft wird die ZUWEISUNG AN EINEN PREIS-BEZEICHNER, nicht die nackte
@@ -524,12 +376,12 @@ describe('Automatisierung — Fähigkeit und Anrufmix bleiben getrennt', () => {
     }
   });
 
-  it('hält die Ausnahmeregel im Rechenkern fest', () => {
+  it('hält die Übernahme als gewähltes Szenario im Rechenkern fest, nicht als Standard', () => {
     const kern = QUELLEN.get('src/lib/telefonassistent-rechner.ts')!;
-    expect(kern).toMatch(/routineanteilProzent/);
-    // Der Kommentar ist hier Teil der Zusage: Er ist die einzige Stelle, an der
-    // steht, warum diese Zahl NICHT die Übernahmequote von Cogniiq ist.
-    expect(kern).toMatch(/Anrufmix|ANRUFMIX/);
+    expect(kern).toMatch(/uebernommenProzent/);
+    // Der Kommentar ist hier Teil der Zusage: Er ist die Stelle, an der steht,
+    // dass 100 % Übernahme eine bewusste Wahl ist und kein versteckter Standard.
+    expect(kern).toMatch(/kein versteckter Standard/);
   });
 });
 
@@ -563,8 +415,13 @@ describe('Rechner-Anker', () => {
     // Gegenrichtung ab. Diese Prüfung deckt die Hinrichtung: ein CTA, der auf
     // einer eingefrorenen Seite landet, verändert deren gerenderte Bytes.
     // Die Kostenseite steht hier seit dem 12.09.2026 nicht mehr: Sie ist keine
-    // eingefrorene Route mehr und TRÄGT den Rechner jetzt selbst.
-    for (const pfad of ['src/pages/industries/KiTelefonassistentArzt.tsx']) {
+    // eingefrorene Route mehr und TRÄGT den Rechner jetzt selbst. Die Arztseite
+    // steht hier seit dem 23.10.2026 nicht mehr: Sie wurde graduiert und
+    // verlinkt den Rechner jetzt bewusst (Kosten sind dort Einwand Nr. 1).
+    // Die Liste folgt PROTECTED_EXPERIMENT_PATHS; solange sie leer ist, prüft
+    // dieser Test nur, dass kein Pfad versehentlich wieder hart getippt wird.
+    const eingefroren = PROTECTED_EXPERIMENT_PATHS.map((route) => ROUTE_ZU_QUELLE[route]).filter(Boolean);
+    for (const pfad of eingefroren) {
       const inhalt = QUELLEN.get(pfad)!;
       expect(inhalt).not.toMatch(/RechnerCta|rechner-anker|rechner:/);
     }
@@ -704,134 +561,70 @@ describe('Analytics', () => {
    Korrektur vom 12.09.2026 nicht an einer Fläche vorbeigeht — und dass
    niemand einen zweiten Personalrechner danebenstellt.
    ────────────────────────────────────────────────────────────────────────── */
-describe('Personallesarten — ein Kern, beide Flächen', () => {
-  const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 };
-  const preis = berechnePreis(volumen, 0);
-  const chancen = {
-    verpassteAnrufeProMonat: 40,
-    davonChancenProzent: 50,
-    abschlussquoteProzent: 50,
-    deckungsbeitragEur: 100,
-    rueckgewinnbarProzent: 50,
-  };
-
-  it('rechnet beide Modi genau einmal — es gibt keine zweite Implementierung', () => {
-    /*
-      Die Arithmetik darf ausschließlich in telefonassistent-rechner.ts stehen.
-      Eine Kopie der Personalformel in einer Seite oder einem Bauteil wäre
-      genau die Gabelung, die dieser Rechner überwunden hat.
-    */
+describe('Nutzenbausteine — ein Kern, beide Flächen', () => {
+  it('rechnet den Nutzen genau einmal — es gibt keine zweite Implementierung', () => {
     for (const [pfad, inhalt] of PRODUKTION) {
       if (pfad === 'src/lib/telefonassistent-rechner.ts') continue;
       expect(
-        /vermeidbarerAnteilProzent\s*(as number)?\s*\)?\s*\/\s*100/.test(inhalt),
-        `${pfad} rechnet die Personalersparnis selbst nach`
+        /uebernommenProzent\s*(as number)?\s*\)?\s*\/\s*100/.test(inhalt),
+        `${pfad} rechnet die Zeitübernahme selbst nach`
       ).toBe(false);
+      expect(/export function berechneNutzen/.test(inhalt), `${pfad} definiert berechneNutzen ein zweites Mal`).toBe(false);
     }
   });
 
-  it('genau eine Fläche definiert die Modi, alle anderen importieren sie', () => {
-    const kern = QUELLEN.get('src/lib/telefonassistent-rechner.ts')!;
-    expect(kern).toContain('export type PersonalModus');
-    for (const [pfad, inhalt] of PRODUKTION) {
-      if (pfad === 'src/lib/telefonassistent-rechner.ts') continue;
-      expect(
-        /type PersonalModus\s*=/.test(inhalt),
-        `${pfad} definiert PersonalModus ein zweites Mal`
-      ).toBe(false);
-    }
-  });
-
-  it('liefert bei gleicher Eingabe in beiden Modi stabile, verschiedene Ergebnisse', () => {
-    const a = berechneWirtschaftlichkeit(volumen, preis, kapazitaetsEingabe(35, 100), chancen);
-    const b = berechneWirtschaftlichkeit(volumen, preis, personalkostenEingabe(4000, 75), chancen);
-    expect(a.vollstaendig).toBe(true);
-    expect(b.vollstaendig).toBe(true);
-    // Verschieden — weil sie wirtschaftlich Verschiedenes messen.
-    expect(a.arbeitsnutzenProMonatEur).not.toBeCloseTo(b.arbeitsnutzenProMonatEur as number, 5);
-    // Aber der Chancenposten ist in beiden identisch: Er hängt an keiner Lesart.
-    expect(a.chancenwertProMonatEur).toBeCloseTo(b.chancenwertProMonatEur as number, 10);
-  });
-
-  it('der Rechner übergibt dem Kern immer nur die Felder EINES Modus', () => {
+  it('der Rechner übergibt dem Kern die Bausteine mit ausdrücklichem aktiv-Schalter', () => {
     const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
-    // Die Konstruktoren sind der einzige Weg in die Wirtschaftlichkeitsrechnung.
-    expect(rechner).toMatch(/kapazitaetsEingabe\(/);
-    expect(rechner).toMatch(/personalkostenEingabe\(/);
-    // Kein handgebautes Eingabeobjekt, das beide Lesarten zugleich füllen könnte.
-    expect(rechner).not.toMatch(/stundenkostenEur:\s*\w+,\s*routineanteilProzent:/);
+    expect(rechner).toMatch(/berechneNutzen\(/);
+    expect(rechner).toMatch(/aktiv:\s*zeitAktiv/);
+    expect(rechner).toMatch(/aktiv:\s*kostenAktiv/);
+    expect(rechner).toMatch(/aktiv:\s*termineAktiv/);
   });
 
-  it('meldet keinen Personalwert an GA4', () => {
+  it('meldet keinen Nutzenwert an GA4', () => {
     const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
     const aufrufe = [...rechner.matchAll(/trackEvent\(([^)]*)\)/g)].map((m) => m[1]);
     for (const argumente of aufrufe) {
-      for (const verboten of [
-        'personalkosten',
-        'vermeidbar',
-        'stundenkosten',
-        'personalersparnis',
-        'arbeitsnutzen',
-        'netto',
-        'roiWert',
-      ]) {
-        expect(
-          argumente.toLowerCase().includes(verboten.toLowerCase()),
-          `trackEvent(${argumente}) überträgt „${verboten}"`
-        ).toBe(false);
+      for (const verboten of ['stundenkosten', 'entfallend', 'deckungsbeitrag', 'kapazitaet', 'saldo', 'zeitwert', 'termine']) {
+        expect(argumente.toLowerCase().includes(verboten), `trackEvent(${argumente}) überträgt „${verboten}"`).toBe(false);
       }
     }
   });
 
-  it('setzt für keinen der Personalwerte einen Vorgabewert', () => {
+  it('setzt für keinen Nutzenwert einen Vorgabewert und wählt keinen Baustein vor', () => {
     const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
-    // Beide Mode-B-Felder starten leer. Ein vorbelegtes Gehalt wäre eine
-    // Behauptung über den Betrieb des Besuchers.
-    expect(rechner).toMatch(/useState<number \| null>\(null\);?\s*$/m);
-    expect(rechner).toContain('const [personalkostenMonat, setPersonalkostenMonat] = useState<number | null>(null)');
-    expect(rechner).toContain('const [vermeidbarerAnteil, setVermeidbarerAnteil] = useState<number | null>(null)');
-  });
-
-  it('startet im zurückhaltenderen Modus, nicht im ertragreicheren', () => {
-    /*
-      Modus B ergibt in fast jedem Betrieb das größere Ergebnis. Die Vorgabe
-      darf deshalb nie B sein: Ein Besucher, der nur klickt, bekäme sonst die
-      Lohnersparnis untergeschoben, die er vielleicht gar nicht hat.
-    */
-    const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
-    expect(rechner).toContain('useState<PersonalModus>("kapazitaet")');
-  });
-});
-
-describe('Obergrenze — die Prosa sagt, worauf sie sich bezieht', () => {
-  const copy = QUELLEN.get('src/lib/telefonassistent-copy.ts')!;
-
-  it('behauptet in keiner gerenderten Konstante eine Obergrenze für die Endsumme', () => {
-    /*
-      Geprüft wird der Quelltext OHNE Kommentare: Die Begründung der Korrektur
-      zitiert die alten Sätze absichtlich, und dieses Zitat darf die Wache
-      nicht auslösen.
-    */
-    const ohneKommentare = nurCode(copy);
-    for (const satz of [
-      'Mehr zahlen Sie in diesem Monat nicht',
-      'Mehr als die ausgewiesene Obergrenze kostet es nie',
-    ]) {
-      expect(ohneKommentare, `„${satz}" steht wieder in einer Konstante`).not.toContain(satz);
+    for (const feld of ['teamAnrufe', 'teamMinuten', 'uebernommen', 'restaufwand', 'stundenkosten', 'entfallend', 'zusatzTermine', 'deckungsbeitrag', 'kapazitaet']) {
+      expect(rechner, `${feld} startet nicht leer`).toMatch(new RegExp(`const \\[${feld}, set\\w+\\] = useState<number \\| null>\\(null\\)`));
+    }
+    for (const schalter of ['zeitAktiv', 'kostenAktiv', 'termineAktiv']) {
+      expect(rechner, `${schalter} ist vorgewählt`).toMatch(new RegExp(`const \\[${schalter}, set\\w+\\] = useState\\(false\\)`));
     }
   });
 
-  it('hält den Geltungsbereich an genau einer Stelle', () => {
-    expect(copy).toContain('deckelungGeltung:');
-    const treffer = [...copy.matchAll(/Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme/g)];
-    expect(treffer).toHaveLength(1);
+  it('meldet den CTA-Klick nicht als Berechnung', () => {
+    const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
+    expect(rechner).not.toMatch(/_completed/);
+    expect(rechner).toMatch(/trackEvent\("price_calculated"\)/);
+    expect(rechner).toMatch(/trackEvent\("roi_calculated"\)/);
+  });
+});
+
+describe('Kein Preisdeckel — die Prosa sagt, wie abgerechnet wird', () => {
+  const copy = QUELLEN.get('src/lib/telefonassistent-copy.ts')!;
+
+  it('behauptet in keiner gerenderten Konstante einen Deckel oder eine Obergrenze', () => {
+    /*
+      Geprüft wird der Quelltext OHNE Kommentare: Die Begründung der Korrektur
+      zitiert die alten Sätze absichtlich.
+    */
+    const ohneKommentare = nurCode(copy);
+    expect(ohneKommentare).not.toMatch(/Obergrenze|gedeckelt|Höchstpreis|Mehr zahlen Sie in diesem Monat nicht/);
   });
 
-  it('verortet die Zusatzposten nicht außerhalb der Obergrenze', () => {
-    // Die Quelle sagt nicht, dass sie darüber liegen — nur, dass das Angebot
-    // es festlegt. Die Gegenbehauptung wäre derselbe Fehler mit umgekehrtem
-    // Vorzeichen.
-    expect(copy).not.toMatch(/zusätzlich zur Obergrenze|kommen zur Obergrenze hinzu|liegen außerhalb der Obergrenze/);
+  it('hält Abrechnung und Rechnungsausweis an genau einer Stelle', () => {
+    expect(copy).toContain('abrechnungGeltung:');
+    const treffer = [...copy.matchAll(/Einen Preisdeckel gibt es nicht/g)];
+    expect(treffer).toHaveLength(1);
   });
 });
 

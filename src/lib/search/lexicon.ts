@@ -304,7 +304,6 @@ export const PAGE_ENRICHMENT: Readonly<Record<string, PageEnrichment>> = {
     kind: 'branche',
     terms: ['Grenzen', 'Notfall', 'Schmerzpatienten'],
   },
-  '/webdesign-agentur-deutschland': { kind: 'leistung', terms: ['Agentur', 'bundesweit', 'remote'] },
   '/ki-agentur-deutschland': { kind: 'leistung', terms: ['KI-Agentur', 'AI Agentur', 'künstliche Intelligenz', 'KI-Systeme', 'bundesweit'] },
   '/kosten-webdesign': {
     label: 'Was kostet eine Website?',

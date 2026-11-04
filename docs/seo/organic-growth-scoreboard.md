@@ -1503,3 +1503,97 @@ Routen, `/bayreuth` Description (M8). Keine neue Seite.
 | Shell | Ankertext Pillar (M11) | dieser Branch | **UNBEKANNT** | offen | mit M23 |
 | `/regensburg/webdesign`, `/muenchen/webdesign` | Ehrlichkeit, Pillar-Link (M12) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
 | `/kosten-ki-telefonassistent` | Faktenkorrektur P5 | dieser Branch | **UNBEKANNT** | HALT (unverändert) | Deploy + 28 d |
+
+---
+
+# Messpunkt 2026-10-23 — Graduierung aller fünf eingefrorenen Routen
+
+Inhaber-Entscheidung vom 2026-10-23 (SEO-Audit, Branch `claude/seo-audit-2026-10`,
+Basis `ed0f8e4`). Datenlage: GSC-Export dieses Durchgangs siehe `SEO_AUDIT_2026.md`
+im Repo-Root; die Aggregate vom 10.09./14.09./17.09. oben bleiben als Historie
+stehen.
+
+| Route | Ergebnis der Messung | Begründung der Graduierung |
+|---|---|---|
+| `/ki-telefonassistent-arzt` | 543 Impr. / Pos. 31,7 (28D bis 08.09.), 145 Impr. „ki telefonassistent arztpraxis" Pos. 33,9 (bis 14.09.). Seit 11.09. kontaminiert. | Stärkste URL der volumenstärksten kommerziellen Query-Familie, Körper seit 11.09. nicht mehr auswertbar; die Besitzfrage F3 braucht editierbaren Text. |
+| `/bayreuth/website-relaunch` | **Ungültig, nie begonnen**: die Edge lieferte bis 12.09. den alten Titel und hielt ihn danach. 131 Impr. / Pos. 14,4 gelten für den ALTEN Titel. | Experiment für ungültig erklärt. Manifest-Titel auf die tatsächlich gecrawlte Fassung („Alte Website modernisieren") gesetzt — für Crawler ändert sich nichts. Description ohne „ohne Rankingverlust" (Ergebniszusage). |
+| `/regensburg/website-relaunch` | 358 Impr. / Pos. 12,2, 1 Klick (28D). Beste Webdesign-Position der Domain. | Kein laufendes Titel-Experiment, nur Beobachtung. Freigegeben, aber **Head bleibt in diesem Durchgang unverändert** (Seite-1-Nähe). |
+| `/bayreuth/webdesign` | 853 Impr. / Pos. 52,0 (28D). | Zwei Monate ohne Bewegung; der Freeze blockierte F9 und die Claim-Hygiene der Schwesterseiten. |
+| `/muenchen/webdesign-kosten` | 268 Impr. / Pos. 37,2 (28D). | dito; blockierte Claim-Hygiene (Preise/Fristen ohne Beleg). |
+
+Vorgehen wie dokumentiert: `PROTECTED_EXPERIMENT_PATHS` leer,
+`GRADUATED_EXPERIMENT_PATHS` trägt alle sechs, Fixture-Einträge von Hand
+entfernt, `npm run seo:baseline` nicht gelaufen, `frozenHeadOverrides` leer.
+Die Folgearbeit aus `post-experiment-opportunities.md` wird in diesem
+Durchgang umgesetzt und je Änderung weiter unten protokolliert.
+
+## Messreihen aus dem Audit-Durchgang 23.10.2026
+
+Alle Zeilen: Commit auf `claude/seo-audit-2026-10`, Deploy **UNBEKANNT**,
+frühestes Urteil Deploy + 28 Tage; Vergleichsbasis sind die 28-Tage-Werte aus der
+Inhaber-Zusammenfassung vom 23.10. (Seite) bzw. der September-Export (Query).
+Scheitern bedeutet immer: Ursache suchen, Texte vergleichen — nicht blind
+zurückrollen, denn entfernte Zusagen ohne Beleg kommen nicht zurück.
+
+| URL | Änderung | Hypothese | Erfolg (Tag 28) | Abbruch |
+|---|---|---|---|---|
+| `/ki-telefonassistent-arzt` | Graduiert, eigenständige Seite, Titel „KI-Telefonassistent Arztpraxis: Anrufe erledigen", 8 FAQs, Service-Schema, Rechner-Link | Als einzige Seite mit der Intention im Titel/H1 und einem operativen Rahmen (welcher Anruf wird erledigt, welcher bleibt beim Team) bewegt sich die Query-Familie „(ki) telefonassistent arzt(praxis)" (≈ 240 Impr./28 d) aus Pos. 34–40 Richtung Pos. ≤ 20 | Seiten-Position < 30 **und** „ki telefonassistent arztpraxis" < 30; erster Klick | Pos. > 40 auf der Seite **oder** Impressionen –50 % bei stabiler Familie → Head gegen die alte Fassung vergleichen, Körper bleibt |
+| `/ki-telefonassistent-praxis` | Titel/Description auf Therapiepraxen | Die Seite hört auf, mit der Arztseite um denselben Kopfbegriff zu konkurrieren; ob die Therapie-Intention überhaupt Nachfrage hat, zeigt der Query×Seite-Export | ≥ 20 Impr./28 d auf Therapie-Queries | 0–5 Impr. nach 56 d → Konsolidierung in `/praxen` per 301 (bereits als Kandidat notiert) |
+| `/praxen` | H1 mit Kopfbegriff, Hub-Description, Eyebrow-Satz | Hub gewinnt „ki telefonassistent praxis" (58 Impr., Pos. 31) ohne der Arztseite Impressionen zu nehmen | Pos. < 25 auf „ki telefonassistent praxis"; Arztseite gleichzeitig nicht schlechter | Arztseite verliert, `/praxen` gewinnt dieselbe Query → Hub-H1 zurück auf Nutzenformulierung |
+| `/kosten-ki-telefonassistent` | Vergleich der Abrechnungsmodelle, Anbieterfragen, generischer Abschnitt, drei Preis-FAQs | Pos. 19 auf „ki telefonassistent kosten" (143 Impr.) ist Seite-2-Grenze; mehr beantwortete Teilfragen (pro Minute, versteckte Kosten, kleine Praxis) heben die Seite auf Seite 1 | Pos. ≤ 12, CTR > 1 % | Pos. > 25 → neue Abschnitte einzeln gegenprüfen (Reihenfolge, nicht Inhalt) |
+| `/ki-telefonassistent-zahnarztpraxis` | **Nur additiv**: zwei Absätze (Datenschutz, Kosten), zwei Weiterlesen-Links | Seite-1-Position (8,9) bleibt; die Absätze beantworten die zwei häufigsten Folgefragen und senken Rückkehr zur SERP | Pos. ≤ 9 gehalten, Klicks ≥ Vorperiode | Pos. > 12 → **die beiden Absätze sofort entfernen** (einzige Änderung, eindeutig zurechenbar) |
+| `/ki-telefonassistent` | Use-Case-Karten verlinken Segmente, Description „Rechner ohne Anmeldung", Branchenliste neu | Mehr kontextuelle Ausgänge zu den Segmenten; eigene Position (Pos. 40, 272 Impr.) unverändert oder besser | Pos. ≤ 35; Segmentseiten erhalten Besuche vom Flagship (Analytics) | Pos. > 48 → Description zurück, Karten bleiben |
+| `/blog/ki-telefonassistent-arztpraxis` | Titel ohne kommerziellen Kopfbegriff, Links auf Eigentümer | Beitrag gibt die kommerzielle Query an die Arztseite ab und hält informationale Impressionen | Arztseite gewinnt die Query; Blog-Impressionen –30 % sind akzeptiert | Beide Seiten verlieren die Query vollständig → Titel prüfen |
+| `/webdesign-agentur-deutschland` → `/webdesign` | 301 | 5 Impr. markenbezogen wandern; keine Veränderung erwartet | `/webdesign` nicht schlechter | — (Redirect bleibt in jedem Fall) |
+| 7 Blogbeiträge | „2025" aus Titeln, `lastmod` = tatsächliches Datum | Keine Verluste durch veraltete Jahreszahl in der SERP | CTR ≥ Vorperiode | — |
+| Seitenweit | JSON-LD dedupliziert, ein `<main>`, x-default nur auf `/`, eine BreadcrumbList, `robots.txt` ohne Widerspruch zu `noindex` | Keine Ranking-Hypothese; Validität in Rich-Results-Test und Search-Console „Verbesserungen" ohne Fehler | 0 Schema-Fehler nach Crawl | Schema-Fehler → Einzelfall beheben |
+| Navigation | Nischen-Slots zeigen auf `/praxen`, Arzt, Zahnarzt, Restaurant, Hotel | Sitewide-Links auf die Eigentümerseiten; keine Messgröße außer Crawl-Tiefe | Eigentümerseiten in GSC „intern verlinkt" ↑ | — |
+
+### Bewusst NICHT geändert (23.10.2026)
+
+`/ki-telefonassistent-zahnarztpraxis` Head/H1/Struktur (Seite 1),
+`/regensburg/website-relaunch` Head (Pos. 11–12), `/webdesign-hotel`
+(1.184 Impr., Pos. 18 — stärkste Webdesign-Impressionen, kein Text angefasst),
+`/prozessautomatisierung`, `/kosten-webdesign`, `/kosten-automatisierung`,
+Homepage-Titel (Positionierungsentscheidung des Inhabers, `SEO_EXTERNAL_ACTIONS.md`
+#17), Stadt-Webdesign-Kostentabellen (W4). Keine neue indexierbare Seite.
+
+## Korrekturdurchgang 23.10.2026 (Branch `claude/seo-release-fixes-2026-10`)
+
+Datenbasis: GSC-Export 24.09.–21.10.2026 (ohne Query×Page). Deploy **UNBEKANNT**,
+Baseline = dieses Fenster, frühestes Urteil nach erneutem Crawl + einem
+vergleichbaren 28-Tage-Fenster; bei < 100 Impressionen verlängern.
+
+| URL | Änderung | Hypothese | Führendes Signal | Alternative Ursachen | Rollback-Kriterium |
+|---|---|---|---|---|---|
+| alle prerenderten Routen | HEAD liefert 200 statt 500 | kein Rankingeffekt erwartet; Protokollfehler behoben | URL-Prüfung, Server-Logs ohne `X-Cogniiq-Shell-Error` | — | keiner (Fehlerbehebung) |
+| `/regensburg/website-relaunch` | Title „… Modernisierung & SEO-Migration" statt „… ohne Rankingverlust"; Garantien → Ziele | lokaler Querykern bleibt (Queries Pos. 5,8 / 5,8); Wahrheitskorrektur kostet nichts Messbares | „website relaunch regensburg", „homepage relaunch regensburg" Position | Saison, Mitbewerber | **nicht** zurückrollen (Garantie war falsch); bei > 5 Plätzen Verlust auf beiden Queries Title-Variante ohne Garantie prüfen |
+| `/praxen` | Praxisarten-Router direkt nach dem Hero | Hub verteilt früher; Segmentseiten erhalten Klicks vom Hub | interne Klicks Hub → Segmente; „telefonassistent praxis" Pos. | — | Block ans Ende zurück, wenn Hub-Impressionen –50 % bei stabilen Segmenten |
+| `/ki-telefonassistent-arzt` | Patientensicht-Dopplung entfernt, Claims korrigiert, Description mit Kalenderweg-Bedingung | kein Verlust; CTR-Effekt der Description beobachten | Pos. auf „ki telefonassistent arztpraxis"; CTR | Title-Änderung aus dem SEO-Branch wirkt gleichzeitig | Abschnitt zurück, wenn Impressionen –50 % **und** Praxen gewinnt dieselbe Query |
+| `/ki-telefonassistent`, `/kosten-ki-telefonassistent` | Rechner: drei Bausteine, Tarifvergleich, keine Zeitwert-Amortisation; Descriptions korrigiert | Vertrauen/Conversion, kein Rankingziel | `price_calculated`, `roi_calculated`, `cta_demo_click`, `lead_submitted` getrennt | — | keiner (Richtigkeit) |
+| `/ki-telefonassistent-zahnarztpraxis` | **keine Änderung** | Schutz; Pos. 8,9 ist Seitenmittel, keine Top-10 für das Hauptkeyword | Dental-Queries einzeln | — | nicht automatisch bei Pos. > 12 (85 Impr. zu schwach); nur bei nachhaltiger Verschlechterung vergleichbarer Queries die additiven Absätze vom 23.10. (SEO-Branch) zurücknehmen |
+
+## Durchgang 24.10.2026 (Branch `claude/seo-design-pricing-2026-10`)
+
+| URL | Änderung | Hypothese | Signal | Rollback |
+|---|---|---|---|---|
+| `/kosten-ki-telefonassistent` | Einrichtungsstaffel entfernt, kein Minutenpreis, Obergrenze „angegeben", Setup-Offers aus dem Schema, Description ohne „gedeckelt/Garantie" | Preiswahrheit; Head bleibt bis auf Description gleich | CTR auf „ki telefonassistent kosten/preise", Rich-Result-Fehler = 0 | Description zurück; Inhalte nicht (Richtigkeit) |
+| `/praxen` | Tarifkarten → Kurzliste mit Link; M19/M16 → Kurzfassung mit Link | Hub dupliziert Kosten- und Produktseite nicht mehr | Impressionen Hub stabil; Kosten-Seite gewinnt Preis-Queries | Blöcke zurück, falls Hub –50 % bei stabilen Segmenten |
+| `/ki-telefonassistent-arzt` | 2 FAQ (Kosten, Dauer) entfernt, weil Abschnitte sie beantworten; Links in Akzentblau | Weniger Dopplung, gleiche Antworten | Position „ki telefonassistent arztpraxis" | FAQ zurück |
+| sitewide | Primäre CTAs in Signalblau (`PubButton.primary`, `CTA_PRIMARY_CLASS`, 36 handgerollte Buttons) | Kein Rankingziel; Orientierung/Conversion | `cta_*`-Events, `lead_submitted` | `PublicUI` Variante zurück |
+| `/ki-telefonassistent-zahnarztpraxis`, `/regensburg/website-relaunch` | nur gemeinsame Komponenten (Button-Farbe, `GRENZEN`-Satz, `KOMPAKT_KOSTEN.text`) | geschützt | wie oben | — |
+| `/kosten-ki-telefonassistent` (Nachtrag 2) | verbindliche Preise: 0,50 €/Mehrminute, 990 € Einrichtung, kein Deckel; Description „Ab 300 € … 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €" (158 Z.) | konkrete Preise in der Description heben die CTR auf Preis-Queries | CTR „ki telefonassistent kosten/preise" nach 28 Tagen ≥ Vorperiode; Misserfolg: CTR −30 % bei gleicher Position | Description-Fassung vom 23.10. |
+| TA-Cluster (Nachtrag 2) | blaue Markendetails (Eyebrows, Icons, Marker, Links, Slider) – nur Klassen | kein Rankingziel | `cta_*`/`price_calculated`-Events stabil oder steigend | Klassen zurück |
+
+## Release-Prüfung 04.11.2026 (Branch `claude/release-fixes-2026-11`, von `claude/seo-design-pricing-2026-10` @ `2936360`)
+
+Datenbasis: GSC-Werte aus dem Auftrag (Produktion, Branch nicht live; „KI Telefonassistent" 42,84 ·
+„… Arztpraxis" 39,48 · „… Kosten" 18,40 · „… Preise" 16,17). Kein Query×Page. Baseline = erstes
+vergleichbares 28-Tage-Fenster nach dem Deploy; frühestes Urteil nach erneutem Crawl.
+
+| URL | Änderung | Hypothese | Signal | Rollback |
+|---|---|---|---|---|
+| `/ki-agentur-deutschland` | FAQ „Was kostet ein KI-Telefonassistent monatlich?" (auch FAQPage-JSON-LD): eigene Staffel „ab ca. 99 € … 199–399 € … ab 499 €" ersetzt durch die Tarife aus `TARIFE`/`FAKTEN`/`EINRICHTUNG` | Preiswahrheit; die Seite konkurriert nicht mehr mit falschen Beträgen gegen `/kosten-ki-telefonassistent` | Rich-Result-Fehler = 0; Impressionen der Seite für „ki telefonassistent kosten" nicht steigend (Eigentümer bleibt die Kosten-Seite) | keiner (Richtigkeit) |
+| `/kosten-ki-telefonassistent` | Vertragsblock: Satz „Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht." entfernt (widersprach Mehrminuten ohne Deckel) | kein Rankingeffekt; Head unverändert | — | keiner (Richtigkeit) |
+| `/kosten-ki-telefonassistent` (J8) | Description „Ab 300 € netto im Monat … zzgl. USt." (162 Z.) statt „… Mit Rechner."; Karten/Beispiel/Schema netto, `valueAddedTaxIncluded: false` | Steuerklarheit; leichter CTR-Verlust möglich, weil „Mit Rechner" entfällt | CTR „ki telefonassistent kosten/preise" nach 28 Tagen; Misserfolg: CTR −30 % bei gleicher Position | „Mit Rechner" statt „zzgl. USt." am Ende – „netto" bleibt in jedem Fall |
+| TA-Cluster (J8) | Netto-/USt.-Hinweise in Fließtext, FAQ und Rechner; Arztpraxis-Hinweis auf `/praxen`, `/ki-telefonassistent-arzt` | kein Rankingziel; Vertrauen | `price_calculated`, `lead_submitted` stabil | keiner (Richtigkeit) |

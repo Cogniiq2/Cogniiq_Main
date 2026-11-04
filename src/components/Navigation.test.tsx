@@ -90,7 +90,7 @@ describe('Hauptnavigation — Menge auf Ebene 1', () => {
     aufbauen();
     await user.click(leistungenAusloeser());
 
-    const einstieg = screen.getByRole('link', { name: 'Für Arzt- und Zahnarztpraxen' });
+    const einstieg = screen.getByRole('link', { name: 'Für Praxen – der Überblick' });
     expect(einstieg.getAttribute('href')).toBe('/praxen');
   });
 

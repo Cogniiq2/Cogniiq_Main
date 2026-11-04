@@ -191,7 +191,7 @@ const config: IndustryPageConfig = {
     {
       question: "Funktioniert der KI-Telefonassistent auch beim Oktoberfest-Betrieb oder bei Spitzenauslastung?",
       answer:
-        "Ja. Der KI-Telefonassistent skaliert beliebig – er nimmt unbegrenzt parallel Anrufe entgegen, ohne Wartezeit. Gerade in Hochsaison wie dem Oktoberfest ist das ein entscheidender Vorteil.",
+        "Ja. Der Assistent nimmt mehrere Anrufe zur selben Zeit an; wie viele gleichzeitig, hängt vom Tarif ab und steht im Angebot. Gerade in der Hochsaison ist das der Punkt, an dem ein besetztes Telefon sonst Reservierungen kostet.",
     },
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in München?",

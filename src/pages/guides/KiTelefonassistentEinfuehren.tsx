@@ -35,7 +35,7 @@
 //   schnell er greift, nicht.
 // - Kein Name eines eingesetzten Dienstleisters oder Modellanbieters: die
 //   Unterauftragnehmerliste ist noch nicht veröffentlichungsreif.
-// - Keine Triage, keine medizinische Einschätzung — Notfälle werden erkannt
+// - Keine Triage, keine medizinische Einschätzung — Notfall-Signalwörter werden weitergeleitet
 //   und sofort weitergeleitet, nie bewertet.
 // - Kein Anteil automatisierter Anrufe, keine Zeitersparnis in Prozent.
 // - Keine weiteren Fristen als die zwei belegten (Übergabefrist, Testphase).
@@ -78,7 +78,7 @@ import { FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
  * statt hartkodiert kommentarlos: faellt ein Punkt weg, faellt der Build auf.
  */
 const GRENZEN_TRIAGE = GRENZEN.points.find((p) => p.startsWith("Keine medizinische Einschätzung"));
-const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Notfälle werden erkannt"));
+const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Hinweise auf einen Notfall"));
 if (!GRENZEN_TRIAGE || !GRENZEN_NOTFALL) {
   throw new Error(
     "GRENZEN.points hat die Triage- oder Notfall-Zusage verloren oder umformuliert. " +
@@ -773,7 +773,7 @@ export function KiTelefonassistentEinfuehren() {
             </p>
             <Link
               to="/kontakt"
-              className="inline-block mt-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 text-[17px] font-semibold min-h-[44px]"
+              className="inline-block mt-6 rounded-xl bg-pub-signal text-white hover:bg-pub-signal-ink px-6 py-3 text-[17px] font-semibold min-h-[44px]"
             >
               Anrufanlässe gemeinsam durchgehen
             </Link>

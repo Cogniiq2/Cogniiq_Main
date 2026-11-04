@@ -116,10 +116,12 @@ function buildHead(html, route, canonical) {
     /<link rel="alternate" hreflang="de-DE" href="[^"]*" \/>/g,
     `<link rel="alternate" hreflang="de-DE" href="${canonicalAttr}" />`
   );
+  // x-default only on the homepage, matching public/sitemap.xml (see
+  // scripts/generate-sitemap.mjs). Every other route drops the tag.
   out = replaceAll(
     out,
-    /<link rel="alternate" hreflang="x-default" href="[^"]*" \/>/g,
-    `<link rel="alternate" hreflang="x-default" href="${canonicalAttr}" />`
+    /\s*<link rel="alternate" hreflang="x-default" href="[^"]*" \/>/g,
+    p === '/' ? `\n    <link rel="alternate" hreflang="x-default" href="${canonicalAttr}" />` : ''
   );
 
   const metaRewrites = [

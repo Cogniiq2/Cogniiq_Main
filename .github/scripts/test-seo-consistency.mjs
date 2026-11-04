@@ -100,9 +100,9 @@ const protectedPaths = [
     .matchAll(/'([^']+)'/g),
 ].map((m) => m[1]);
 
-if (!protectedPaths.length) {
+if (!/PROTECTED_EXPERIMENT_PATHS: readonly string\[\] = \[/.test(protectedSrc)) {
   fail('Could not read PROTECTED_EXPERIMENT_PATHS from src/lib/routing/protectedExperiments.ts');
-} else ok(`${protectedPaths.length} protected experiment paths read`);
+} else ok(`${protectedPaths.length} protected experiment paths read (empty = every experiment graduated)`);
 
 if (!/const frozenHeadOverrides: Record<string, \{ title\?: string; description\?: string \}>/.test(middleware)) {
   fail(

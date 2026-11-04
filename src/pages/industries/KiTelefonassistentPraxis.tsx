@@ -63,7 +63,7 @@ const config: NationalIndustryPageConfig = {
     "Wiederkehrende Fragen zu Zeiten, Anfahrt oder Unterlagen beantwortet der Assistent nach Ihren Vorgaben",
     "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
     "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
-    `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die Obergrenze Ihres Tarifs`,
+    `Festes Minutenkontingent zum festen Monatspreis – jede weitere Minute ${FAKTEN.mehrpreisProMinute}; ${FAKTEN.nettoZusatz}`,
   ],
   workflow: {
     title: "So läuft ein Terminanruf in der Therapiepraxis ab",
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
     ankertext: "Kosten und Wirtschaftlichkeit selbst prüfen",
     kontext: "Praxis",
     einleitung:
-      "Bevor Sie ein Angebot anfordern: Der Rechner nennt den passenden Tarif für Ihr Anrufaufkommen, die einmalige Einrichtung und — mit Ihren eigenen Stundenkosten — ab wann sich das trägt.",
+      "Bevor Sie ein Angebot anfordern: Der Rechner nennt den günstigsten Tarif für Ihr Anrufaufkommen samt Mehrminuten, die einmalige Einrichtung und — mit Ihren eigenen Zahlen — was davon in Geld messbar ist.",
   },
   cityLinks: [
     { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
@@ -119,7 +119,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Kommen meine Patienten mit einer Computerstimme klar?",
       answer:
-        "Nicht jeder Anrufer mag synthetische Stimmen – das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Wer nicht mit dem Assistenten sprechen möchte, kann jederzeit einen Rückruf hinterlassen und wird nicht in ein Menü gezwungen. In der Anfangszeit werten wir die Gespräche mit Ihnen aus und passen an, was nicht ankommt.",
+        "Nicht jeder Anrufer mag synthetische Stimmen – das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Wer nicht mit dem Assistenten sprechen möchte, kann jederzeit einen Rückruf hinterlassen und wird nicht in ein Menü gezwungen.",
     },
     {
       question: "Worauf müssen Sie bei DSGVO und Gesundheitsdaten in Therapiepraxen achten?",

@@ -57,7 +57,7 @@ const CITY_CONFIGS: Record<CitySlug, CityConfig> = {
     canonical: `${BUSINESS_INFO.website}/muenchen`,
     title: "Cogniiq in München – KI-Telefonassistent, Websites und Automatisierung",
     description: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungslösungen für Unternehmen in München. Hochwertige digitale Systeme für den Münchner Markt.",
-    intro: "Cogniiq entwickelt digitale Systeme für Unternehmen in München – von hochkonvertierenden Websites über KI-Telefonassistenten bis zu automatisierten Prozessen.",
+    intro: "Cogniiq entwickelt digitale Systeme für Unternehmen in München – von Websites über KI-Telefonassistenten bis zu automatisierten Prozessen.",
     tagline: "Vor Ort in München und remote · drei Leistungen · ein Ansprechpartner",
   },
   regensburg: {
@@ -168,7 +168,7 @@ export function CityLandingPage({ citySlug }: Props) {
               <div className="flex flex-wrap gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-pub-signal text-white rounded-xl font-semibold hover:bg-pub-signal-ink transition-colors"
                 >
                   Kostenloses Erstgespräch
                   <ArrowRight size={16} />

@@ -28,7 +28,7 @@ import {
   BETREUUNG,
   CTA,
   DATENSCHUTZ_PUNKTE,
-  DECKELUNG,
+  ABRECHNUNG,
   EINRICHTUNG_PROJEKT,
   FAKTEN,
   ZWEI_WOCHEN_GARANTIE,
@@ -46,7 +46,9 @@ import {
   UEBERGABE_ABWICKLUNG,
   UMKEHRBARKEIT,
   RECHNER,
+  EINRICHTUNG,
 } from "@/lib/telefonassistent-copy";
+import { CTA_PRIMARY_CLASS } from "@/components/public/PublicUI";
 
 const base = BUSINESS_INFO.website;
 
@@ -59,7 +61,7 @@ const faqItems = [
   {
     question: "Kommen meine Patientinnen und Patienten mit einer Computerstimme klar?",
     answer:
-      "Nicht alle sofort — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. Die ersten Wochen begleiten wir aktiv und ändern, was nicht ankommt.",
+      "Nicht alle sofort — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln.",
   },
   {
     question: "Landet der Termin automatisch in meiner Praxissoftware?",
@@ -79,7 +81,7 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als geplant?",
     answer:
-      `Nur begrenzt. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung} ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
+      `Ja, wenn Sie das Kontingent überschreiten – um die Mehrminuten, zu einem festen Satz. ${FAKTEN.abrechnung} ${FAKTEN.tarifzuordnung} ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
   {
     question: "Wie komme ich wieder aus dem Vertrag heraus?",
@@ -137,32 +139,32 @@ const cityLinks = [
 const SECTION = "py-24";
 const SECTION_ALT = "py-24 bg-gray-50 dark:bg-gray-900/40";
 const PROSE = "text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]";
-const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+const H2 =
+  "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6 before:block before:w-8 before:h-1 before:rounded-full before:bg-pub-accent dark:before:bg-blue-400 before:mb-4";
 const H3 = "text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5";
 const CARD =
   "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
 const CARD_ALT =
   "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
-/** Neutraler Listenpunkt — Farbe bleibt der Handlung vorbehalten (§1.1). */
+/** Listenpunkt in Akzentblau (Markendetail, 24.10.2026); Signalblau bleibt der Handlung vorbehalten. */
 const DOT =
-  "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
+  "mt-[10px] w-1.5 h-1.5 rounded-full bg-pub-accent-soft dark:bg-blue-400 flex-shrink-0";
 /** Primärer CTA, ≥ 44 px Tap-Ziel (§1.6). */
-const CTA_PRIMARY =
-  "inline-flex items-center gap-2 px-7 py-4 min-h-[44px] bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[16px] hover:bg-gray-700 dark:hover:bg-white transition-colors";
+const CTA_PRIMARY = CTA_PRIMARY_CLASS;
 
 export function PraxenPage() {
   return (
     <>
       <PageSEO
         title="KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq"
-        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln. Termine werden im Gespräch vergeben, verschoben und abgesagt; Ausnahmen gehen an Ihr Team. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe."
+        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln. Termine werden im Gespräch vergeben, verschoben und abgesagt; Ausnahmen gehen an Ihr Team. Keine Triage, festes Minutenkontingent, in zwei Wochen eingerichtet und bereit zur Freigabe."
         canonical={`${base}/praxen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen bg-white dark:bg-gray-950">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         {/* ── 1 · M1 Wiedererkennung ── */}
         <section className="pt-32 pb-24">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -180,11 +182,14 @@ export function PraxenPage() {
             </nav>
 
             <motion.div className="cq-rise">
+              <p className="text-[15px] font-medium uppercase tracking-[0.14em] text-pub-accent dark:text-blue-400 mb-4">
+                Am Tresen steht eine Patientin. Und das Telefon klingelt trotzdem.
+              </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight mb-7">
-                Am Tresen steht eine Patientin.
+                KI-Telefonassistent für Praxen:
                 <br />
                 <span className="text-pub-ink-3 dark:text-gray-500 font-light">
-                  Und das Telefon klingelt trotzdem.
+                  ein Empfang am Telefon, der Anliegen erledigt.
                 </span>
               </h1>
               <div className={`${PROSE} space-y-5 mb-9`}>
@@ -227,6 +232,40 @@ export function PraxenPage() {
           </div>
         </section>
 
+        {/* ── Wegweiser direkt nach dem Hero: der Hub verteilt, die Segmentseiten
+            vertiefen. Stand bis 23.10.2026 am Seitenende, hinter ~5.000 Wörtern
+            Hausarzt-Strecke, die inzwischen /ki-telefonassistent-arzt trägt. ── */}
+        <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`} aria-labelledby="praxisform-heading">
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <h2 id="praxisform-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+              Welche Praxis sind Sie?
+            </h2>
+            <p className={`${PROSE} mb-8`}>
+              Die Anrufanlässe unterscheiden sich: Rezept und Überweisung in der
+              Arztpraxis, Schmerzpatienten und Recall in der Zahnarztpraxis,
+              Behandlungszeiten ohne Empfang in der Therapiepraxis. Jede Seite
+              beschreibt ihre Anlässe, Regeln und Grenzen. Was alle gemeinsam
+              haben – Kalenderweg, Übergabe, Datenschutz, Einführung –, steht
+              weiter unten auf dieser Seite einmal.
+            </p>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {segmentLinks.map((s) => (
+                <Link
+                  key={s.href}
+                  to={s.href}
+                  className={`${CARD} block hover:border-pub-accent-line dark:hover:border-blue-500/40 transition-colors`}
+                >
+                  <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                    {s.label}
+                    <ArrowRight size={15} className="text-pub-accent dark:text-blue-400" aria-hidden="true" />
+                  </h3>
+                  <p className={PROSE}>{s.text}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── 2 · M2 Was es kostet, nicht erreichbar zu sein ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -249,8 +288,10 @@ export function PraxenPage() {
             </div>
             <div className={`${CARD} mt-8`}>
               <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.6]">
-                Mehr als ein Drittel der Befragten ist beim Versuch der
-                telefonischen Terminbuchung gescheitert.
+                Mehr als ein Drittel der befragten Nutzerinnen und Nutzer von
+                Arztterminportalen berichtet, bei der telefonischen Terminbuchung
+                gescheitert zu sein – eine Aussage über diese Nutzergruppe, nicht
+                über alle Patientinnen und Patienten.
               </p>
               <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2">
                 Quelle: vzbv, Marktcheck Arztterminportale, 2025
@@ -375,7 +416,7 @@ export function PraxenPage() {
               ziehen und was vor der Freigabe geprüft gehört, steht im{" "}
               <Link
                 to="/ki-telefonassistent-einfuehren"
-                className="underline underline-offset-4 hover:no-underline text-gray-900 dark:text-gray-100"
+                className="underline underline-offset-4 hover:no-underline text-pub-accent-ink dark:text-blue-400 decoration-pub-accent-line"
               >
                 Leitfaden zur Einführung in der Praxis
               </Link>
@@ -509,57 +550,37 @@ export function PraxenPage() {
           </div>
         </section>
 
-        {/* ── 13 · M10 Preis und Deckelung — Obergrenze zuerst (§5.1) ── */}
+        {/* ── 13 · M10 Preis und Abrechnungsregel — vor der ersten Zahl (§5.1) ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{DECKELUNG.headline}</h2>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.geltung}</p>
-            <p className={`${PROSE} mb-4`}>{DECKELUNG.tarifwechsel}</p>
-            <p className={`${PROSE} mb-10`}>{DECKELUNG.nichtProBehandler}</p>
+            <h2 className={H2}>{ABRECHNUNG.headline}</h2>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.text}</p>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.geltung}</p>
+            <p className={`${PROSE} mb-4`}>{ABRECHNUNG.tarifwechsel}</p>
+            <p className={`${PROSE} mb-10`}>{ABRECHNUNG.nichtProBehandler}</p>
 
-            {/* Tarife als Karten — auf dem Handy kein horizontales Scrollen */}
-            <div className="grid md:grid-cols-3 gap-5">
+            {/* Die Tarifkarten stehen seit dem 24.10.2026 nur noch auf der
+                Kostenseite (eine Preisquelle, eine Darstellung). Der Hub nennt
+                die Kontingente und verlinkt. */}
+            <ul className="grid md:grid-cols-3 gap-5">
               {TARIFE.map((t) => (
-                <div key={t.name} className={CARD}>
-                  <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                <li key={t.name} className={CARD}>
+                  <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2">
                     {t.name}
                   </p>
-                  <p className="text-[28px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-none mb-1">
-                    {t.monatlich}
+                  <p className={PROSE}>
+                    {t.minuten.toLocaleString("de-DE")} Inklusivminuten im Monat für {t.monatlich} netto; bei
+                    durchschnittlich rund zwei Minuten je Anruf ungefähr{" "}
+                    {t.anrufeCa.toLocaleString("de-DE")} Anrufe. Jede weitere Minute {FAKTEN.mehrpreisProMinute} netto.
                   </p>
-                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">
-                    im Monat
-                  </p>
-                  <dl className="space-y-2.5 text-[16px]">
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Kontingent</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.minuten.toLocaleString("de-DE")} Min.
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">entspricht</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        ca. {t.anrufeCa.toLocaleString("de-DE")} Anrufe
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Obergrenze</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.obergrenze}
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-3">
-                      <dt className="text-gray-500 dark:text-gray-500">Einrichtung</dt>
-                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
-                        {t.einrichtung}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
+            <p className={`${PROSE} mt-6`}>
+              {EINRICHTUNG.standard} Rechenbeispiele, Zusatzsprachen und Vertragsrahmen stehen
+              auf der Kostenseite.
+            </p>
+            <p className={`${PROSE} mt-6`}>{FAKTEN.steuerbasisPraxis}</p>
             <p className={`${PROSE} mt-6`}>{TARIF_ENTERPRISE}</p>
 
             <div className={`${CARD} mt-8`}>
@@ -571,7 +592,7 @@ export function PraxenPage() {
 
             <Link
               to="/kosten-ki-telefonassistent"
-              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors"
             >
               Alle Preisangaben im Detail
               <ArrowRight size={15} aria-hidden="true" />
@@ -580,7 +601,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── Rechner: steht NACH dem Preisblock, damit der Leser Tarife und
-            Deckelung kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
+            Abrechnungsregel kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
         {/*
           Seit dem 11.09.2026 rechnet auch diese Seite mit dem kanonischen
           Rechner. Vorher stand hier `PraxisRechnerSection` mit einem
@@ -595,37 +616,25 @@ export function PraxenPage() {
           nachsatz={RECHNER.anbindungsHinweis}
         />
 
-        {/* ── 14 · M19 Umkehrbarkeit ── */}
-        <section className={SECTION_ALT}>
+        {/* ── 14/15 · Vertrag und Grenzen der Passung: seit dem 24.10.2026 nur
+            noch als Kurzfassung mit Verweis. Die vollständigen Blöcke M19
+            (Umkehrbarkeit) und M16 (Wann wir nicht passen) stehen auf der
+            Produktseite und der Kostenseite; dreimal derselbe Text auf drei
+            Seiten einer Familie war ein Befund des Reviews. ── */}
+        <section className={SECTION_ALT} aria-labelledby="vertrag-heading">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{UMKEHRBARKEIT.headline}</h2>
-            <dl className="space-y-5 mb-8">
-              {UMKEHRBARKEIT.fakten.map((f) => (
-                <div key={f.label} className={CARD_ALT}>
-                  <dt className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                    {f.label}
-                  </dt>
-                  <dd className={PROSE}>{f.wert}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className={PROSE}>{UMKEHRBARKEIT.vetorecht}</p>
-          </div>
-        </section>
-
-        {/* ── 15 · M16 Wann wir nicht passen ── */}
-        <section className={SECTION}>
-          <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{NICHT_PASSEND.headline}</h2>
-            <p className={`${PROSE} mb-8`}>{NICHT_PASSEND.intro}</p>
-            <ul className="space-y-5">
-              {NICHT_PASSEND.points.map((point, i) => (
-                <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
-                  <span className={DOT} />
-                  {point}
-                </li>
-              ))}
-            </ul>
+            <h2 id="vertrag-heading" className={H2}>{UMKEHRBARKEIT.headline}</h2>
+            <p className={`${PROSE} mb-5`}>
+              {FAKTEN.laufzeit} {FAKTEN.kuendigung} {FAKTEN.preisgarantie}
+            </p>
+            <p className={`${PROSE} mb-5`}>{NICHT_PASSEND.intro}</p>
+            <Link
+              to="/kosten-ki-telefonassistent"
+              className="inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent-ink hover:text-pub-signal-ink transition-colors"
+            >
+              Laufzeit, Kündigung, Testphase und die Fälle, in denen wir abraten
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
           </div>
         </section>
 
@@ -643,7 +652,7 @@ export function PraxenPage() {
             </ul>
             <Link
               to="/datenschutz-sicherheit"
-              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-pub-accent dark:text-blue-400 hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors"
             >
               Datenschutz und Sicherheit im Detail
               <ArrowRight size={15} aria-hidden="true" />
@@ -684,25 +693,6 @@ export function PraxenPage() {
         {/* ── Wegweiser: nur Gesundheitsinhalte (Positionierung Option B) ── */}
         <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`}>
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-              Für Ihre Praxisform
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-12">
-              {segmentLinks.map((s) => (
-                <Link
-                  key={s.href}
-                  to={s.href}
-                  className={`${CARD} block hover:border-gray-300 dark:hover:border-gray-600 transition-colors`}
-                >
-                  <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                    {s.label}
-                    <ArrowRight size={15} className="text-gray-400" aria-hidden="true" />
-                  </h3>
-                  <p className={PROSE}>{s.text}</p>
-                </Link>
-              ))}
-            </div>
-
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Praxen in Ihrer Region
             </h2>
@@ -711,7 +701,7 @@ export function PraxenPage() {
                 <li key={c.href}>
                   <Link
                     to={c.href}
-                    className="inline-flex items-center gap-2 px-5 py-3 min-h-[44px] rounded-xl border border-gray-200 dark:border-gray-700 text-[16px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-3 min-h-[44px] rounded-xl border border-gray-200 dark:border-gray-700 text-[16px] font-medium text-gray-700 dark:text-gray-300 hover:border-pub-accent-line hover:text-pub-accent-ink dark:hover:text-blue-300 transition-colors [&>svg]:text-pub-accent dark:[&>svg]:text-blue-400"
                   >
                     {c.label}
                     <ArrowRight size={14} aria-hidden="true" />
@@ -721,7 +711,7 @@ export function PraxenPage() {
             </ul>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

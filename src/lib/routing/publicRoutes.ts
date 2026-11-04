@@ -76,7 +76,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/kontakt",
     title: "Kostenloses Erstgespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
-    description: "30 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
+    description: "Ein kurzes Gespräch – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
     keywords: "Cogniiq Kontakt, KI Erstgespräch, Webdesign Anfrage, Automatisierung Anfrage",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -103,7 +103,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/praxen",
     title: "KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq",
-    description: "Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe.",
+    description: "KI-Telefonassistent für Arzt-, Zahnarzt- und Therapiepraxen: Wegweiser zur passenden Praxisseite – plus Kalenderweg, Übergabe und Datenschutz für alle.",
     keywords: "KI Telefonassistent Praxis, Praxisempfang Telefon, telefonische Erreichbarkeit Praxis, Anrufannahme Arztpraxis",
     indexable: true,
     sitemap: { lastmod: "2026-08-16", changefreq: "monthly", priority: "0.90" },
@@ -142,7 +142,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     // was das Produkt tut — erledigen statt annehmen — ohne daraus eine
     // universelle Integrationszusage zu machen.
     title: "KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq",
-    description: "KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung.",
+    description: "KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Rechner ohne Anmeldung.",
     keywords: "KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, Anrufe automatisieren",
     indexable: true,
     sitemap: { lastmod: "2026-09-11", changefreq: "monthly", priority: "0.92" },
@@ -159,7 +159,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
       auf 0.95 wie beim Automatisierungs-Pillar: eine nationale Seite, nicht zwei.
     */
     title: "Webdesign Agentur – Websites für Unternehmen | Cogniiq",
-    description: "Was eine Website bei Cogniiq umfasst, wer Inhalte liefert, wie SEO, Performance, Tracking und Barrierefreiheit ins Projekt kommen, was den Preis bestimmt und wie ein Projekt bis zum Go-live abläuft.",
+    description: "Webdesign für Unternehmen: was eine Website umfasst, wer die Inhalte liefert, was den Preis bestimmt und wie ein Projekt bis zum Go-live abläuft.",
     keywords: "Webdesign Agentur, Webdesign für Unternehmen, Website erstellen lassen, professionelle Website, Firmenwebsite",
     indexable: true,
     sitemap: { lastmod: "2026-09-13", changefreq: "monthly", priority: "0.95" },
@@ -180,22 +180,9 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     sitemap: { lastmod: "2026-09-12", changefreq: "monthly", priority: "0.95" },
   },
   {
-    path: "/webdesign-agentur-deutschland",
-    /*
-      Bleibt vorerst live (13.09.2026): Konsolidierung in /webdesign ist
-      beschlossen und aufgeschoben, weil die Seite Anker auf zwei eingefrorene
-      Experimente trägt (docs/seo/ARCHITEKTUR.md §5.1, F9).
-    */
-    title: "Webdesign Agentur Deutschland | Individuelle Websites national – Cogniiq",
-    description: "Cogniiq ist Ihre Webdesign Agentur für ganz Deutschland. Wir entwickeln individuelle, SEO-optimierte Websites die konvertieren – remote oder persönlich in Bayern.",
-    keywords: "Webdesign Agentur Deutschland, Website Agentur Deutschland, professionelle Website Deutschland",
-    indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
-  },
-  {
     path: "/ki-agentur-deutschland",
     title: "KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq",
-    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt.",
+    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten und Automatisierungssysteme – entwickelt für den deutschen Markt.",
     keywords: "KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
@@ -263,7 +250,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth",
     title: "Cogniiq in Bayreuth – KI-Telefonassistent, Websites & Automatisierung",
-    description: "Cogniiq – Ihre AI-Agentur in Bayreuth. KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung für Unternehmen in Oberfranken. Persönliche Betreuung vor Ort.",
+    description: "Cogniiq – Ihre AI-Agentur in Bayreuth. KI-Telefonassistent, Websites und Prozessautomatisierung für Unternehmen in Oberfranken. Persönliche Betreuung vor Ort.",
     keywords: "AI Agentur Bayreuth, Webdesign Bayreuth, KI Telefonassistent Bayreuth, Automatisierung Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -338,8 +325,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/bayreuth/website-relaunch",
-    title: "Website Relaunch Bayreuth – Mehr Performance & bessere Rankings | Cogniiq",
-    description: "Website Relaunch in Bayreuth: Ihre bestehende Website modernisieren ohne Rankingverlust. Neues Design, bessere Performance, stärkeres SEO – persönliche Betreuung.",
+    title: "Website Relaunch Bayreuth – Alte Website modernisieren | Cogniiq",
+    description: "Website Relaunch in Bayreuth: bestehende Website modernisieren, Weiterleitungen und Inhalte vor dem Umzug geprüft. Neues Design, schnellere Ladezeit, persönliche Betreuung.",
     keywords: "Website Relaunch Bayreuth, Website modernisieren Bayreuth, Homepage Relaunch Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -479,7 +466,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/regensburg/website-relaunch",
-    title: "Website Relaunch Regensburg – Modernisierung ohne Rankingverlust | Cogniiq",
+    title: "Website Relaunch Regensburg – Modernisierung & SEO-Migration | Cogniiq",
     description: "Website Relaunch in Regensburg: alte Website modernisieren, Performance verbessern, lokales SEO optimieren. Professionelle Umsetzung für Unternehmen in Ostbayern.",
     keywords: "Website Relaunch Regensburg, Homepage Relaunch Regensburg, Website modernisieren Regensburg",
     indexable: true,
@@ -613,8 +600,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // ─── INDUSTRY-SPECIFIC SERVICE PAGES — KI-TELEFONASSISTENT ───────────────────
   {
     path: "/ki-telefonassistent-arzt",
-    title: "KI-Telefonassistent für Arztpraxen | Terminwünsche aufnehmen – Cogniiq",
-    description: "Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.",
+    title: "KI-Telefonassistent Arztpraxis: Anrufe erledigen | Cogniiq",
+    description: "KI-Telefonassistent für Arztpraxen: Termine im Gespräch vergeben, verschieben, absagen – über den geprüften Kalenderweg. Rezeptwünsche ans Team. Keine Triage.",
     keywords: "KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.87" },
@@ -637,8 +624,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/ki-telefonassistent-praxis",
-    title: "KI-Telefonassistent für medizinische Praxen | Terminverwaltung automatisieren – Cogniiq",
-    description: "KI-Telefonassistent für Arzt- und Facharztpraxen: Termine aufnehmen, Rezeptanfragen strukturiert erfassen, Anmeldung entlasten – ohne Gesprächsaufzeichnung.",
+    title: "KI-Telefonassistent für Therapiepraxen | Cogniiq",
+    description: "KI-Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Termine im Gespräch vergeben, verschieben, absagen – ohne Mitschnitt.",
     keywords: "KI Telefonassistent Praxis, Praxis Telefonassistent, Terminverwaltung Praxis KI, AI Praxis",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -655,8 +642,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/automatisierung-arzt",
-    title: "Automatisierung für Arztpraxen | Terminbuchung & Kommunikation – Cogniiq",
-    description: "Prozessautomatisierung für Arztpraxen: Terminbuchung, Erinnerungen, Patientenkommunikation und Dokumentenverwaltung automatisieren. Mehr Zeit für Patienten.",
+    title: "Automatisierung für Arztpraxen | Erinnerungen, Warteliste & Kommunikation – Cogniiq",
+    description: "Prozessautomatisierung für Arztpraxen: Terminbestätigungen, Erinnerungen, Wartelistenkontakt und Patientenkommunikation regelbasiert automatisieren – mit Mensch an den Entscheidungsstellen.",
     keywords: "Automatisierung Arztpraxis, Praxis Automatisierung, Terminbuchung Automatisierung, Arzt KI Systeme",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -697,7 +684,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/kosten-ki-telefonassistent",
     title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
-    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie.",
+    description: "Was kostet ein KI Telefonassistent für Praxen? Ab 300 € netto im Monat mit 500 Inklusivminuten, jede weitere Minute 0,50 €, Einrichtung einmalig 990 €, zzgl. USt.",
     keywords: "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },
@@ -736,7 +723,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/keine-terminbuchung-online",
     title: "Keine Online-Terminbuchung? Das kostet Sie täglich Patienten & Kunden | Cogniiq",
-    description: "Ohne Online-Terminbuchung verlieren Sie Patienten und Kunden an Wettbewerber. Cogniiq integriert Terminbuchungssysteme in Ihre Website – in wenigen Tagen.",
+    description: "Ohne Online-Terminbuchung buchen Patienten und Kunden dort, wo es abends noch geht. Was eine Terminbuchung auf der Website leistet, was sie voraussetzt und wie Cogniiq sie einrichtet.",
     keywords: "Keine Online Terminbuchung, Terminbuchung Website, Online Buchungssystem integrieren",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },
@@ -769,31 +756,31 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/blog/ki-automatisierung-kleine-unternehmen",
-    title: "KI-Automatisierung für kleine Unternehmen 2025 | Leitfaden",
+    title: "KI-Automatisierung für kleine Unternehmen | Leitfaden",
     description: "KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/ki-telefonassistent-arztpraxis",
-    title: "KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt | Cogniiq",
-    description: "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
+    title: "Telefon in der Arztpraxis: was beim Team bleiben muss | Cogniiq",
+    description: "Rezept, Befund, Akuttermin, Krankschreibung: welche Anrufe in einer Arztpraxis ein Mensch führen muss, welche ein Assistent erledigen kann – und woran die Praxissoftware-Anbindung hängt.",
     indexable: true,
     sitemap: { lastmod: "2026-09-05", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/webdesign-konversion-tipps",
-    title: "Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps",
+    title: "Webdesign für mehr Anfragen & Konversion | 8 Tipps",
     description: "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate verdoppeln können.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/lokales-seo-unternehmen",
-    title: "Lokales SEO für Unternehmen 2025 | Google Maps & lokale Suche",
+    title: "Lokales SEO für Unternehmen | Google Maps & lokale Suche",
     description: "Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/prozessautomatisierung-roi",
@@ -807,35 +794,35 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     title: "Verpasste Anrufe Kosten berechnen | KI-Telefonassistent",
     description: "Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation mit Durchschnittswerten aus deutschen KMU – und wie ein KI-Telefonassistent den Verlust stoppt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-09-17", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/ki-telefonassistent-restaurant",
-    title: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
+    title: "KI-Telefonassistent Restaurant | Reservierungen automatisieren",
     description: "Wie Restaurants mit einem KI-Telefonassistenten Reservierungsanfragen auch in der Stoßzeit annehmen, was der Assistent übernimmt, was beim Team bleibt und woran die Anbindung an ein Reservierungssystem hängt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/website-ohne-anfragen",
-    title: "Website bringt keine Anfragen? Ursachen & Lösungen 2025",
+    title: "Website bringt keine Anfragen? Ursachen & Lösungen",
     description: "Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/digitalisierung-mittelstand",
-    title: "Digitalisierung Mittelstand 2025 | Wo anfangen & was vermeiden",
+    title: "Digitalisierung Mittelstand | Wo anfangen & was vermeiden",
     description: "Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/webdesign-agentur-auswahl",
-    title: "Webdesign Agentur auswählen 2025 | 7 entscheidende Kriterien",
+    title: "Webdesign Agentur auswählen | 7 entscheidende Kriterien",
     description: "Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
 
   // ─── LEGAL ───────────────────────────────────────────────────────────────────

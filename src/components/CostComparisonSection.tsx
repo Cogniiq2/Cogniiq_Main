@@ -62,7 +62,7 @@ const VERGLEICH: Array<{ label: string; mensch: boolean; ki: boolean; hinweis?: 
     label: 'Notfälle und heikle Situationen einschätzen',
     mensch: true,
     ki: false,
-    hinweis: 'Notfälle werden erkannt und sofort weitergeleitet, nie eingeschätzt.',
+    hinweis: 'Hinterlegte Notfall-Signalwörter lösen die Weiterleitung aus – eingeschätzt wird nie.',
   },
   { label: 'Kein Urlaub, keine Krankheit, keine Pause', mensch: false, ki: true },
   { label: 'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO', mensch: true, ki: true },

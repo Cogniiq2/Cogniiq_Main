@@ -11,7 +11,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { FAKTEN, ZWEI_WOCHEN_GARANTIE, TARIFE } from "./telefonassistent-copy";
+import { EINRICHTUNG, FAKTEN, ZWEI_WOCHEN_GARANTIE, TARIFE, VERTRAG } from "./telefonassistent-copy";
 
 const ROOT = join(__dirname, "..", "..");
 
@@ -36,6 +36,8 @@ const CLUSTER = [
   "src/components/TelefonassistentKompaktSection.tsx",
   "src/components/TelefonassistentBeweiskette.tsx",
   "src/components/NationalIndustryPage.tsx",
+  // Seit 04.11.2026: Die FAQ dort nannte eine eigene Preisstaffel (ab 99 €).
+  "src/pages/pillars/KiAgenturDeutschland.tsx",
 ];
 
 /**
@@ -43,9 +45,12 @@ const CLUSTER = [
  * der er kommen muss. Beides steht hier nebeneinander, damit klar ist, wohin
  * eine Änderung gehört.
  */
-const KERNZAHLEN: Array<{ literal: RegExp; quelle: string }> = [
-  { literal: /0,39\s?€/, quelle: "FAKTEN.mehrpreisProMinute bzw. FAKTEN.deckelung" },
-  { literal: /1\.400\s?€/, quelle: "TARIFE (obergrenze) bzw. FAKTEN.deckelung" },
+const KERNZAHLEN: Array<{ literal: RegExp; quelle: string; metaErlaubt?: boolean }> = [
+  // Die alte „Obergrenze 1.400 €" ist am 24.10.2026 entfallen; sie darf nicht zurückkehren.
+  { literal: /1\.400\s?€/, quelle: "entfallen (alte Obergrenze) – kein Preisdeckel" },
+  { literal: /0,50\s?€/, quelle: "FAKTEN.mehrpreisProMinute", metaErlaubt: true },
+  { literal: /\b990\s?€/, quelle: "EINRICHTUNG.anzeige", metaErlaubt: true },
+  { literal: /1\.490|2\.490|3\.490/, quelle: "entfallen (alte Einrichtungsstaffel) – EINRICHTUNG" },
   { literal: /(zwei\s+Wochen|\b14\s?Tage[n]?)\s+nach\s+Zahlungseingang/, quelle: "FAKTEN.uebergabeGarantie" },
   { literal: /innerhalb\s+von\s+3\s?Tagen/, quelle: "FAKTEN.aenderungen" },
   { literal: /24\s?Monate/, quelle: "FAKTEN.preisgarantie" },
@@ -66,21 +71,58 @@ function ohneKommentare(quelltext: string): string {
     .join("\n");
 }
 
+describe("Preis-Meta-Description stimmt mit der zentralen Preisquelle überein", () => {
+  const eur = (n: number) => `${n.toLocaleString("de-DE")} €`;
+  const erwartet = [
+    // J8 (04.11.2026): Nettopreise, Umsatzsteuer kommt hinzu.
+    `Ab ${eur(TARIFE[0].monatlichEur)} netto im Monat`,
+    `${TARIFE[0].minuten} Inklusivminuten`,
+    `jede weitere Minute ${FAKTEN.mehrpreisProMinute.replace("\u00A0", " ")}`,
+    `Einrichtung einmalig ${EINRICHTUNG.anzeige.replace("\u00A0", " ")}`,
+    "zzgl. USt.",
+  ];
+  it.each([
+    "src/lib/routing/publicRoutes.ts",
+    "src/pages/costs/KostenKiTelefonassistent.tsx",
+  ])("%s", (datei) => {
+    const m = lies(datei).match(/"Was kostet ein KI Telefonassistent für Praxen\?[^"]*"/);
+    expect(m, "Kosten-Description nicht gefunden").not.toBeNull();
+    for (const teil of erwartet) expect(m![0]).toContain(teil);
+    expect(m![0]).not.toMatch(/Obergrenze|gedeckelt|1\.490|0,39/);
+  });
+});
+
 describe("Kernaussagen liegen an genau einer Stelle", () => {
   it.each(CLUSTER)("%s tippt keine Kernzahl selbst", (datei) => {
     const text = ohneKommentare(lies(datei));
-    const treffer = KERNZAHLEN.filter((k) => k.literal.test(text)).map(
+    // Meta-Descriptions stehen im Manifest als Literal (test-seo-consistency
+    // liest den Quelltext). Für sie gilt stattdessen der Abgleichstest unten.
+    const ohneMeta = text.replace(/description(?:=|:)\s*"[^"]*"/g, "");
+    const treffer = KERNZAHLEN.filter((k) => k.literal.test(k.metaErlaubt ? ohneMeta : text)).map(
       (k) => `${k.literal.source} → gehört in ${k.quelle}`
     );
     expect(treffer).toEqual([]);
   });
 
   it("FAKTEN und TARIFE bleiben widerspruchsfrei", () => {
-    // Die Deckelungsaussage muss jede Obergrenze aus TARIFE wörtlich nennen.
-    for (const tarif of TARIFE) {
-      expect(FAKTEN.deckelung).toContain(tarif.obergrenze);
+    // Abrechnung (24.10.2026): Kontingent + 0,50 € je weitere Minute, kein Deckel.
+    expect(FAKTEN.mehrpreisProMinuteEur).toBe(0.5);
+    expect(FAKTEN.mehrpreisProMinute).toBe("0,50\u00A0€");
+    expect(FAKTEN.abrechnung).toContain(FAKTEN.mehrpreisProMinute);
+    expect(FAKTEN.abrechnung).toContain("in allen drei Tarifen");
+    expect(FAKTEN.abrechnung).toContain("Einen Preisdeckel gibt es nicht");
+    for (const text of [FAKTEN.abrechnung, FAKTEN.abrechnungGeltung, FAKTEN.abrechnungKurz, FAKTEN.tarifzuordnung]) {
+      expect(text).not.toMatch(/Obergrenze|gedeckelt|maximal\s+\d|Höchstpreis|0,39/);
     }
-    expect(FAKTEN.deckelung).toContain(FAKTEN.mehrpreisProMinute);
+    for (const tarif of TARIFE) {
+      expect(tarif).not.toHaveProperty("obergrenze");
+      expect(tarif).not.toHaveProperty("obergrenzeEur");
+    }
+    // Einrichtung: ein Betrag für alle Tarife.
+    expect(EINRICHTUNG.eur).toBe(990);
+    expect(EINRICHTUNG.anzeige).toBe("990\u00A0€");
+    expect(EINRICHTUNG.standard).toContain(EINRICHTUNG.anzeige);
+    expect(EINRICHTUNG.standard).toContain("in allen drei Tarifen");
     // Die Zusage spricht die Frist aus ("zwei Wochen"), sie beziffert sie nicht.
     // Beide Formen muessen dieselbe Frist meinen — sonst steht eine Zusage mit
     // Geldfolge im Markt, die der Vertrag nicht deckt (Korrektur 23.08.2026).
@@ -91,6 +133,26 @@ describe("Kernaussagen liegen an genau einer Stelle", () => {
     expect(FAKTEN.laufzeit).toContain(String(FAKTEN.laufzeitMonate));
     expect(FAKTEN.laufzeit).toContain(FAKTEN.monatlichAufschlag);
     expect(FAKTEN.preisgarantie).toContain(String(FAKTEN.preisgarantieMonate));
+  });
+});
+
+/*
+  Korrektur 04.11.2026. Mit Mehrminuten ohne Deckel schwankt die Monatsrechnung
+  mit dem Verbrauch. Ein Satz, der einen gleichbleibenden Monatsbetrag zusagt,
+  widerspricht der Abrechnungsregel derselben Seite. Und keine Seite außerhalb
+  von TARIFE darf eigene Monatsbeträge für den Telefonassistenten nennen.
+*/
+describe("Monatsbeträge kommen nur aus TARIFE", () => {
+  it("die Preisgarantie verspricht keinen konstanten Monatsbetrag", () => {
+    for (const f of VERTRAG.fakten) {
+      expect(f.wert).not.toMatch(/Monatsbetrag\s+nicht|ändert sich Ihr Monatsbetrag/);
+    }
+  });
+
+  it("die KI-Agentur-FAQ nennt die Tarife aus der Preisquelle, keine eigene Staffel", () => {
+    const quelltext = ohneKommentare(lies("src/pages/pillars/KiAgenturDeutschland.tsx"));
+    expect(quelltext).not.toMatch(/\b(99|199|399|499)\s?(\u00A0)?€/u);
+    expect(quelltext).toContain("TARIFE[0].monatlich");
   });
 });
 
@@ -222,6 +284,68 @@ describe("Zwei-Wochen-Garantie bleibt widerspruchsfrei", () => {
     }
     for (const datei of CLUSTER) {
       expect(ohneKommentare(lies(datei))).not.toMatch(VERTRAGSVERWEIS);
+    }
+  });
+});
+
+/*
+  J8 · Steuerbasis (Inhaber-Entscheidung 04.11.2026): Alle Tarifpreise,
+  Mehrminuten, Zusatzsprachen und Einrichtungsgebühren sind Nettopreise
+  zuzüglich der gesetzlichen Umsatzsteuer (derzeit 19 %). Diese Tests halten
+  fest, dass jede Seite mit Preisen das sagt, dass Arztpraxen es ausdrücklich
+  lesen und dass das Schema keine Bruttopreise behauptet.
+*/
+describe("J8 · Preise sind netto zzgl. Umsatzsteuer", () => {
+  it("Satz und Anzeigeform sind dieselbe Zahl", () => {
+    expect(FAKTEN.umsatzsteuerSatz).toBe(0.19);
+    const prozent = `${Math.round(FAKTEN.umsatzsteuerSatz * 100)}\u00A0%`;
+    expect(FAKTEN.umsatzsteuerProzent).toBe(prozent);
+    expect(FAKTEN.nettoZusatz).toContain(prozent);
+    expect(FAKTEN.steuerbasis).toContain(prozent);
+    expect(FAKTEN.steuerbasis).toMatch(/Nettopreise zuzüglich der gesetzlichen Umsatzsteuer/);
+    expect(FAKTEN.steuerbasisPraxis).toMatch(/^Für Arztpraxen ausdrücklich:/);
+    expect(FAKTEN.steuerbasisPraxis).toContain(prozent);
+  });
+
+  it("die verbindlichen Nettobeträge bleiben unverändert", () => {
+    expect(TARIFE.map((t) => t.monatlichEur)).toEqual([300, 500, 800]);
+    expect(TARIFE.map((t) => t.minuten)).toEqual([500, 1000, 2000]);
+    expect(FAKTEN.mehrpreisProMinuteEur).toBe(0.5);
+    expect(EINRICHTUNG.eur).toBe(990);
+  });
+
+  it("die Kernsätze mit Beträgen nennen die Steuerbasis", () => {
+    expect(FAKTEN.abrechnung).toContain(`${FAKTEN.mehrpreisProMinute} netto`);
+    expect(FAKTEN.abrechnungKurz).toContain("netto");
+    expect(EINRICHTUNG.standard).toContain(`${EINRICHTUNG.anzeige} netto`);
+    expect(EINRICHTUNG.kurz).toContain("netto");
+    expect(VERTRAG.fakten.find((f) => f.label === "Umsatzsteuer")?.wert).toBe(FAKTEN.steuerbasis);
+  });
+
+  it.each([
+    ["src/pages/costs/KostenKiTelefonassistent.tsx", "FAKTEN.steuerbasisPraxis"],
+    ["src/pages/PraxenPage.tsx", "FAKTEN.steuerbasisPraxis"],
+    ["src/pages/industries/KiTelefonassistentArzt.tsx", "FAKTEN.steuerbasisPraxis"],
+    ["src/components/TelefonRechner.tsx", "FAKTEN.steuerbasis"],
+    ["src/pages/KiTelefonassistentPage.tsx", "FAKTEN.steuerbasis"],
+    ["src/pages/pillars/KiAgenturDeutschland.tsx", "FAKTEN.steuerbasis"],
+    ["src/lib/standorte-service-configs.ts", "FAKTEN.steuerbasis"],
+  ])("%s weist die Steuerbasis aus", (datei, konstante) => {
+    expect(ohneKommentare(lies(datei))).toContain(konstante);
+  });
+
+  it("das Offer-Schema der Kostenseite behauptet keine Bruttopreise", () => {
+    const quelltext = ohneKommentare(lies("src/pages/costs/KostenKiTelefonassistent.tsx"));
+    const preisangaben = quelltext.match(/priceCurrency: "EUR",/g) ?? [];
+    const netto = quelltext.match(/valueAddedTaxIncluded: false,/g) ?? [];
+    expect(preisangaben.length).toBeGreaterThan(0);
+    expect(netto.length).toBe(preisangaben.length);
+    expect(quelltext).not.toMatch(/valueAddedTaxIncluded: true/);
+  });
+
+  it("keine Stelle nennt die Preise brutto oder inklusive Umsatzsteuer", () => {
+    for (const datei of [...CLUSTER, "src/lib/telefonassistent-copy.ts"]) {
+      expect(ohneKommentare(lies(datei)), datei).not.toMatch(/inkl(\.|usive)\s+(MwSt|Mehrwertsteuer)|Bruttopreise sind|Preise (sind|verstehen sich) brutto/);
     }
   });
 });

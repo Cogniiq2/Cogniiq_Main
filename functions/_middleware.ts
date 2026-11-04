@@ -71,71 +71,41 @@ export async function onRequest(context: CloudflarePagesContext) {
   //
   // Until 2026-09-12 this Function carried a 560-line copy of every route's
   // title, description, canonical and keywords and rewrote the prerendered
-  // <head> with it on every request. That copy was a second source of truth for
-  // facts the route manifest already owns, and it had drifted on 29 of 86 shared
-  // routes — so the value a crawler read was the stale edge copy, not the
-  // reviewed manifest value. Among the suppressed values were claim corrections
-  // (BOOKING_WRITE, blanket "DSGVO-konform", "kein Anruf geht verloren") and two
-  // titles whose search experiments therefore never reached a crawler at all.
+  // <head> at the edge; it had drifted on 29 of 86 routes (docs/seo/ARCHITEKTUR.md
+  // §7). The table is gone: scripts/prerender.mjs writes and validates the head
+  // from the route manifest, and the manifest wins, never the consumer.
   //
-  // The table is gone rather than merely corrected. scripts/prerender.mjs writes
-  // the head from the manifest AND validates it per route (title, description,
-  // canonical, robots), with proper HTML escaping that this Function's raw string
-  // interpolation never had. Rewriting that output at the edge could only drift
-  // from it again. Same direction of truth as src/lib/routing/routeMetadata.ts,
-  // which removed the third copy (the one in the page components) for the same
-  // reason: the manifest wins, never the consumer.
-  //
-  // What remains below is a deliberate, shrinking exception. A route running a
-  // frozen search experiment is measured against the bytes a crawler has been
-  // receiving, and for these routes that is the edge value, not the manifest
-  // value. Aligning them would silently restart a running measurement, so the
-  // delivered bytes are held until the experiment is evaluated. Every key MUST
-  // be in PROTECTED_EXPERIMENT_PATHS, and the map MUST be emptied when the last
-  // experiment graduates — both asserted in .github/scripts/test-seo-consistency.mjs.
-  //
-  // WHY EVERY FROZEN ROUTE IS STILL NAMED IN THIS FILE
-  //
-  // The freeze rule (.claude/rules/seo-public-site.md) counts how many places in
-  // the source tree mention a protected path, comments included — removing a
-  // mention is itself a change to a frozen route. Each of the five is therefore
-  // still named here, now stating what this Function does to its head instead of
-  // carrying a copy of it. That is also the fact a future reader needs: whether
-  // what a crawler receives for that route is the manifest value or a held one.
-  //
-  //   /bayreuth/webdesign ........... edge and manifest already agreed before the
-  //                                   table was removed, so nothing is held and
-  //                                   the delivered head is unchanged.
-  //   /regensburg/website-relaunch .. same: the two values were identical.
-  //   /muenchen/webdesign-kosten .... same: the two values were identical.
-  //   /ki-telefonassistent-arzt ..... same, and expected — its head was aligned
-  //                                   in both files by the claim-integrity fix of
-  //                                   2026-09-11.
-  //   /bayreuth/website-relaunch .... the one that DIVERGED. Held below.
-  //
-  // Verified route by route on 2026-09-12 against the removed table: the only
-  // divergence among the five was the title of the relaunch route in Bayreuth.
-  // /bayreuth/webdesign, /muenchen/webdesign-kosten, /regensburg/website-relaunch
-  // and /ki-telefonassistent-arzt were byte-identical on both sides, which is why
-  // dropping the table changes nothing a crawler sees for them.
-  //
-  // The held one: the manifest carries the 2026-08-29 "Performance & bessere
-  // Rankings" title experiment, while the edge has been serving the older "Alte
-  // Website modernisieren" throughout — so that experiment has never actually
-  // reached a crawler. Aligning it now would start it, not continue it. Recorded
-  // in docs/seo/post-experiment-opportunities.md; the owner decides whether to
-  // ship it (a deliberate reset) or void it. Until then this route's SERP snippet
-  // does not move.
+  // What remains is an escape hatch for a route running a frozen search
+  // experiment whose delivered bytes must be held while the experiment is
+  // evaluated. Every key MUST be in PROTECTED_EXPERIMENT_PATHS — asserted in
+  // .github/scripts/test-seo-consistency.mjs — and the map is EMPTY whenever no
+  // experiment is frozen, as it is since 2026-10-23: the last held override
+  // (/bayreuth/website-relaunch) was voided and its manifest title aligned with
+  // the bytes crawlers had been receiving, so nothing changed for them.
   // ===========================================================================
-  const frozenHeadOverrides: Record<string, { title?: string; description?: string }> = {
-    '/bayreuth/website-relaunch': {
-      title: 'Website Relaunch Bayreuth – Alte Website modernisieren | Cogniiq',
-    },
-  };
+  const frozenHeadOverrides: Record<string, { title?: string; description?: string }> = {};
 
   const frozenHead = frozenHeadOverrides[pathname];
 
-  let response = await context.next();
+  // ============================================================
+  // HEAD is answered from the GET document, minus the body.
+  //
+  // Cloudflare's asset layer honours HEAD and returns the HTML response WITHOUT
+  // a body. Everything below reads the body to validate it is a complete
+  // document (describeDocumentProblem) and to patch the private-shell head, so
+  // a bodyless HEAD reply failed that check and surfaced as
+  //   500  X-Cogniiq-Shell-Error: asset body is not an HTML document
+  // on every prerendered route (observed in review on /ki-telefonassistent-arzt;
+  // GET on the same URL was fine). Resolve HEAD as the equivalent GET, then
+  // strip the body: same status, same headers, Content-Length of the document
+  // that GET would deliver, no entity. Non-document requests never reach this
+  // point (asset guard above), and redirects pass through unchanged below.
+  // ============================================================
+  const isHead = context.request.method === 'HEAD';
+  const fetchAsGet = () =>
+    context.env.ASSETS.fetch(new Request(context.request.url, { method: 'GET' }));
+
+  let response = isHead ? await fetchAsGet() : await context.next();
   let status = 200;
 
   // ============================================================
@@ -182,7 +152,9 @@ export async function onRequest(context: CloudflarePagesContext) {
   );
   if (problem) {
     return new Response(
-      `Cogniiq: cannot serve ${isPrivateSurface ? 'the application shell' : 'this page'} — ${problem}.`,
+      isHead
+        ? null
+        : `Cogniiq: cannot serve ${isPrivateSurface ? 'the application shell' : 'this page'} — ${problem}.`,
       {
         status: 500,
         headers: {
@@ -207,6 +179,15 @@ export async function onRequest(context: CloudflarePagesContext) {
   headers.set('Content-Type', 'text/html; charset=utf-8');
   headers.set('Cache-Control', 'no-cache');
 
+  /** The one place a document leaves this Function: GET with the body, HEAD
+   *  with the same status and headers and no entity. Content-Length is left to
+   *  the runtime: setting it by hand on a bodyless response makes the
+   *  `wrangler pages dev` proxy wait for bytes that never come. */
+  const dokument = (body: string) => {
+    headers.delete('Content-Length');
+    return new Response(isHead ? null : body, { status, headers });
+  };
+
   if (isPrivateSurface) {
     headers.set('X-Robots-Tag', 'noindex, nofollow');
     html = html.replace(
@@ -215,20 +196,14 @@ export async function onRequest(context: CloudflarePagesContext) {
     );
     html = html.replace(/(<meta\s+name="robots"\s+content=")[^"]*/i, '$1noindex, nofollow');
 
-    return new Response(html, {
-      status,
-      headers,
-    });
+    return dokument(html);
   }
 
   // The prerendered head is already the manifest's, validated per route by
   // scripts/prerender.mjs. Serve it untouched unless this route is holding a
   // frozen experiment's delivered bytes.
   if (!frozenHead) {
-    return new Response(html, {
-      status,
-      headers,
-    });
+    return dokument(html);
   }
 
   if (frozenHead.title) {
@@ -249,8 +224,5 @@ export async function onRequest(context: CloudflarePagesContext) {
     );
   }
 
-  return new Response(html, {
-    status,
-    headers,
-  });
+  return dokument(html);
 }

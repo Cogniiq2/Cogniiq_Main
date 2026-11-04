@@ -11,7 +11,7 @@ const config: ClusterPageConfig = {
   cityHub: "/regensburg",
   topic: "Website Relaunch",
   seo: {
-    title: "Website Relaunch Regensburg – Modernisierung & SEO-Neustart | Cogniiq",
+    title: "Website Relaunch Regensburg – Modernisierung & SEO-Migration | Cogniiq",
     description:
       "Website Relaunch in Regensburg: Cogniiq modernisiert veraltete Websites für Unternehmen in Regensburg und der Oberpfalz. Pagespeed, SEO, DSGVO – komplett neu aufgesetzt.",
     canonical: `${base}/regensburg/website-relaunch`,
@@ -20,8 +20,8 @@ const config: ClusterPageConfig = {
   },
   hero: {
     h1: "Website Relaunch in Regensburg",
-    lead: "Veraltete Website, schlechte Rankings, langsame Ladezeit – ein Relaunch setzt den digitalen Auftritt neu auf. Technisch fundiert, SEO-sicher, ohne Verlust bestehender Rankings.",
-    trustTags: ["Regensburg", "SEO-Migration", "Pagespeed", "Kein Ranking-Verlust"],
+    lead: "Veraltete Website, schlechte Rankings, langsame Ladezeit – ein Relaunch setzt den digitalen Auftritt neu auf. Technisch fundiert, mit SEO-Migration, deren Ziel der Erhalt bestehender Rankings ist.",
+    trustTags: ["Regensburg", "SEO-Migration", "Pagespeed", "Ranking-Erhalt als Ziel"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -29,8 +29,8 @@ const config: ClusterPageConfig = {
     items: [
       { label: "Für wen", value: "Websites älter als 3 Jahre oder mit Performance-Problemen" },
       { label: "Typische Ziele", value: "Mehr Anfragen, schnellere Ladezeit, bessere Rankings" },
-      { label: "Projektdauer", value: "3–8 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 2.000 €" },
+      { label: "Projektdauer", value: "Nach Umfang – im Konzept festgelegt" },
+      { label: "Preisrahmen", value: "Nach Umfang – im schriftlichen Angebot" },
     ],
   },
   intro: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "Nicht jede veraltete Website braucht sofort einen Relaunch. Manchmal genügen gezielte Optimierungen: Pagespeed-Fixes, DSGVO-Update, SEO-Anpassungen. Manchmal ist die technische Basis so schwach, dass Flickarbeit teurer ist als ein sauberer Neustart.",
       "Cogniiq analysiert die bestehende Website zuerst: Core Web Vitals, SEO-Status, DSGVO-Konformität, Conversion-Struktur. Das Ergebnis ist eine klare Empfehlung – mit konkreter Begründung, nicht mit pauschaler Empfehlung zum Relaunch.",
-      "Ein Relaunch verbessert nachweislich Rankings, Ladezeit und Conversion. Der Schlüssel liegt in der sorgfältigen SEO-Migration: Weiterleitungen für alle relevanten URLs, Erhalt bestehender Rankings und simultane SEO-Verbesserung.",
+      "Ein Relaunch kann Rankings, Ladezeit und Conversion verbessern – garantieren lässt sich das nicht. Der Schlüssel liegt in der sorgfältigen SEO-Migration: Weiterleitungen für alle relevanten URLs, Erhalt der Inhalte und Struktur, die heute ranken, und messbare Kontrolle nach dem Umzug.",
     ],
   },
   painPoints: [
@@ -69,21 +69,21 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "In Regensburg haben viele Betriebe Websites aus den Jahren 2015–2019. Das Regensburger Stadtbild hat sich digital weiterentwickelt – die Konkurrenz ist präsenter geworden, die Suchmaschinenstandards strenger. Wer heute noch eine Website mit 6-Sekunden-Ladezeit und fehlender Mobiloptimierung betreibt, verliert täglich Besucher an modernere Konkurrenten.",
       "Besonders in der Gastronomie – einem der stärksten Wirtschaftssektoren in Regensburg – entscheidet die Website oft darüber, ob ein Tourist oder Einheimischer reserviert oder weitersucht.",
-      "Cogniiq führt Relaunches mit besonderer Sorgfalt durch. Bestehende Rankings gehen nicht verloren – sie werden verbessert. Persönliche Termine in Regensburg auf Wunsch möglich.",
+      "Cogniiq führt Relaunches mit besonderer Sorgfalt durch: Ziel ist, bestehende Rankings zu erhalten und die Basis für bessere zu legen. Persönliche Termine in Regensburg auf Wunsch möglich.",
     ],
   },
   faq: [
     {
       question: "Verliere ich meine Rankings beim Relaunch?",
-      answer: "Bei sorgfältiger SEO-Migration nicht. Cogniiq erstellt vorab einen vollständigen Weiterleitungsplan für alle relevanten URLs.",
+      answer: "Das Risiko lässt sich stark senken, aber nicht ausschließen – Google bewertet neu, sobald sich Struktur und Inhalte ändern. Cogniiq erstellt vorab einen vollständigen Weiterleitungsplan für alle relevanten URLs, erhält die Inhalte, die heute ranken, und kontrolliert die Rankings nach dem Umzug.",
     },
     {
       question: "Was kostet ein Website Relaunch in Regensburg?",
-      answer: "Einfache Relaunches ab ca. 2.000 €. Mit vollständiger SEO-Migration und neuen Inhalten: 3.500 € – 7.000 €.",
+      answer: "Das hängt vom Umfang ab: Seitenzahl, Inhalte, Weiterleitungen, Schnittstellen. Eine Zahl vor der Analyse wäre geraten; was den Preis treibt, steht auf unserer Kostenseite, das Angebot kommt nach dem Erstgespräch.",
     },
     {
       question: "Wie lange dauert ein Relaunch?",
-      answer: "3–8 Wochen. Die alte Website bleibt bis zum Launch vollständig erreichbar.",
+      answer: "Das hängt vom Umfang ab; den Zeitplan legt das Konzept fest. Die alte Website bleibt bis zum Launch erreichbar.",
     },
     {
       question: "Was passiert mit meinen bestehenden Inhalten?",

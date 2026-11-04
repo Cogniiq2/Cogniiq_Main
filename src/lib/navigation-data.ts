@@ -65,7 +65,9 @@ export const LEISTUNGEN: NavLeistung[] = [
       // Führt bewusst auf /praxen statt auf die Segmentseiten: Das ist der Hub
       // mit der vollständigen Beweiskette, die Segmentseiten hängen darunter.
       // /praxen war bis hierher weder in der Navigation noch im Footer verlinkt.
-      { label: "Für Arzt- und Zahnarztpraxen", href: "/praxen" },
+      { label: "Für Praxen – der Überblick", href: "/praxen" },
+      { label: "Für Arztpraxen", href: "/ki-telefonassistent-arzt" },
+      { label: "Für Zahnarztpraxen", href: "/ki-telefonassistent-zahnarztpraxis" },
       { label: "Für Restaurants", href: "/ki-telefonassistent-restaurant" },
       { label: "Für Hotels", href: "/ki-telefonassistent-hotel" },
     ],

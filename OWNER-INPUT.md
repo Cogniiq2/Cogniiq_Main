@@ -349,3 +349,162 @@ nachdem es zum ersten Mal ausgelöst wurde.
 **Bitte keine Testanfrage über das echte Formular abschicken** — der Endpunkt
 löst eine reale Bearbeitung aus. Das Ereignis erscheint mit der ersten echten
 Anfrage.
+
+## Nachtrag 23.10.2026 — Tarifregeln, die der Rechner nicht erfinden darf (BLOCKIEREND für die Release-Freigabe)
+
+Der Preis- und Nutzenrechner wendet die veröffentlichte Zuordnungsregel
+(`FAKTEN.tarifzuordnung`) auf einen einzigen eingegebenen Monatswert an und legt
+seit dem 23.10.2026 alle drei Listentarife daneben offen. Einen „günstigsten
+Tarif" verspricht er nicht mehr. Was er weiterhin nicht weiß und deshalb nicht
+sagt, steht hier. Solange diese Punkte offen sind, ist jede Monatssumme eine
+Teilsumme aus bekannten Positionen, und der Stand gilt als NOT READY TO DEPLOY
+(siehe `FINAL_SEO_RELEASE_AUDIT.md`).
+
+### J1 · Wer darf welchen Tarif nutzen?
+Kapazität, Leistungen, Standorte, Behandler, Vertragsgrenzen — oder darf jeder
+Kunde jeden Listentarif wählen und an dessen Obergrenze laufen?
+
+### J2 · Wann ist höherer Verbrauch „dauerhaft"?
+Welcher Zeitraum, welche Schwelle, automatische Umstellung oder neues Angebot, ab
+wann, mit welcher Mitteilung? Bleibt ein einzelner Spitzenmonat im kleineren Tarif
+gedeckelt?
+
+### J3 · Geltung des Deckels
+Gilt die Obergrenze nur für Grundgebühr + Mehrminuten? Liegen Sprach-,
+Integrations- und Kündigungsaufschläge innerhalb oder außerhalb? (Verwandt mit H2.)
+
+### J4 · Bezugsgröße des 20-%-Aufschlags
+Auf welche Positionen genau? (Verwandt mit H1.)
+
+### J5 · Umfang der 24-Monats-Preisgarantie
+Tarifbestandteile, Minutenpreis, Deckel? Der Satz „Innerhalb dieser Zeit ändert
+sich Ihr Monatsbetrag nicht" (`VERTRAG`) liest sich wie eine konstante Rechnung
+trotz schwankendem Verbrauch — ist das gemeint?
+
+### J6 · Branchenbezug
+Sind Basis/Praxis/MVZ reine Praxistarife oder gelten sie für alle Branchen?
+(Identisch mit Q3 aus `SEO_EXTERNAL_ACTIONS.md`.)
+
+### J7 · Sprachpaket
+Zählt Deutsch mit, genaue Staffel, Obergrenze der Sprachen? (Identisch mit H3.)
+
+### J8 · Steuerbasis und Drittkosten
+Netto oder brutto in Preisliste und Rechner? Welche einmaligen oder laufenden
+Integrations-/Drittanbietergebühren gibt es, und welche können tatsächlich null sein?
+
+### J9 · Datenschutz- und Tracking-Aussage am Rechner
+Der Rechner behauptet: „Ihre Eingaben werden nicht gespeichert, nicht übertragen
+und nicht an Analysedienste gemeldet." Der Code hält das ein (nur feste
+Ereignisnamen, keine Werte in URL oder Event; geprüft durch
+`rechner-konsistenz.test.tsx`). Bitte bestätigen, dass kein weiteres Tag-Setup
+(GTM, Ads) Formularfelder oder Seitenzustand mitliest.
+
+## Nachtrag 24.10.2026 — Einrichtung, Mehrminuten, Obergrenze (Umsetzung der Inhaber-Klarstellung)
+
+Umgesetzt im Branch `claude/seo-design-pricing-2026-10`:
+
+- Die drei Monatspreise und Kontingente bleiben wie vorgegeben (300 € / 500 Min, 500 € / 1.000 Min,
+  800 € / 2.000 Min). Die Anrufzahlen 250 / 500 / 1.000 stehen überall als „ungefähr, bei rund
+  zwei Minuten je Anruf", nie als Zusicherung.
+- Die nach Tarifnamen gestaffelte Einrichtung (1.490 / 2.490 / 3.490 €) ist überall entfernt –
+  aus `TARIFE`, Preiskarten, Rechner, FAQ, JSON-LD. Die Einrichtung heißt jetzt „Standardaufwand,
+  bei allen drei Tarifen gleich; Betrag im Angebot" (`EINRICHTUNG` in `telefonassistent-copy.ts`).
+- Kein Minutenpreis mehr: „0,39 € je weitere Minute" und jede Deckelungs-Rechnung sind aus Copy
+  und Rechner entfernt. Die Obergrenzen 500 / 800 / 1.400 € stehen als **angegebene** Werte mit
+  dem Zusatz „Geltungsbereich laut Angebot" – nie als garantierter Höchstbetrag der Monatsrechnung.
+- Der Rechner nennt den kleinsten Tarif, dessen Kontingent das Aufkommen trägt; oberhalb des
+  größten Kontingents „individuell". Erstjahreskosten und Amortisation zeigt er nicht mehr, weil
+  der Einrichtungsbetrag fehlt.
+
+### J10 · Betrag der einheitlichen Standard-Einrichtung (BLOCKIEREND für Preisangaben)
+Welcher Betrag trägt Kosten (ElevenLabs, n8n, Claude, Arbeitszeit der acht Schritte) und
+Zielmarge? Ist 1.490 € dieser Betrag? Ohne Antwort bleibt die Einrichtung „im Angebot" und der
+Rechner ohne Erstjahr/Amortisation. Es wurde keine Marge geschätzt und kein Preis gesetzt.
+
+### J11 · Bedeutung der angegebenen Obergrenze
+Ist sie ein Höchstbetrag für Monatspreis + Mehrminuten, eine Kapazitätsgrenze oder etwas anderes?
+Bis zur Antwort wird sie nur „angegeben" und nicht erklärt.
+
+### J12 · Mehrminuten
+Werden Minuten über dem Kontingent berechnet (Satz, Staffel) oder führt dauerhaft höheres
+Aufkommen zum Tarifwechsel? Bis zur Antwort: „Konditionen im Angebot".
+
+### J13 · Sonderintegration
+Wie wird Mehraufwand für aufwendige, nicht verfügbare oder neu zu bauende Anbindungen bepreist
+(Stundensatz, Pauschale nach Prüfung)? Bis zur Antwort: „nach Prüfung getrennt im Angebot", ohne Betrag.
+
+Offen bleiben weiterhin J1–J9 (Steuerbasis, 20-%-Bezug, Preisgarantie-Umfang, Sprachpaket).
+
+## Nachtrag 24.10.2026 (2) — verbindliche Preisstruktur umgesetzt
+
+Der Inhaber hat am 24.10.2026 verbindlich festgelegt und der Branch
+`claude/seo-design-pricing-2026-10` setzt um:
+
+| Tarif | Monat | Inklusivminuten | ca. Anrufe* | Mehrminute | Standard-Einrichtung |
+|---|---|---|---|---|---|
+| Basis | 300 € | 500 | 250 | 0,50 € | 990 € einmalig |
+| Praxis | 500 € | 1.000 | 500 | 0,50 € | 990 € einmalig |
+| MVZ | 800 € | 2.000 | 1.000 | 0,50 € | 990 € einmalig |
+
+\* nur mit sichtbarer Annahme „bei durchschnittlich rund zwei Minuten je Anruf".
+
+Kein Preisdeckel, keine Obergrenze: Die Monatsrechnung steigt um jede Mehrminute. Damit sind
+**J10 (990 €), J11 (Obergrenze entfällt), J12 (0,50 €/Minute, alle Tarife) und J13 (separat
+angeboten, Umfang und Preis vor Beauftragung, kein Pauschalbetrag) beantwortet.** Die frühere
+Fassung dieses Dokuments (Nachtrag oben, „Betrag im Angebot", „angegebene Obergrenze") ist überholt.
+
+Weiter offen und für den Release relevant:
+
+### J8 · Steuerbasis — BEANTWORTET am 04.11.2026
+~~Netto oder brutto?~~ Siehe Nachtrag 04.11.2026 unten.
+
+### J14 · Monatlicher Nutzungsbericht und Alarme (Produktfunktion – NICHT implementiert)
+Im Repository gibt es keine Minutenerfassung, keine Abrechnungstabellen, keinen Import der
+Gesprächsdauer aus ElevenLabs/Telefonie und keine 80-/100-%-Warnungen (geprüft per Codesuche
+24.10.2026; Treffer nur in Marketingtexten). Die Website verspricht deshalb **keinen** Bericht und
+**keine** Warnungen, sondern nur den Ausweis der Mehrminuten auf der Monatsrechnung (Ihre Vorgabe).
+Benötigt, bevor ein Bericht beworben wird: Erfassung je Gespräch (Dauer in Sekunden, keine Inhalte,
+kein Audio, keine Patientendaten), Monatsaggregation je Kunde, Bericht mit Anrufen, abrechenbarer
+Zeit, Inklusiv-/genutzten Minuten, Anzahl/Dauer der Mehrminuten, Betrag zu 0,50 €, Monatssumme;
+optional Warnungen bei 80 % und 100 %.
+
+### J15 · Rundungsregel der abrechenbaren Minuten (offen)
+ElevenLabs liefert die Gesprächsdauer nach eigener Dokumentation in Sekunden; im Repo ist das nicht
+angebunden und nicht verifiziert. Entscheidung nötig: Sekunden je Monat summieren und einmal
+runden (empfohlen, kundenfreundlich, transparent) – oder je Gespräch auf volle Minuten aufrunden
+(teurer für den Kunden, muss dann ausdrücklich im Vertrag und auf der Website stehen). Bis dahin
+rechnet der Rechner ohne Rundung und sagt: „Wie Gesprächssekunden in der Abrechnung zu Minuten
+werden, legt Ihr Vertrag fest."
+
+## Nachtrag 04.11.2026 — J8 Steuerbasis verbindlich beantwortet
+
+**Inhaber-Entscheidung:** Sämtliche Cogniiq-Tarifpreise und Einrichtungsgebühren sind
+**Nettopreise zuzüglich der gesetzlichen Umsatzsteuer (aktuell 19 %)**.
+
+| Position | netto | zzgl. 19 % USt. | brutto |
+|---|---|---|---|
+| Basis / Monat (500 Min.) | 300,00 € | 57,00 € | 357,00 € |
+| Praxis / Monat (1.000 Min.) | 500,00 € | 95,00 € | 595,00 € |
+| MVZ / Monat (2.000 Min.) | 800,00 € | 152,00 € | 952,00 € |
+| Mehrminute | 0,50 € | – | – (Steuer auf die Monatssumme) |
+| Standard-Einrichtung, einmalig | 990,00 € | 188,10 € | 1.178,10 € |
+| eine Zusatzsprache / Monat | 79,00 € | 15,01 € | 94,01 € |
+
+Umgesetzt in Branch `claude/release-fixes-2026-11`:
+
+- Eine Quelle: `FAKTEN.umsatzsteuerSatz` (0,19), `umsatzsteuerProzent`, `nettoZusatz`,
+  `steuerbasis`, `steuerbasisPraxis` in `src/lib/telefonassistent-copy.ts`. Ändert sich der
+  gesetzliche Satz, wird nur dort angepasst.
+- Rechner (`mitUmsatzsteuer()` in `telefonassistent-rechner.ts`): gerechnet wird netto; die Steuer
+  kommt genau einmal auf die Summe (Monat, Einrichtung, erstes Jahr), nicht auf Teilpositionen.
+  Geldbeträge werden dabei auf Cent gerundet (Netto, dann Steuer); die Minutenrundung bleibt J15.
+  Der Nutzenrechner zeigt zusätzlich einen Geldsaldo „ohne Vorsteuerabzug" (laufende Kosten
+  brutto), weil umsatzsteuerfreie Arztpraxen die Steuer in der Regel nicht abziehen können.
+- Kennzeichnung: Kostenseite (Karten „netto zzgl. 19 % USt.", Rechenbeispiel netto/USt./brutto,
+  Vertragsblock „Umsatzsteuer", FAQ, Meta-Description „Ab 300 € netto … zzgl. USt."), JSON-LD
+  `valueAddedTaxIncluded: false` an allen Offers; Praxen-Hub, Arzt-Seite und Kostenseite mit dem
+  ausdrücklichen Arztpraxis-Hinweis; Flagship, Kompaktblöcke, Stadtseiten, Praxis-Seite,
+  KI-Agentur-FAQ mit Steuerbasis.
+
+Die Website gibt **keine** Steuerberatung zum Status einer einzelnen Praxis; sie verweist auf die
+Steuerberatung. Weiter offen: J15 (Minutenrundung), J5, J4, J7/H3 – keiner davon blockiert.

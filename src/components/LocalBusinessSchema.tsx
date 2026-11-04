@@ -100,7 +100,6 @@ export function LocalBusinessSchema() {
         email: BUSINESS_INFO.contact.email,
         priceRange: BUSINESS_INFO.priceRange,
         currenciesAccepted: "EUR",
-        paymentAccepted: "Cash, Credit Card, Bank Transfer",
         openingHoursSpecification: BUSINESS_INFO.businessHours.dayOfWeek.map((day) => ({
           "@type": "OpeningHoursSpecification",
           dayOfWeek: `https://schema.org/${day}`,
