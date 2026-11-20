@@ -118,8 +118,11 @@ are independent events**. They very probably are not – see §4.
 | `/ki-telefonassistent-zahnarztpraxis`, `/impressum`, `/blog/digitalisierung-mittelstand`, `/zu-viel-manuelle-arbeit` | 1 each | | |
 
 **Concentration:** 12 of 14 attributable query clicks (86 %) come from one query; 12 of 27 page
-clicks (44 %) from one page – and the equal count makes it near-certain (not proven: no
-query × page) that this is the same event: "webdesign bayern" → `/muenchen/webdesign`.
+clicks (44 %) fall on one page. **Hypothesis, not fact:** the equal count suggests these are the
+same clicks ("webdesign bayern" → `/muenchen/webdesign`). The standard export has no query × page
+dimension, so this pairing is unproven: `/muenchen/webdesign` could have earned its 12 clicks from
+unlisted queries and "webdesign bayern" could land on `/bayreuth/webdesign`, `/deutschland` or
+another page. Export #3 in §9 proves or disproves it.
 Impressions are also concentrated by page: top 1 page 32 %, top 5 pages 67.5 %, top 10 pages 80 %
 (HHI 0.150). By query they are diffuse (top 10 queries 32 %, HHI 0.015; 166 of 448 queries have
 ≤ 2 impressions).

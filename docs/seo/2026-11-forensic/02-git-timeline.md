@@ -938,9 +938,10 @@ This section lays the daily series of `01-gsc-facts.md` (2026-10-21 → 2026-11-
 - HYPOTHESIS. A head/title change needs a recrawl and re-evaluation before it can change
   ranking or snippet; a two-day lag is possible for a small site but fast.
 - ALTERNATIVE. The stop is the end of the "webdesign bayern" burst (12 of 14 attributable
-  clicks, landing page `/muenchen/webdesign`). Appendix B lists head changes to
+  clicks; landing page **presumed** `/muenchen/webdesign` because that page also shows 12 clicks –
+  a hypothesis without query × page proof). Appendix B lists head changes to
   `/muenchen/webdesign` only on 09-12 and 09-17; it is **not** among the 22 URLs changed on 11-04
-  (checked by search of Appendix B/C). The page that carried the clicks was therefore not edited, and the
+  (checked by search of Appendix B/C). If the pairing holds, the page that carried the clicks was not edited, and the
   only release effects that could reach it are sitewide: removed global JSON-LD, removed
   `x-default`, three new nav links.
 - CONFIDENCE that #105 caused the stop: **low (≈ 15 %)**.
