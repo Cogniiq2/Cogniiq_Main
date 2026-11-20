@@ -238,6 +238,7 @@ Readings:
 | Item | Earlier | Now (28 d to 11-17) | Reading |
 |---|---|---|---|
 | Property, 28 d | 12,675 impr. · 14 clicks · CTR 0.11 % (to 09-08) | 7,348 · 27 · 0.37 % | impressions −42 %, clicks up; neither is a channel |
+| Property, 28 d (adjacent window) | 6,448 impr. · 9 clicks · CTR 0.14 % · pos. 35.9 (09-24 → 10-21, export of 10-23 as quoted in `FINAL_SEO_RELEASE_AUDIT.md`) | 7,348 · 27 · 0.37 % · pos. 44.8 | **vs. the directly preceding 28 days: impressions +14 %, clicks ×3.** The latest window is the best click window on record (14 → 9 → 27). Average position is worse while impressions rose – the signature of more deep-position impressions, not of lost rankings |
 | Brand impressions, 28 d | 18 (to 09-08) | 3 | brand demand ≈ none, falling |
 | `internetagentur hotel` | 193 impr. · pos. 44.7 (to 09-08) | 309 · **8.3** | **large ranking gain** |
 | `internetagentur hotels` | 124 · 44.0 | 188 · **9.9** | large ranking gain |
