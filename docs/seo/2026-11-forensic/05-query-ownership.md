@@ -1,5 +1,10 @@
 # 05 · Query ownership — rebuilt from live titles, H1s, headings and anchors
 
+> **Read with `08-adversarial-review.md`.** The suggestion in this document to edit titles/H1s
+> of city webdesign pages "regardless of the export" is **withdrawn**: it would change the only
+> click-earning URL (`/muenchen/webdesign`) during a core update without query × page data.
+> All overlap cases here are on-page risk indicators, not proven cannibalisation.
+
 Audit date: 2026-11-20 · Rule under test: **one primary intent → one primary owner**
 (`docs/seo/ARCHITEKTUR.md`). Source of truth for this file is the **live prerendered HTML** of all
 89 manifest routes (86 indexable), not the ownership documents. Where the documents and the live

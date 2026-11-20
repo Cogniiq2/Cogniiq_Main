@@ -6,9 +6,11 @@ Priorities: 1. KI-Telefonassistent · 2. Prozessautomatisierung · 3. Webdesign.
 ## 1. Position in one paragraph
 
 Cogniiq does not have a traffic drop to repair; it has an organic channel that does not yet
-exist (27 clicks in 28 days, 12 of them one low-priority query, 1 brand click). No technical
-defect and no release explains the November movement, and the core update started after the
-clicks had already stopped. The path to top 10 is therefore not a repair programme. It is:
+exist (27 clicks in 28 days, 12 of them one low-priority query, 1 brand click). The fortnight 10-23 → 11-05
+(26 clicks) was the anomaly; before it the property earned 1–2 non-brand clicks per 28 days. No
+technical defect, no release and not the core update (reported start after the clicks had
+stopped) explains the movement with more than ≈ 10–20 % probability; the data cannot support
+any causal November story. The path to top 10 is therefore not a repair programme. It is:
 (1) evidence that the service is real, (2) presence and mentions outside the own domain,
 (3) concentrating the site's signals on few owner pages with first-party substance – in that
 order, measured one change at a time.

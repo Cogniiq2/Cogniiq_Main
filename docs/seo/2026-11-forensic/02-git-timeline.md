@@ -1003,3 +1003,17 @@ This section lays the daily series of `01-gsc-facts.md` (2026-10-21 → 2026-11-
 2. Release #105 bundled 22 head changes, one 301, two sitewide schema/hreflang removals and
    nav links in one deploy. No effect of that release can ever be attributed to one of them.
    Future SEO releases: one hypothesis per deploy, ≥ 28 days apart per URL.
+
+### 9.5 Corrections after the adversarial review (`08-adversarial-review.md`)
+
+- **"Global JSON-LD graph removed" (§4.4, §9.1) is wrong as a statement about served output.**
+  Organization, WebSite and LocalBusiness JSON-LD are still served on every page the reviewer
+  fetched; the 11-04 change moved where the graph is emitted. It is not a sitewide schema loss.
+- **"`/muenchen/webdesign` was not edited on 11-04"** holds for head and copy only. Shared
+  template markup on that page did change (`<main>` → `<div>`, CTA classes).
+- **"Last production change 11-04"** is the last *repository* change. Cloudflare-side settings
+  (managed robots.txt, email obfuscation, redirect rules) are undated and outside git.
+- **T1 wording.** The burst accounts for at most 12 of 26 missing clicks; the remaining clicks
+  also stopped (14 in 16 days → 1 in 11). The reviewer's confidences: repository changes as main
+  cause 10 % (partial contributor 20 %); core update 5 % (15 % if its reported start date is
+  wrong – the date is unverified); sitewide ranking loss 10 %; "anomalous fortnight" 75 %.

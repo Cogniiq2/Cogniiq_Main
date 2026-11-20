@@ -1,5 +1,11 @@
 # 06 · Content quality — people-first and spam-policy audit
 
+> **Read with `08-adversarial-review.md`.** The KEEP / IMPROVE / CONSOLIDATION / NOINDEX classes
+> below are a content judgement, **not an action list**. The geo-modified pages on the
+> consolidation and noindex lists carry 16 of the 27 clicks of the latest window, including
+> `/muenchen/webdesign` (12). No page is consolidated or set to noindex on the basis of this
+> document alone; see `10-post-core-plan.md` §5.
+
 Audit date: 2026-11-20 · Auditor role: content quality / people-first · Scope: every URL in
 `src/lib/routing/publicRoutePaths.ts` (89 routes), measured on the **live prerendered HTML** of
 `https://www.cogniiq.de` fetched on 2026-11-20. Research only; no source file was changed.

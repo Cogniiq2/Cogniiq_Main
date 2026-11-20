@@ -1,5 +1,11 @@
 # 07 · Authority and proof gap — what the site can actually show
 
+> **Read with `08-adversarial-review.md`.** Where this document calls authority/proof the
+> "binding constraint" with high confidence, the confidence is reduced to **≈ 50 %**: no
+> backlink data was measured, and hotel queries rose from position ≈ 44 to ≈ 8 in ten weeks
+> without any known authority change. The absence of proof on the site is a fact; its causal
+> weight for rankings is a hypothesis.
+
 Audit date: 2026-11-20 · Sources: live prerendered HTML of all 89 public routes (fetched
 2026-11-20), repository source, and the repo's own planning documents
 (`FINAL_EXTERNAL_AUTHORITY_PLAN.md`, `docs/seo/authority-acquisition-plan.md`,

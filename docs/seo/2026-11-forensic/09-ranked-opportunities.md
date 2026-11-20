@@ -26,7 +26,7 @@ decision only the owner has).
 | Problem type | What belongs here | Evidence |
 |---|---|---|
 | **RANKING** (dominant) | 77 % of impressions at position > 20. KI head and practice terms 30–40; KI cost terms 15–22; hotel terms other than "internetagentur" 13–19; Prozessautomatisierung ≈ 40 with almost no impressions; München/cost webdesign 60–75 | `01` §5, §6 |
-| **CTR** (one case) | `internetagentur hotel` (309 impr., pos. 8.3, 0 clicks, P(0) ≈ 0.001), plural probable; Regensburg relaunch pair weak (P ≈ 0.04 combined). Positions 13–19 with small samples are **not** CTR failures | `01` §5 |
+| **CTR** (one candidate) | `internetagentur hotel` (309 impr., pos. 8.3, 0 clicks) is the main anomaly, but only ≈ 35–60 % likely real: P(0) ranges 0.001–0.17 depending on the assumed CTR, and part of the impressions may be rank-tracker traffic (`08`). Plural and Regensburg relaunch pair weaker. Positions 13–19 with small samples are **not** CTR failures | `01` §5 |
 | **TECHNICAL** (no causal defect) | FAQ answers in JSON-LD but not in the HTML on 45–46 pages; minor hygiene. Canonical host is the apex and consistent – closed. No defect explains any traffic movement | `03` |
 
 Beneath the ranking problem: no evidence of delivered work on the site, almost no brand demand
@@ -110,10 +110,10 @@ existing comparisons (P1-1) is the stronger route to those queries.
 
 | # | Action | Type | B | S | E | F | Score |
 |---|---|---|---:|---:|---:|---:|---:|
-| P1-1 | **Get listed where page one already is**, and establish the entity: OMR Reviews category, the existing vendor lists (Dr. Web, it-daily, hosttest), Google Business Profile for the real address, review profile, `sameAs` once profiles exist | OFF-SITE (+ small CODE for `sameAs`) | 5 | 4 | 0.5 | 4 | **2.5** |
+| P1-1 | **Measure, then build, external presence.** First the GSC "Links" export (authority is assumed, not measured – 50 % that it is the ceiling). Then: get listed where page one already is, and establish the entity: OMR Reviews category, the existing vendor lists (Dr. Web, it-daily, hosttest), Google Business Profile for the real address, review profile, `sameAs` once profiles exist | OFF-SITE (+ small CODE for `sameAs`) | 5 | 4 | 0.5 | 4 | **2.5** |
 | P1-2 | **Cost page from ≈ 17 to page one:** add the cost-normalisation method (per call / per minute / per user / flat → one figure for the reader's volume), a worked example with real invoice logic, "when we are the expensive option". Title/description untouched until the German SERP is seen | CONTENT | 5 | 4 | 0.5 | 2 | **5.0** |
 | P1-3 | **One owner per KI intent.** After query × page exports: rebalance internal anchors toward the flagship, differentiate or merge the practice trio (`/ki-telefonassistent-arzt`, `/praxen`, `/ki-telefonassistent-praxis`), strip "& KI-Telefonassistent" from industry × city H1s | CODE/CONTENT, gated on OWNER data | 5 | 3 | 0.4 | 3 | **2.0** |
-| P1-4 | **`internetagentur hotel` CTR investigation** – the only page-one exposure the domain has (511 impressions at ≤ 10). Query-filtered export (pages, countries, devices, days) + SERP screenshots → then at most one snippet test on `/webdesign-hotel` | OWNER → CONTENT | 2 | 5 | 0.6 | 2 | **3.0** |
+| P1-4 | **`internetagentur hotel` CTR investigation** – the only page-one exposure the domain has (511 impressions at ≤ 10). Query-filtered export (pages, countries, devices, days) + SERP screenshots first; a snippet test on `/webdesign-hotel` only if those confirm real page-one presence in Germany. Investigation, not a rewrite | OWNER (→ CONTENT only if confirmed) | 2 | 5 | 0.35 | 2 | **1.75** |
 | P1-5 | **Prozessautomatisierung: give "prozessautomatisierung agentur" an owner and connect the ROI assets.** The pillar never uses the word "Agentur"; `roi für prozessautomatisierung` (pos. 15.1) lands on a blog post while the calculator lives elsewhere. Pillar has 4 impressions in 28 days – demand evidence is thin | CONTENT | 4 | 2 | 0.4 | 2 | **1.6** |
 
 ### P2 / P3 — later (max 5)
@@ -121,7 +121,7 @@ existing comparisons (P1-1) is the stronger route to those queries.
 | # | Action | Type | B | S | E | F | Score |
 |---|---|---|---:|---:|---:|---:|---:|
 | P2-1 | **Remove live unsupported claims** ("ohne Rankingverlust", "Vor Ort in München/Regensburg", "Google-Dominanz … Top-3", city price tables, "amortisiert sich in 6–12 Monaten"). Trust and legal exposure rather than ranking | CONTENT | 3 | 1 | 0.9 | 1 | **2.7** |
-| P2-2 | **Category comparison + buyer's test protocol for KI-Telefonassistenten** – only after P0-2; judged as a sales asset first | CONTENT | 5 | 2 | 0.3 | 3 | **1.0** |
+| P2-2 | **Category comparison + buyer's test protocol for KI-Telefonassistenten** – only after P0-2, as a sales asset. The export shows **zero** impressions for any "vergleich"/"anbieter" query and its components already have owner pages; without a distinct job it violates the repo rule. Default: do not build | CONTENT | 5 | 1 | 0.3 | 3 | **0.5** |
 | P2-3 | **Staged reduction of geo-modified pages**, beginning with the 6 noindex candidates and the `/webdesign-immobilien-{stadt}` set, one family per 28 days, only with query × page data per URL. `/muenchen/webdesign` is excluded until its click source is understood | CODE/CONTENT | 3 | 2 | 0.3 | 4 | **0.45** |
 | P3-1 | **Hygiene bundle:** `www` → apex 301 (Cloudflare, cleanup only), Cloudflare email obfuscation producing a sitewide 404 link, real `lastmod` values, Article schema dates, React error #421 on `/bayreuth/webdesign`, HSTS, preview-host noindex | CODE / Cloudflare | 2 | 1 | 0.9 | 2 | **0.9** |
 | P3-2 | **Restore measurement discipline in the repo:** `PROTECTED_EXPERIMENT_PATHS` is empty while the docs say "FROZEN"; three docs misstate what shipped on 11-04; decide the `/regensburg/website-relaunch` title on page-filtered data | CODE (docs/tests) | 2 | 2 | 0.8 | 1 | **3.2** |
@@ -151,3 +151,14 @@ effect – it protects the ability to measure the others.
 | Blog expansion | 14 long pages already hold 43 % of the words; information gain, not volume, is missing |
 | 68 titles over 60 characters | Cosmetic without SERP evidence |
 | Chasing `prozessautomatisierung` head term | Definitional SERP (SAP, IBM, Haufe); not winnable by an agency page |
+
+## 6. Changes after the adversarial review
+
+- Hotel CTR item (P1-4) confidence 0.6 → 0.35; it is an investigation, not a rewrite.
+- Comparison resource (P2-2) search opportunity 2 → 1; default is not to build.
+- Authority is treated as a 50 % hypothesis: P1-1 starts with measurement (links export).
+- The consolidation/noindex list of `06` and the city-title edits of `05` are **not** actions;
+  the geo pages concerned carry 16 of 27 clicks.
+- KI diagnosis: the reviewer could not discriminate between proof, authority and result type
+  either. The discriminating data are the links export, the German SERP screenshots and the
+  page-filtered query exports – all in P0-1.

@@ -280,3 +280,31 @@ to clicks on 11-06 did not happen through the KI cluster's rankings.
 
 Scripts: session scratchpad `gsc-scripts/an.py` (stdlib Python, reads the unpacked ZIP).
 The repo's `scripts/seo/gsc-analyze.mjs` can reproduce the cluster and bucket tables.
+
+## 10. Corrections after the adversarial review (`08-adversarial-review.md`)
+
+The reviewer recomputed this document from the CSVs. The arithmetic reproduces (one slip:
+`Länder.csv` has 38 rows, not 37). Four readings above are **weakened and superseded here**:
+
+1. **§4 "no real loss, just the end of a one-query burst" is too strong.** Even if all 12
+   "webdesign bayern" clicks fell inside 11-02 → 11-05, the *other* clicks went from 14 in 16
+   days to 1 in 11 days (p ≈ 0.005–0.017 before any correction for having looked for a break).
+   The burst explains at most 12 of 26 missing clicks. Corrected reading: **the anomaly is the
+   fortnight 2026-10-23 → 11-05 (26 clicks), not the silence after it** – earlier 28-day windows
+   had 1–2 non-brand clicks in total. Why that fortnight was strong is unexplained.
+2. **§5 "`internetagentur hotel` = CTR PROBLEM (real/certain)" is downgraded to "main CTR
+   candidate, ≈ 35–60 % likely real".** P(0) = 0.001 assumes a 2.2 % CTR at position 8 and
+   all-human impressions. At 1.3 % it is 0.018, at 0.6 % it is 0.17. Signs that a share of
+   impressions is not human: weekend/weekday impression ratio ≈ 1.04 on a B2B query set while 24
+   of 27 clicks fall on weekdays; 46 % of impressions beyond position 50; prompt-style queries in
+   the list. If a large share is rank-tracker traffic, every CTR statement in §5 loses its
+   denominator.
+3. **§6 query-mix explanation of the position worsening (movement A) is not supported.** Daily
+   impressions and daily position correlate at about −0.45 – the opposite of what "more deep
+   impressions" predicts. Movement A is **unexplained**.
+4. **§7 "KI money queries did not move since 11-04"** rests on comparison values without a
+   stated window; flagship page impressions fell (272 in the window to 10-21 → 121). Corrected:
+   no evidence of a KI ranking *step*; stability is not demonstrated.
+
+The page-position arithmetic lifts "webdesign bayern → `/muenchen/webdesign`" to roughly 90 %
+plausibility; it remains a hypothesis until a query × page export exists.
