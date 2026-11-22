@@ -55,13 +55,19 @@ ok(cleanCustom.text.includes(LINK) && !/<\/?[a-z][^>]*>/i.test(cleanCustom.text)
 
 // ---------------------------------------------------------------- (B) worker
 const idx = read('supabase/functions/send-offer-document-email/index.ts');
+// The deployed worker (v27, see docs/ops/production-reconciliation-2026-11.md) logs exactly one
+// sanitised event: a failed offer-token revocation, with the job id and nothing else. Only that exact
+// line is exempt; any other console call, or any other payload on that line, still fails below.
+const SANITISED_WORKER_LOG = /console\.error\('offer_email: token revocation failed', \{ jobId: job\.id \}\);/g;
+const idxLogless = idx.replace(SANITISED_WORKER_LOG, '');
 ok(/if \(type === 'offer_email'\)/.test(idx), 'worker handles the offer_email job type');
 ok(/owner_worker_mint_offer_link/.test(idx) && /\$\{PUBLIC_APP_URL\}\/d\/\$\{minted\.token\}/.test(idx), 'worker mints a fresh token + builds the exact /d/ link');
 ok(/buildOfferEmail\(ctx, link, \{ subject: job\.subject \?\? payload\.subject, message: payload\.message \}\)/.test(idx), 'worker passes the editable subject/message to the builder');
 ok(/owner_worker_mark_offer_sent/.test(idx), 'worker advances the offer to sent after a successful send');
-ok(/if \(sent\.error\)[\s\S]{0,220}owner_worker_revoke_offer_token/.test(idx), 'worker revokes the minted token when the send fails');
-ok(/owner_worker_mark_offer_sent[\s\S]{0,80}return \{ providerId: sent\.id \}/.test(idx), 'offer status is only marked sent AFTER the provider send succeeds');
-ok(!/console\.(log|error|info)/.test(idx), 'worker logs nothing (no token/secret/byte leakage)');
+ok(/if \(sent\.error\) \{[\s\S]{0,700}owner_worker_revoke_offer_token[\s\S]{0,400}throw new Error\(`email \$\{sent\.error\}`\);/.test(idx), 'worker revokes the minted token when the send fails');
+ok(/throw new Error\(`email \$\{sent\.error\}`\);[\s\S]{0,400}owner_worker_mark_offer_sent[\s\S]{0,120}if \(markErr\) throw new Error\('offer status update failed'\);\s*return \{ providerId: sent\.id \}/.test(idx),
+  'offer status is only marked sent AFTER the provider send succeeds, and a failed status advance fails the job');
+ok(!/console\.(log|error|info|warn|debug)/.test(idxLogless), 'worker logs nothing beyond the sanitised revocation event (no token/secret/byte leakage)');
 
 // ---------------------------------------------------------------- (B) migration
 const mig = read('supabase/migrations/20260723128000_owner_offer_email_workflow.sql');

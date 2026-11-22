@@ -1,4 +1,13 @@
-# storage-purge-worker — production Storage-deletion worker (SOURCE ONLY — NOT DEPLOYED)
+# storage-purge-worker — production Storage-deletion worker
+
+> **Deployment status (verified read-only 2026-11-22):** DEPLOYED and ACTIVE in production as
+> **v7** (`verify_jwt = false`), but the deployed bundle is **not** identical to this source and
+> has no known git source: it reads its secret from `STORAGE_PURGE_WORKER_SECRET` (this source and
+> the instructions below use `WORKER_SECRET`) and inlines the `_shared` helpers. pg_cron job
+> `cogniiq-storage-purge-worker` currently receives **HTTP 401 on every call** — the deployed
+> function's secret does not match the Vault value the cron job sends. The queue was empty at
+> verification time, so no purge has been lost yet. Fixing it is a separate owner-approved
+> operation — see `docs/ops/production-reconciliation-2026-11.md`.
 
 Drains the durable `owner_storage_purge_queue` outbox and performs the real deletion of Storage
 object bytes after an owner purge or emergency deletion. Invoked every minute by a secure

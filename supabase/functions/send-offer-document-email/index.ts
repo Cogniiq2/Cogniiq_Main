@@ -1,4 +1,10 @@
-// Supabase Edge Function: PRODUCTION automation-job worker. SOURCE ONLY — NOT DEPLOYED.
+// Supabase Edge Function: PRODUCTION automation-job worker. DEPLOYED AND LIVE.
+//
+// Deployment reality (verify before editing): this function is ACTIVE in the production project
+// with verify_jwt=false, and pg_cron job 'cogniiq-automation-worker' has invoked it every minute
+// since 2026-07-23. Earlier revisions of this header claimed "SOURCE ONLY — NOT DEPLOYED", which
+// was false and led to reasoning about the system as if no automation ran. Any change here reaches
+// customers on the next deploy.
 //
 // Invoked every minute by a secure Supabase Cron/pg_net call (see ./README.md). It:
 //   1. authenticates the caller with a constant-time WORKER_SECRET check (x-worker-secret);
@@ -40,7 +46,11 @@ const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? '';
 const PUBLIC_APP_URL = (Deno.env.get('PUBLIC_APP_URL') ?? '').replace(/\/$/, '');
 const FINANCE_BUCKET = 'owner-finance-documents';
 const SIGNATURE_BUCKET = 'owner-offer-signatures';
-const BATCH = 10;
+// Each job can render a PDF and make a Resend round-trip, and the pg_cron caller aborts at 20s.
+// A batch of 10 could not finish in that budget, which is how jobs were orphaned in 'processing'.
+// Claim fewer per tick and stop early; the cron fires every minute, so throughput is unaffected.
+const BATCH = 3;
+const DRAIN_BUDGET_MS = 15_000;
 
 type Sb = ReturnType<typeof createClient>;
 interface ClaimedJob {
@@ -87,16 +97,40 @@ async function sendEmail(
     from: EMAIL_FROM, to: msg.to, subject: msg.subject, html: msg.html, text: msg.text,
   };
   if (opts.attachment) payload.attachments = [{ filename: opts.attachment.filename, content: opts.attachment.contentBase64 }];
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${RESEND_API_KEY}`, 'content-type': 'application/json',
-      // Deterministic key -> retries never create a duplicate send.
-      'Idempotency-Key': opts.idempotencyKey,
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) return { id: null, error: `provider ${res.status}` };
+  let res: Response;
+
+  try {
+    res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${RESEND_API_KEY}`,
+        'content-type': 'application/json',
+        // Deterministic key -> retries never create a duplicate send.
+        'Idempotency-Key': opts.idempotencyKey,
+      },
+      body: JSON.stringify(payload),
+      // A hung provider call must not run past the caller's own deadline and leave the job
+      // claimed-but-unfinished; the deadline is well inside the drain budget.
+      signal: AbortSignal.timeout(15_000),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'unknown provider error';
+    return { id: null, error: `provider request failed: ${message}` };
+  }
+
+  if (!res.ok) {
+    // Carry a bounded, whitespace-collapsed slice of the provider's reason into the job's
+    // last_error so a rejected send is diagnosable ("provider 422: <reason>") in the UI.
+    const providerBody = await res.text().catch(() => '');
+    const safeDetail = providerBody.replace(/\s+/g, ' ').trim().slice(0, 180);
+    return {
+      id: null,
+      error: safeDetail
+        ? `provider ${res.status}: ${safeDetail}`
+        : `provider ${res.status}`,
+    };
+  }
+
   const data = await res.json().catch(() => ({}));
   return { id: data?.id ?? null, error: null };
 }
@@ -111,16 +145,31 @@ Deno.serve(async (req: Request) => {
 
   const svc = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
+  // ---- Reclaim stalled jobs before claiming new ones. ----
+  // A job leaves 'processing' only via owner_complete_automation_job, so an isolate torn down
+  // mid-job (the cron caller times out at 20s) orphans the row forever — one confirmation email
+  // sat in 'processing' for 31 days. Best-effort: a failure here must never block the drain.
+  // NOTE: use try/catch, not .catch() — a PostgrestBuilder is a thenable and has no .catch method,
+  // so calling it throws a TypeError and takes down the whole handler.
+  try {
+    await svc.rpc('owner_reap_stalled_automation_jobs', { p_stale_minutes: 15 });
+  } catch { /* reaping is opportunistic; never block the drain */ }
+
   // ---- Atomic claim (FOR UPDATE SKIP LOCKED inside the RPC). ----
   const { data: claimed, error: claimErr } = await svc.rpc('owner_claim_automation_jobs', { p_limit: BATCH, p_types: null });
   if (claimErr) return json({ ok: false, error: 'could not claim jobs' }, 500);
 
   const results: Array<{ id: string; status: string }> = [];
+  const startedAt = Date.now();
   for (const job of (claimed ?? []) as ClaimedJob[]) {
+    // Stop before the caller's 20s timeout can tear the isolate down mid-job. Unprocessed claims
+    // are released by the reaper on a later tick rather than being silently orphaned.
+    if (Date.now() - startedAt > DRAIN_BUDGET_MS) break;
     const jobId: string = job.id;
     try {
       const outcome = await processJob(svc, job);
-      // Generation-only jobs (certificate/PDF) terminate as 'completed', never 'sent'.
+      // Generation-only jobs (certificate/PDF/create/issue) terminate as 'completed', never 'sent':
+      // 'sent' renders as "Versendet" in the owner UI and must mean a provider accepted an email.
       const terminal = outcome.terminal ?? 'sent';
       await svc.rpc('owner_complete_automation_job', {
         p_job_id: jobId, p_status: terminal, p_provider_message_id: outcome.providerId ?? null,
@@ -187,14 +236,15 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
     if (!job.offer_id) throw new Error('missing offer');
     const { error } = await svc.rpc('owner_ensure_offer_invoice_internal', { p_offer_id: job.offer_id });
     if (error) throw new Error('invoice create failed');
-    return { providerId: null };
+    // 'completed', not the default 'sent': nothing was emailed here.
+    return { providerId: null, terminal: 'completed' };
   }
 
   if (type === 'invoice_issue') {
     const invoiceId = await resolveInvoiceId(svc, job);
     const { error } = await svc.rpc('owner_issue_invoice_internal', { p_invoice_id: invoiceId });
     if (error) throw new Error('invoice issue failed'); // NOT marked sent unless the issue succeeded
-    return { providerId: null };
+    return { providerId: null, terminal: 'completed' };
   }
 
   if (type === 'invoice_send' || type === 'invoice_email') {
@@ -203,7 +253,7 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
     const { error: issueErr } = await svc.rpc('owner_issue_invoice_internal', { p_invoice_id: invoiceId });
     if (issueErr) throw new Error('invoice issue failed');
 
-    const gen = await generateAndStoreInvoicePdf(svc, invoiceId);
+    const gen = await generateAndStoreInvoicePdf(svc, invoiceId, job.recipient_email);
     const to = gen.ctx.recipient?.email;
     if (!to) throw new Error('no recipient email');
     const mail = buildInvoiceEmail(gen.ctx);
@@ -220,12 +270,19 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
     if (!PUBLIC_APP_URL) throw new Error('app url not configured');
     // Editable subject/message authored in the owner dialog (safe payload; escaped in the builder).
     const payload = (job.payload ?? {}) as { subject?: string | null; message?: string | null };
-    // Prefer the server-authoritative recipient email over the free-text one on the job. The RPC
-    // already validated + normalized the recipient into recipient_email; the context resolves the
-    // trusted address again so we never send to an unvalidated string.
-    const { data: ctx, error: ctxErr } = await svc.rpc('owner_worker_offer_context', { p_offer_id: job.offer_id });
+    // The address the owner typed in "Angebot versenden" is authoritative. It was validated and
+    // normalized by owner_enqueue_offer_email before it was written to recipient_email, so it is
+    // never an unvalidated free-text string; the context applies it with highest precedence and
+    // falls back to the offer's stored address. Previously the context value was preferred
+    // unconditionally and, because it fell back to the seller's own business email, the typed
+    // address could never win — offers went to the frozen address on the offer record instead.
+    const { data: ctx, error: ctxErr } = await svc.rpc('owner_worker_offer_context', {
+      p_offer_id: job.offer_id,
+      p_recipient_override: job.recipient_email,
+    });
     if (ctxErr || !ctx) throw new Error('offer context failed');
-    const to = ctx.recipient?.email ?? job.recipient_email;
+    // No fallback to the seller: a missing recipient must fail the job, never mail ourselves.
+    const to = ctx.recipient?.email;
     if (!to) throw new Error('no recipient email');
     // Mint a FRESH secure token (hash-only stored); use its raw value in memory only. Minted here
     // in the worker — NEVER when the dialog opens — so no active token is created on UI renders.
@@ -239,12 +296,23 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
     );
     if (sent.error) {
       // Send failed → revoke the just-minted token so no active token is orphaned; a retry mints
-      // a fresh one. Best-effort; never throws over the original failure.
-      if (minted.token_id) await svc.rpc('owner_worker_revoke_offer_token', { p_token_id: minted.token_id }).catch(() => {});
+      // a fresh one. Best-effort: revocation failure must never replace the original email error,
+      // but it leaves a live token behind, so it is logged rather than swallowed.
+      if (minted.token_id) {
+        try {
+          const { error: revokeErr } = await svc.rpc('owner_worker_revoke_offer_token', { p_token_id: minted.token_id });
+          if (revokeErr) console.error('offer_email: token revocation failed', { jobId: job.id });
+        } catch {
+          console.error('offer_email: token revocation failed', { jobId: job.id });
+        }
+      }
       throw new Error(`email ${sent.error}`);
     }
     // Provider confirmed acceptance → advance the offer to 'sent' (finalized/viewed only; idempotent).
-    await svc.rpc('owner_worker_mark_offer_sent', { p_offer_id: job.offer_id });
+    // A failed advance must fail the job: silently swallowing it would leave the offer showing an
+    // unsent state while the job reports success and the customer already has the email.
+    const { error: markErr } = await svc.rpc('owner_worker_mark_offer_sent', { p_offer_id: job.offer_id });
+    if (markErr) throw new Error('offer status update failed');
     return { providerId: sent.id };
   }
 
@@ -261,8 +329,15 @@ async function resolveInvoiceId(svc: Sb, job: ClaimedJob): Promise<string> {
 
 // Render + privately store the invoice PDF from TRUSTED server context; register it (idempotent).
 // Deterministic storage path per invoice → retries overwrite the same object (no orphans).
-async function generateAndStoreInvoicePdf(svc: Sb, invoiceId: string): Promise<{ ctx: InvoiceWorkerCtx; pdf: Uint8Array; filename: string; version: number; documentId: string | null }> {
-  const { data, error: ctxErr } = await svc.rpc('owner_worker_invoice_context', { p_invoice_id: invoiceId });
+async function generateAndStoreInvoicePdf(
+  svc: Sb, invoiceId: string, recipientOverride: string | null = null,
+): Promise<{ ctx: InvoiceWorkerCtx; pdf: Uint8Array; filename: string; version: number; documentId: string | null }> {
+  // The override carries the address chosen for this send; it is only present on send jobs, so
+  // pure PDF-generation jobs keep resolving the recipient from the invoice's linked offer.
+  const { data, error: ctxErr } = await svc.rpc('owner_worker_invoice_context', {
+    p_invoice_id: invoiceId,
+    p_recipient_override: recipientOverride,
+  });
   if (ctxErr || !data) throw new Error('invoice context failed');
   const ctx = data as InvoiceWorkerCtx;
   const pdf = renderInvoicePdf(ctx);

@@ -72,7 +72,11 @@ const email = read('supabase/functions/send-offer-document-email/index.ts');
 ok(/EMAIL_PROVIDER/.test(email) && /RESEND_API_KEY = Deno\.env\.get/.test(email), 'email provider abstraction reads secrets from env');
 ok(/owner_complete_automation_job/.test(email) && /'retrying'/.test(email), 'worker records retrying/failed via the completion RPC (bounded retries + backoff in SQL)');
 ok(/WORKER_SECRET/.test(email) && /safeEqual/.test(email), 'worker requires a constant-time WORKER_SECRET');
-ok(!/console\.(log|error|info)/.test(email), 'email worker logs nothing (no token/secret leakage)');
+// The deployed worker (v27, see docs/ops/production-reconciliation-2026-11.md) logs exactly one
+// sanitised event: a failed offer-token revocation, with the job id and nothing else. Only that exact
+// line is exempt; any other console call, or any other payload on that line, still fails below.
+const SANITISED_WORKER_LOG = /console\.error\('offer_email: token revocation failed', \{ jobId: job\.id \}\);/g;
+ok(!/console\.(log|error|info|warn|debug)/.test(email.replace(SANITISED_WORKER_LOG, '')), 'email worker logs nothing beyond the sanitised revocation event (no token/secret leakage)');
 
 if (failures) { console.error(`\noffer acceptance automation tests: ${failures} FAILED`); process.exit(1); }
 console.log('\noffer acceptance automation tests: ALL PASSED');

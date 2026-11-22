@@ -1,4 +1,17 @@
-# send-offer-document-email — production automation worker (SOURCE ONLY — NOT DEPLOYED)
+# send-offer-document-email — production automation worker
+
+> **Deployment status (verified read-only 2026-11-22):** DEPLOYED and ACTIVE in the production
+> project as **v27** (`verify_jwt = false`, authenticated by `x-worker-secret`). pg_cron job
+> `cogniiq-automation-worker` calls it every minute; the last 24 h showed only HTTP 200 responses.
+> The four `.ts` files in this directory are **byte-identical to the deployed v27 bundle**
+> (source commit `02997ba`), pinned by `.github/scripts/test-production-reconciliation.mjs`.
+> v27 also depends on production-only migration `20260823102556_offer_invoice_email_recipient_fix`
+> (recipient override, stall reaper), now imported into `supabase/migrations/`.
+> Behaviour that differs from older descriptions below: batch of **3** jobs with a **15 s drain
+> budget**, `owner_reap_stalled_automation_jobs(15)` runs before every claim, the Resend call has a
+> **15 s timeout**, the job recipient is passed as an explicit override (no seller fallback), and
+> `invoice_create` / `invoice_issue` terminate as `completed`. See
+> `docs/ops/production-reconciliation-2026-11.md`. Redeploying is an explicit owner-approved action.
 
 Drains the durable `owner_automation_jobs` outbox and performs the real downstream work
 after an offer is accepted. Invoked every minute by a secure Supabase Cron / pg_net call.

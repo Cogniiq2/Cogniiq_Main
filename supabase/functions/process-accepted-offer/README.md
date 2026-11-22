@@ -1,4 +1,11 @@
-# process-accepted-offer (SOURCE ONLY — NOT DEPLOYED)
+# process-accepted-offer
+
+> **Deployment status (verified read-only 2026-11-22):** DEPLOYED and ACTIVE in production as
+> **v19** (`verify_jwt = false`). The deployed bundle is **not** identical to this source: its
+> acceptance-failure branch logs the raw database error and returns `debug` / `code` fields to the
+> unauthenticated caller. This repository version deliberately does NOT contain that handler (it
+> returns a generic error). The deployed variant is an open security finding awaiting a separate,
+> owner-approved redeploy — see `docs/ops/production-reconciliation-2026-11.md`.
 
 Token-authenticated offer acceptance with a drawn signature. The browser posts the
 signature as a `data:image/png;base64,…` payload plus signer details; this function

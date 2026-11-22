@@ -115,8 +115,13 @@ ok(/owner_worker_register_certificate/.test(idx), 'worker registers the certific
 ok(/terminal: 'completed'/.test(idx), "generation-only jobs terminate as 'completed', never 'sent'");
 ok(/buildConfirmationEmail/.test(idx) && /idempotencyKey: `\$\{job\.id\}:confirmation`/.test(idx), 'confirmation email uses a deterministic idempotency key');
 ok(/throw new Error\(`unknown job type/.test(idx), 'unknown job types fail safely (never silently succeed)');
-ok(!/console\.(log|error|info)/.test(idx), 'worker logs nothing (no token/secret/byte/path leakage)');
-ok(!new RegExp('storage_path[^\\n]*console').test(idx), 'private storage path is never logged');
+// The deployed worker (v27, see docs/ops/production-reconciliation-2026-11.md) logs exactly one
+// sanitised event: a failed offer-token revocation, with the job id and nothing else. Only that exact
+// line is exempt; any other console call, or any other payload on that line, still fails below.
+const SANITISED_WORKER_LOG = /console\.error\('offer_email: token revocation failed', \{ jobId: job\.id \}\);/g;
+const idxLogless = idx.replace(SANITISED_WORKER_LOG, '');
+ok(!/console\.(log|error|info|warn|debug)/.test(idxLogless), 'worker logs nothing beyond the sanitised revocation event (no token/secret/byte/path leakage)');
+ok(!new RegExp('storage_path[^\\n]*console').test(idxLogless), 'private storage path is never logged');
 
 // ---------------------------------------------------------------- (C) migration structural
 const mig = read('supabase/migrations/20260723127000_owner_signed_certificate_workflow.sql');

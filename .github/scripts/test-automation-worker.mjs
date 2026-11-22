@@ -96,8 +96,18 @@ ok(/idempotencyKey: `\$\{job\.id\}:confirmation`/.test(idx), 'confirmation email
 ok(/unknown job type/.test(idx), 'unknown job types fail safely');
 ok(/owner_worker_mint_offer_link/.test(idx) && /\$\{PUBLIC_APP_URL\}\/d\/\$\{minted\.token\}/.test(idx), 'offer_email mints a fresh token + exact /d/ link');
 ok(/owner_complete_automation_job/.test(idx), 'outcomes recorded via complete RPC');
-ok(!/console\.(log|error|info)/.test(idx), 'worker logs nothing (no token/secret/byte leakage)');
-ok(!/x-worker-secret[^]*console/.test(idx), 'secret never logged');
+// The deployed worker (v27, see docs/ops/production-reconciliation-2026-11.md) logs exactly one
+// sanitised event: a failed offer-token revocation, with the job id and nothing else. Only that exact
+// line is exempt; any other console call, or any other payload on that line, still fails below.
+const SANITISED_WORKER_LOG = /console\.error\('offer_email: token revocation failed', \{ jobId: job\.id \}\);/g;
+const idxLogless = idx.replace(SANITISED_WORKER_LOG, '');
+ok(!/console\.(log|error|info|warn|debug)/.test(idxLogless), 'worker logs nothing beyond the sanitised revocation event (no token/secret/byte leakage)');
+ok(!/x-worker-secret[^]*console/.test(idxLogless), 'secret never logged');
+// Deployed-baseline behaviour (v27) that must not silently regress.
+ok(/owner_reap_stalled_automation_jobs/.test(idx), 'worker reclaims stalled processing jobs before claiming');
+ok(/const BATCH = 3;/.test(idx) && /DRAIN_BUDGET_MS/.test(idx), 'worker uses the small batch + drain budget that fit the pg_cron timeout');
+ok(/AbortSignal\.timeout\(/.test(idx), 'provider call is bounded by a timeout');
+ok(/p_recipient_override/.test(idx), 'worker passes the job recipient as explicit override (no seller fallback)');
 
 // ---------------------------------------------------------------- (B) migration structural
 const mig = read('supabase/migrations/20260723126000_owner_automation_worker.sql');

@@ -64,6 +64,9 @@ jobs:
       - name: Supabase isolated-workspace reconciliation tests
         run: node .github/scripts/test-supabase-migration-reconcile.mjs
 
+      - name: Production reconciliation guard (imported production-only migrations + deployed worker baseline)
+        run: node .github/scripts/test-production-reconciliation.mjs
+
       - name: Invitation status helper unit tests
         run: node .github/scripts/test-invitation-status.mjs
 
