@@ -73,7 +73,7 @@ for (const required of ['source_ref', 'target_migration', 'mode', 'confirmation'
 assert(inputs.target_migration.type === 'choice', 'target_migration must be a choice input');
 assert(inputs.mode.type === 'choice', 'mode must be a choice input');
 assert(
-  JSON.stringify(inputs.mode.options) === JSON.stringify(['audit-history', 'dry-run', 'apply']),
+  JSON.stringify(inputs.mode.options) === JSON.stringify(['audit-history', 'dry-run', 'backup-only', 'apply']),
   'mode options drifted',
 );
 assert(inputs.source_ref.required === true, 'source_ref must remain required');
@@ -269,7 +269,7 @@ assertStepIncludes(
 
 const managedBackupStep = 'Check managed Supabase backup / PITR availability (read-only)';
 const backupBlock = stepBlock(managedBackupStep);
-assertIncludes(backupBlock, "if: ${{ inputs.mode == 'apply' }}", 'Managed backup check must run only in apply mode');
+assertIncludes(backupBlock, "if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}", 'Managed backup check must run in apply and backup-only mode');
 assertIncludes(backupBlock, 'id: managed_backup', 'Managed backup check must expose its outcome to the gate');
 assertIncludes(backupBlock, 'continue-on-error: true', 'Managed backup check must not stop the run on a Free plan; the gate decides');
 assertIncludes(backupBlock, '/database/backups', 'Managed backup check must call the documented read-only endpoint');
@@ -279,7 +279,7 @@ assert(/--request\s+(POST|PUT|PATCH|DELETE)/.test(backupBlock) === false, 'Manag
 assertNotIncludes(backupBlock, 'echo "$SUPABASE_ACCESS_TOKEN"', 'Managed backup check must never print the access token');
 
 const dumpBlock = stepBlock('Create Free-plan logical production backup');
-assertIncludes(dumpBlock, "if: ${{ inputs.mode == 'apply' }}", 'Logical backup must be taken only in apply mode');
+assertIncludes(dumpBlock, "if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}", 'Logical backup must be taken in apply and backup-only mode');
 assertIncludes(dumpBlock, 'id: logical_backup', 'Logical backup step must expose its outcome to the gate');
 assertIncludes(dumpBlock, 'working-directory: isolated-migration-source', 'Logical backup must run where the project is linked');
 assertIncludes(dumpBlock, 'SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}', 'Logical backup needs the DB password in the environment');
@@ -332,7 +332,7 @@ assertIncludes(verifyBackupBlock, '--target-migration "$TARGET_MIGRATION"', 'Bac
 /* ------------------------------------------------------------ encryption + round trip */
 
 const encryptBlock = stepBlock('Encrypt the backup and prove it decrypts');
-assertIncludes(encryptBlock, "if: ${{ inputs.mode == 'apply' }}", 'Encryption must run only in apply mode');
+assertIncludes(encryptBlock, "if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}", 'Encryption must run in apply and backup-only mode');
 assertIncludes(encryptBlock, 'id: logical_backup_encrypt', 'Encryption must expose its outcome to the gate');
 assertIncludes(encryptBlock, 'SUPABASE_BACKUP_PASSPHRASE: ${{ secrets.SUPABASE_BACKUP_PASSPHRASE }}', 'Encryption must read the dedicated backup passphrase secret');
 assertIncludes(encryptBlock, 'if [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then', 'Encryption must fail closed when the passphrase secret is empty');
@@ -450,7 +450,7 @@ assertIncludes(safetyNetBlock, 'shred -u "$RUNNER_TEMP/$BACKUP_KEY_SUBDIR/passph
 /* ----------------------------------------------------------------------- the gate */
 
 const restorePointBlock = stepBlock('Verify a restore point exists before writing');
-assertIncludes(restorePointBlock, "if: ${{ inputs.mode == 'apply' }}", 'Restore-point gate must run only in apply mode');
+assertIncludes(restorePointBlock, "if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}", 'Restore-point gate must run in apply and backup-only mode');
 assertNotIncludes(restorePointBlock, 'continue-on-error', 'The restore-point gate itself must be able to stop the run');
 assertIncludes(restorePointBlock, 'node .github/scripts/verify-supabase-restore-point.mjs', 'Restore-point gate must use the tested script');
 for (const signal of [
@@ -495,7 +495,7 @@ for (const [earlier, later] of [
 {
   const secretsBlock = stepBlock('Verify required Supabase secrets are configured');
   assertIncludes(secretsBlock, 'SUPABASE_BACKUP_PASSPHRASE: ${{ secrets.SUPABASE_BACKUP_PASSPHRASE }}', 'The passphrase secret must be checked up front');
-  assertIncludes(secretsBlock, 'if [ "$MODE" = "apply" ] && [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then', 'Apply mode must refuse to start without the passphrase');
+  assertIncludes(secretsBlock, 'if { [ "$MODE" = "apply" ] || [ "$MODE" = "backup-only" ]; } && [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then', 'Apply and backup-only modes must refuse to start without the passphrase');
   assert(
     workflowText.indexOf('- name: Verify required Supabase secrets are configured') <
       workflowText.indexOf('- name: Create Free-plan logical production backup'),
@@ -539,6 +539,38 @@ const applyBlock = stepBlock('Apply migration push');
 assertIncludes(applyBlock, "if: ${{ inputs.mode == 'apply' }}", 'Final push must run only in apply mode');
 assertIncludes(applyBlock, 'working-directory: isolated-migration-source', 'Final push must use the isolated workspace');
 assertIncludes(applyBlock, 'run: supabase db push', 'Final push command must remain supabase db push without extra flags');
+
+/* ------------------------------------------------------------ backup-only mode */
+// backup-only must rehearse the WHOLE restore-point chain and must never be able to write.
+for (const name of [
+  'Check managed Supabase backup / PITR availability (read-only)',
+  'Create Free-plan logical production backup',
+  'Verify logical backup and write manifest',
+  'Encrypt the backup and prove it decrypts',
+  'Upload encrypted production backup artifact',
+  'Remove all plaintext production dumps',
+  'Verify a restore point exists before writing',
+]) {
+  assertStepIncludes(name, "if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}", `${name} must run in backup-only mode too`);
+}
+{
+  const stopBlock = stepBlock('Stop after backup-only');
+  assertIncludes(stopBlock, "if: ${{ inputs.mode == 'backup-only' }}", 'The backup-only stop marker must run only in backup-only mode');
+  assert(
+    workflowText.indexOf('- name: Verify a restore point exists before writing') < workflowText.indexOf('- name: Stop after backup-only') &&
+      workflowText.indexOf('- name: Stop after backup-only') < workflowText.indexOf('- name: Apply migration push'),
+    'Stop after backup-only must sit between the restore-point gate and the apply push',
+  );
+  // Every step that writes to production stays strictly apply-only.
+  for (const name of ['Verify apply confirmation', 'Apply migration push', 'Verify applied migration history']) {
+    const block = stepBlock(name);
+    assertIncludes(block, "if: ${{ inputs.mode == 'apply' }}", `${name} must stay apply-only`);
+    assertNotIncludes(block, 'backup-only', `${name} must never run in backup-only mode`);
+  }
+  // The only non-dry-run push in the workflow is the apply-only step.
+  const pushes = workflowText.split('\n').filter((l) => /supabase db push(?!\s+--dry-run)/.test(l) && !/^\s*#/.test(l));
+  assert(pushes.length === 1, `exactly one real 'supabase db push' must exist, found ${pushes.length}`);
+}
 
 /* ------------------------------------------------------------------ post-apply */
 
