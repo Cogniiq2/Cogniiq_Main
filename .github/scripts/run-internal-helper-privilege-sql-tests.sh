@@ -37,6 +37,8 @@ as "$PGBIN/pg_ctl" -D "$DATA" -o "-k $SOCK -c listen_addresses=''" -l "$WORKBASE
 sleep 1
 PSQL() { as "$PGBIN/psql" -h "$SOCK" -U postgres -d postgres -v ON_ERROR_STOP=1 "$@"; }
 
+echo "PostgreSQL server under test: $(PSQL -tAc 'select version()')"
+
 PSQL -q -f "$ROOT/supabase/tests/lib_bootstrap.sql" >/dev/null
 PSQL -q -f "$SQLDIR/internal-helper-privilege-defaults.sql" >/dev/null
 
@@ -56,3 +58,34 @@ PSQL -q -f "$MIG/$HOTFIX.sql"   # idempotency: a second run must succeed and cha
 echo "hotfix applied twice without error"
 
 PSQL -q -f "$SQLDIR/internal-helper-privilege-tests.sql"
+
+# ---- T9. The hotfix can never report success without securing all 16 helpers. -------------
+# Hide one expected helper and re-expose another, then run the hotfix: it must FAIL, and because
+# it fails inside its transaction, the re-exposed grant must still be there (nothing changed).
+PSQL -q -c "alter function public.owner_purge_merge_counts(jsonb, jsonb) rename to owner_purge_merge_counts_hidden"
+PSQL -q -c "grant execute on function public.owner_force_destroy_row(text, uuid, integer) to authenticated"
+if PSQL -q -f "$MIG/$HOTFIX.sql" >"$WORKBASE/t9.log" 2>&1; then
+  echo "FAIL T9: hotfix reported success although an expected helper was missing"; exit 1
+fi
+grep -q "expected internal helper public.owner_purge_merge_counts(jsonb, jsonb) does not exist" "$WORKBASE/t9.log" \
+  || { echo "FAIL T9: unexpected failure reason:"; cat "$WORKBASE/t9.log"; exit 1; }
+[ "$(PSQL -tAc "select has_function_privilege('authenticated','public.owner_force_destroy_row(text, uuid, integer)','execute')")" = "t" ] \
+  || { echo "FAIL T9: the aborted run changed privileges (no rollback)"; exit 1; }
+PSQL -q -c "alter function public.owner_purge_merge_counts_hidden(jsonb, jsonb) rename to owner_purge_merge_counts"
+PSQL -q -f "$MIG/$HOTFIX.sql" >/dev/null 2>&1
+[ "$(PSQL -tAc "select has_function_privilege('authenticated','public.owner_force_destroy_row(text, uuid, integer)','execute')")" = "f" ] \
+  || { echo "FAIL T9: re-running after restoring the helper did not re-secure it"; exit 1; }
+echo "PASS T9: a missing helper aborts the hotfix with full rollback; a complete set is re-secured"
+
+# ---- T10. An unexpected extra overload of a helper name is secured too. ------------------------
+# Created by the migration owner, so the emulated platform defaults give authenticated EXECUTE.
+PSQL -q -c "create function public.owner_force_destroy_row(p_table text) returns integer language sql security definer as 'select 1'"
+[ "$(PSQL -tAc "select has_function_privilege('authenticated','public.owner_force_destroy_row(text)','execute')")" = "t" ] \
+  || { echo "FAIL T10: harness did not reproduce the default grant on a new overload"; exit 1; }
+PSQL -q -f "$MIG/$HOTFIX.sql" >/dev/null 2>&1
+[ "$(PSQL -tAc "select has_function_privilege('authenticated','public.owner_force_destroy_row(text)','execute')")" = "f" ] \
+  || { echo "FAIL T10: an extra overload stayed client-executable"; exit 1; }
+PSQL -q -c "drop function public.owner_force_destroy_row(text)"
+echo "PASS T10: an unexpected overload of a helper name is revoked as well"
+
+echo "internal-helper privilege harness: ALL STAGES PASSED"

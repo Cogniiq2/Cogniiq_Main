@@ -82,12 +82,14 @@ against production in preparing this fix.
 ## 4. Migration details
 
 - Version `20261123120000` (> latest production `20260924202220`; no collision).
-- For each helper that exists: `revoke execute … from public, anon, authenticated` and
-  `grant execute … to service_role`.
-- Self-guarding: helpers are resolved with `to_regprocedure()`; missing ones are skipped. This is
-  required because `20260910*` were applied outside the ledger and cannot be ledger prerequisites.
-  Allowlist entry therefore has `requires: []` (justified inline in
+- Strict prerequisite: all 16 exact signatures must exist, otherwise the migration raises and
+  rolls back — it can never report success without securing all 16. This replaces a ledger
+  dependency, which is impossible because `20260910*` were applied outside the ledger; the
+  allowlist entry therefore has `requires: []` (justified inline in
   `.github/scripts/lib/supabase-migration-allowlist.mjs`).
+- For EVERY function in `public` carrying one of the 16 names (all overloads, not only the
+  expected signatures): `revoke execute … from public, anon, authenticated` and
+  `grant execute … to service_role`.
 - Fail-closed verification inside the same transaction: raises (→ full rollback) if any helper is
   still client-executable, if service_role lost a helper, or if any owner entry point lost
   `authenticated` EXECUTE or gained `anon`.
@@ -116,6 +118,16 @@ migrations, then:
 | T6 service_role: storage-purge claim RPC + helpers execute | PASS |
 | T7 privileges-only (all helpers still present) | PASS |
 | T8 prevention invariant (below) | PASS |
+| T9 one expected helper missing → hotfix aborts, nothing changed (rollback proven); restored → re-secured | PASS |
+| T10 an unexpected extra overload of a helper name (created under the default grants) is revoked too | PASS |
+
+**Database version.** CI runs every throwaway-cluster SQL harness on **PostgreSQL 17**, the
+production major version, via `.github/actions/setup-postgresql-17` (sets `PGBIN`, prints and
+asserts the version). Before this, the harnesses picked the highest version on the runner; when
+the GitHub ubuntu image started shipping PostgreSQL 18, five SQL jobs failed in
+`20260711120000_receptionist_persistence.sql` because PostgreSQL 18 records column NOT NULL
+constraints in `pg_constraint` (`contype 'n'`, `<table>_<column>_not_null`). That was an
+environment change, not a migration regression; the migration is unchanged.
 
 Also passing: full-chain `supabase/tests/run_owner_purge_policy_smoke.sh` (now includes the
 hotfix), `run-workspace-organization-sql-tests.sh`, `run-receptionist-leads-rls-sql-tests.sh`,

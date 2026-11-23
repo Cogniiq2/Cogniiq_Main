@@ -251,9 +251,10 @@ export const ALLOWED_MIGRATIONS = [
     // The objects it touches come from 20260910120000/130000/140000, which were applied to
     // production OUTSIDE the migration ledger (docs/ops/production-reconciliation-2026-11.md
     // §4.4) — so they cannot be named here: the gate checks the REMOTE ledger and would refuse
-    // forever. Instead the SQL is self-guarding: every function is resolved with
-    // to_regprocedure() and skipped if absent, and a fail-closed verification block raises (and
-    // rolls the whole migration back) if any helper is still client-executable afterwards. The
+    // forever. Instead the SQL checks its own prerequisite strictly: all 16 exact signatures must
+    // exist (otherwise it raises), it revokes on every overload of those names, and a fail-closed
+    // verification block raises (and rolls the whole migration back) if any of them is still
+    // client-executable afterwards. The
     // only other objects it needs are the anon/authenticated/service_role roles, which exist in
     // every Supabase project. Listing an unrelated recorded version would make the gate assert
     // something untrue.

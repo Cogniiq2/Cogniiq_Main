@@ -53,10 +53,15 @@
 -- ------
 --   * Privileges only: no table, row, function body, trigger or policy is created, altered or
 --     deleted. Forward-only, idempotent (re-running is a no-op), replay-safe on a fresh database.
---   * Self-guarding: 20260910120000/130000/140000 were applied to production OUTSIDE the
---     migration ledger (docs/ops/production-reconciliation-2026-11.md §4.4), so they cannot be
---     listed as ledger prerequisites. Each helper is resolved with to_regprocedure() and a
---     missing one is skipped with a NOTICE instead of failing.
+--   * Strict prerequisite check instead of a ledger dependency: 20260910120000/130000/140000
+--     were applied to production OUTSIDE the migration ledger
+--     (docs/ops/production-reconciliation-2026-11.md §4.4), so they cannot be listed as ledger
+--     prerequisites. Instead every one of the 16 exact signatures must exist; if any is missing
+--     the migration RAISES and rolls back. It can never report success without having secured
+--     all 16.
+--   * Overload-safe: revocation and verification cover EVERY function in schema public that
+--     carries one of the 16 names, not only the expected signatures, so an unexpected extra
+--     overload cannot stay client-executable.
 --   * Deliberately NOT changed: request_is_service_role() (anon EXECUTE in production; it only
 --     reads the caller's own JWT role claim and is referenced by trigger guards), and any
 --     function whose authenticated grant the source intends (e.g. owner_process_offer_acceptance,
@@ -104,29 +109,47 @@ declare
   ];
   v_sig text;
   v_fn regprocedure;
+  v_names name[];
   v_done int := 0;
 begin
+  -- ---- 1. Strict prerequisite: all 16 exact signatures must exist ---------------------------
   foreach v_sig in array v_internal loop
-    v_fn := to_regprocedure(v_sig);
-    if v_fn is null then
-      raise notice 'P0 hotfix: % does not exist here, nothing to revoke', v_sig;
-      continue;
+    if to_regprocedure(v_sig) is null then
+      raise exception 'P0 hotfix aborted: expected internal helper % does not exist; refusing to report success without securing all 16', v_sig;
     end if;
+  end loop;
+
+  select array_agg(distinct p.proname) into v_names
+  from unnest(v_internal) s(sig) join pg_proc p on p.oid = to_regprocedure(s.sig);
+
+  -- ---- 2. Revoke client EXECUTE on EVERY overload carrying one of the 16 names --------------
+  for v_fn in
+    select p.oid::regprocedure
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = any (v_names)
+    order by 1
+  loop
     execute format('revoke execute on function %s from public, anon, authenticated', v_fn);
     execute format('grant execute on function %s to service_role', v_fn);
     v_done := v_done + 1;
   end loop;
 
-  -- ---- Fail-closed verification -------------------------------------------------------------
-  foreach v_sig in array v_internal loop
-    v_fn := to_regprocedure(v_sig);
-    continue when v_fn is null;
+  if v_done < cardinality(v_internal) then
+    raise exception 'P0 hotfix aborted: secured % function(s), expected at least %', v_done, cardinality(v_internal);
+  end if;
+
+  -- ---- 3. Fail-closed verification over the same complete set -------------------------------
+  for v_fn in
+    select p.oid::regprocedure
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = any (v_names)
+  loop
     if has_function_privilege('anon', v_fn, 'execute')
        or has_function_privilege('authenticated', v_fn, 'execute') then
-      raise exception 'P0 hotfix incomplete: % is still executable by a client role', v_sig;
+      raise exception 'P0 hotfix incomplete: % is still executable by a client role', v_fn;
     end if;
     if not has_function_privilege('service_role', v_fn, 'execute') then
-      raise exception 'P0 hotfix regression: service_role lost EXECUTE on %', v_sig;
+      raise exception 'P0 hotfix regression: service_role lost EXECUTE on %', v_fn;
     end if;
   end loop;
 
@@ -141,7 +164,7 @@ begin
     end if;
   end loop;
 
-  raise notice 'P0 hotfix: client EXECUTE revoked on % internal helper(s); entry points intact', v_done;
+  raise notice 'P0 hotfix: client EXECUTE revoked on % internal helper function(s) (all 16 expected signatures present); entry points intact', v_done;
 end;
 $$;
 
