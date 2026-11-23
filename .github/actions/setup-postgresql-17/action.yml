@@ -1,0 +1,36 @@
+name: PostgreSQL 17 server binaries
+description: >
+  Installs PostgreSQL 17 server binaries — the major version of the production Supabase project —
+  and pins every throwaway-cluster SQL harness to them via PGBIN.
+
+  Why this exists: the harnesses default to the HIGHEST version found under /usr/lib/postgresql.
+  When the GitHub ubuntu runner image began shipping PostgreSQL 18, that silently changed the
+  database under test. PostgreSQL 18 records column NOT NULL constraints in pg_constraint
+  (contype 'n', named <table>_<column>_not_null); 17 and earlier do not. The receptionist
+  migration's constraint reconciliation (20260711120000, already applied in production on 17)
+  therefore failed on 18 although nothing in it had changed. Tests must reproduce production, so
+  the major version is chosen explicitly here instead of inherited from the runner image.
+runs:
+  using: composite
+  steps:
+    - name: Install and select PostgreSQL 17
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [ ! -x /usr/lib/postgresql/17/bin/initdb ]; then
+          sudo apt-get update
+          if ! apt-cache show postgresql-17 >/dev/null 2>&1; then
+            # The official PGDG repository; postgresql-common ships the setup script.
+            sudo apt-get install --yes postgresql-common
+            sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          fi
+          sudo apt-get install --yes postgresql-17
+        fi
+        echo "PGBIN=/usr/lib/postgresql/17/bin" >> "$GITHUB_ENV"
+        echo "Installed PostgreSQL server majors on this runner: $(ls /usr/lib/postgresql | tr '\n' ' ')"
+        version="$(/usr/lib/postgresql/17/bin/postgres --version)"
+        echo "SQL harnesses pinned to: $version"
+        case "$version" in
+          *" 17."*) ;;
+          *) echo "Expected a PostgreSQL 17 server, got: $version"; exit 1 ;;
+        esac
