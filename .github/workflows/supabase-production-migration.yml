@@ -50,12 +50,13 @@ on:
           - 20261123120000_revoke_client_execute_on_internal_purge_helpers.sql
         default: 20260826120000_owner_historical_paid_invoice.sql
       mode:
-        description: Audit history, run a dry run, or apply the migration
+        description: Audit history, run a dry run, rehearse the backup chain only (backup-only, never writes), or apply the migration
         required: true
         type: choice
         options:
           - audit-history
           - dry-run
+          - backup-only
           - apply
         default: dry-run
       confirmation:
@@ -279,9 +280,9 @@ jobs:
           test -n "$SUPABASE_PROJECT_ID"
           test -n "$SUPABASE_DB_PASSWORD"
 
-          if [ "$MODE" = "apply" ] && [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then
+          if { [ "$MODE" = "apply" ] || [ "$MODE" = "backup-only" ]; } && [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then
             echo "SUPABASE_BACKUP_PASSPHRASE is not configured."
-            echo "Apply mode requires it: the production backup must be encrypted before it can"
+            echo "Apply and backup-only modes require it: the production backup must be encrypted before it can"
             echo "be uploaded, because artifacts in this PUBLIC repository are world-readable."
             exit 1
           fi
@@ -478,7 +479,7 @@ jobs:
       # On the Free plan this is expected to report nothing, which is not itself an error.
       - name: Check managed Supabase backup / PITR availability (read-only)
         id: managed_backup
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         continue-on-error: true
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -513,7 +514,7 @@ jobs:
       # instead, so no credential is ever rendered into a log, a filename or a dump.
       - name: Create Free-plan logical production backup
         id: logical_backup
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         continue-on-error: true
         shell: bash
         working-directory: isolated-migration-source
@@ -583,7 +584,7 @@ jobs:
       # — never a value.
       - name: Verify logical backup and write manifest
         id: logical_backup_verify
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         continue-on-error: true
         env:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
@@ -635,7 +636,7 @@ jobs:
       # encryption. The decrypted copies are destroyed as soon as that check has run.
       - name: Encrypt the backup and prove it decrypts
         id: logical_backup_encrypt
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         continue-on-error: true
         shell: bash
         env:
@@ -724,7 +725,7 @@ jobs:
       # migration, short enough that an encrypted copy of production does not linger.
       - name: Upload encrypted production backup artifact
         id: logical_backup_artifact
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
@@ -739,7 +740,7 @@ jobs:
       # the run instead of being tidied up quietly afterwards.
       - name: Remove all plaintext production dumps
         id: plaintext_cleanup
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -774,7 +775,7 @@ jobs:
       # would let a run skip the encryption path, which is the one thing that keeps customer
       # data out of a public artifact.
       - name: Verify a restore point exists before writing
-        if: ${{ inputs.mode == 'apply' }}
+        if: ${{ inputs.mode == 'apply' || inputs.mode == 'backup-only' }}
         run: |
           node .github/scripts/verify-supabase-restore-point.mjs \
             --managed "${{ steps.managed_backup.outcome }}" \
@@ -786,6 +787,15 @@ jobs:
             --manifest "$BACKUP_DIR/manifest.json" \
             --run-id "${{ github.run_id }}" \
             --run-attempt "${{ github.run_attempt }}"
+
+      # backup-only rehearses the complete restore-point chain (logical dump, integrity
+      # manifest, authenticated encryption, decryption round trip, encrypted artifact upload,
+      # plaintext removal, restore-point gate) against production WITHOUT writing to it. Every
+      # step that writes to the database is gated on `inputs.mode == 'apply'` alone, so this
+      # mode can never reach the push. Use it to prove backup readiness before an apply run.
+      - name: Stop after backup-only
+        if: ${{ inputs.mode == 'backup-only' }}
+        run: echo "Backup-only run completed. Restore-point gate passed; no migration was applied."
 
       - name: Apply migration push
         if: ${{ inputs.mode == 'apply' }}
