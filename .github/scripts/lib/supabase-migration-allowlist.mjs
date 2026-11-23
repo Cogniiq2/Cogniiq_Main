@@ -243,6 +243,23 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260710120000', '20260722120000', '20260828120000'],
     description: 'Admin Center — atomic EXPENSE Schnellimport with vendor resolution (Ausgaben)',
   },
+  {
+    file: '20261123120000_revoke_client_execute_on_internal_purge_helpers.sql',
+    version: '20261123120000',
+    // P0 security hotfix: privileges only. It revokes EXECUTE from public/anon/authenticated on
+    // 16 internal purge/force-delete helpers and asserts the owner entry points keep theirs.
+    // The objects it touches come from 20260910120000/130000/140000, which were applied to
+    // production OUTSIDE the migration ledger (docs/ops/production-reconciliation-2026-11.md
+    // §4.4) — so they cannot be named here: the gate checks the REMOTE ledger and would refuse
+    // forever. Instead the SQL is self-guarding: every function is resolved with
+    // to_regprocedure() and skipped if absent, and a fail-closed verification block raises (and
+    // rolls the whole migration back) if any helper is still client-executable afterwards. The
+    // only other objects it needs are the anon/authenticated/service_role roles, which exist in
+    // every Supabase project. Listing an unrelated recorded version would make the gate assert
+    // something untrue.
+    requires: [],
+    description: 'P0 security hotfix — revoke client EXECUTE on internal purge/force-delete helpers',
+  },
 ];
 
 /**

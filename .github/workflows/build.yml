@@ -501,3 +501,27 @@ jobs:
       # either: a policy-only review would call this table safe while anon could still empty it.
       - name: Receptionist leads RLS SQL tests
         run: bash .github/scripts/run-receptionist-leads-rls-sql-tests.sh
+
+  internal-helper-privilege-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # P0 hotfix 20261123120000. Supabase's default privileges grant EXECUTE on every new
+      # public function directly to anon/authenticated/service_role, so `revoke … from public,
+      # anon` left the internal purge destroyers callable by every signed-in customer. This
+      # emulates those defaults on a throwaway cluster, proves the defect BEFORE the fix (a
+      # customer session deletes an owner row), applies the fix twice, and asserts: customer
+      # and anon are refused all 16 helpers, owner purge workflows still succeed as
+      # authenticated, service_role jobs still work, and — the standing prevention invariant —
+      # no unreviewed unguarded SECURITY DEFINER function is client-executable.
+      - name: Internal helper privilege SQL tests (Supabase default grants)
+        run: bash .github/scripts/run-internal-helper-privilege-sql-tests.sh
