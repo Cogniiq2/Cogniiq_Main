@@ -233,6 +233,33 @@ do $$ declare e uuid := (select id from fx where k = 'eng_a'); n int; begin
 end $$;
 commit;
 
+-- Approve decisions carry the exact value the owner saw (expected_value).
+create or replace function pg_temp.approve(p_engagement uuid, p_code text) returns jsonb language sql as $f$
+  select jsonb_build_object('code', p_code, 'action', 'approve',
+    'expected_value', public.owner_onboarding_detail(p_engagement)->'answers'->p_code->'value');
+$f$;
+
+-- ---------------------------------------------------------------------------------------------
+-- T8c. Lifecycle: nothing is reviewable before the customer submits (drafts exist from T5)
+-- ---------------------------------------------------------------------------------------------
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); begin
+  if public.owner_onboarding_detail(e)->'answers'->'company_name' is null then raise exception 'FAIL T8c: fixture has no draft'; end if;
+  begin perform public.owner_onboarding_review(e, jsonb_build_array(pg_temp.approve(e, 'company_name')));
+    raise exception 'FAIL T8c: a draft answer was approved before submission';
+  exception when others then if sqlerrm not like '%noch nicht übermittelt%' then raise; end if; end;
+  begin perform public.owner_onboarding_review(e, '[{"code":"company_name","action":"request_changes","comment":"x"}]');
+    raise exception 'FAIL T8c: changes requested on a draft before submission';
+  exception when others then if sqlerrm not like '%noch nicht übermittelt%' then raise; end if; end;
+  if exists (select 1 from public.owner_engagement_fields where engagement_id = e and code = 'PRO-F001' and value_text is not null) then
+    raise exception 'FAIL T8c: a draft reached an engagement field';
+  end if;
+  raise notice 'PASS T8c: review is refused until the customer submits';
+end $$;
+commit;
+
 -- ---------------------------------------------------------------------------------------------
 -- T9. Fill, submit (missing required → refused), duplicate submit, edit after submit refused
 -- ---------------------------------------------------------------------------------------------
@@ -290,10 +317,16 @@ do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; d jsonb;
   begin perform public.owner_onboarding_review(e, '[{"code":"faq","action":"request_changes"}]');
     raise exception 'FAIL T10: change request without explanation accepted';
   exception when others then if sqlerrm like 'FAIL%' then raise; end if; end;
-  r := public.owner_onboarding_review(e,
-    '[{"code":"company_name","action":"approve"},{"code":"urgent_handling","action":"approve"},
-      {"code":"languages","action":"approve"},{"code":"opening_hours","action":"approve"},
-      {"code":"faq","action":"request_changes","comment":"Bitte ergänzen Sie die Frage nach Rezepten."}]');
+  begin perform public.owner_onboarding_review(e, '[{"code":"company_name","action":"approve"}]');
+    raise exception 'FAIL T10: approval without the reviewed value accepted';
+  exception when serialization_failure then null; end;
+  begin perform public.owner_onboarding_review(e, '[{"code":"company_name","action":"approve","expected_value":"Etwas anderes"}]');
+    raise exception 'FAIL T10: approval of a value the owner did not see accepted';
+  exception when serialization_failure then null; end;
+  r := public.owner_onboarding_review(e, jsonb_build_array(
+    pg_temp.approve(e, 'company_name'), pg_temp.approve(e, 'urgent_handling'),
+    pg_temp.approve(e, 'languages'), pg_temp.approve(e, 'opening_hours'),
+    '{"code":"faq","action":"request_changes","comment":"Bitte ergänzen Sie die Frage nach Rezepten."}'::jsonb));
   if (r->>'approved')::int <> 4 or (r->>'changes_requested')::int <> 1 then raise exception 'FAIL T10: review result %', r; end if;
   if (r->>'intake_status') <> 'changes_requested' then raise exception 'FAIL T10: intake status %', r->>'intake_status'; end if;
   if (select value_text from public.owner_engagement_fields where engagement_id = e and code = 'PRO-F001') <> 'Praxis A GmbH' then
@@ -306,7 +339,7 @@ do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; d jsonb;
   if not exists (select 1 from public.owner_engagement_activity where engagement_id = e and event_type = 'client_intake_reviewed') then
     raise exception 'FAIL T10: review not audited';
   end if;
-  r := public.owner_onboarding_review(e, '[{"code":"company_name","action":"approve"}]');
+  r := public.owner_onboarding_review(e, jsonb_build_array(pg_temp.approve(e, 'company_name')));
   if (r->>'approved')::int <> 0 then raise exception 'FAIL T10: re-approval not idempotent'; end if;
   raise notice 'PASS T10: explicit approval writes fields through the canonical RPC; go-live gate unaffected';
 end $$;
@@ -326,6 +359,60 @@ do $$ declare e uuid := (select id from fx where k = 'eng_a'); g jsonb; v int; r
   r := public.client_onboarding_submit(e, (r->>'version')::int);
   if r->>'status' <> 'submitted' then raise exception 'FAIL T11: resubmit %', r; end if;
   raise notice 'PASS T11: changes-requested loop works; approved facts are locked for the customer';
+end $$;
+commit;
+
+-- T11b. Partial review during rework, drafts never reviewable, resubmission reviewable, stale
+-- values refused. (faq was resubmitted in T11.)
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; begin
+  r := public.owner_onboarding_review(e, '[{"code":"services_offered","action":"request_changes","comment":"Bitte genauer."}]');
+  if r->>'intake_status' <> 'changes_requested' then raise exception 'FAIL T11b: status %', r->>'intake_status'; end if;
+end $$;
+commit;
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000905');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); v int; begin
+  v := (public.client_onboarding_get(e)->'intake'->>'version')::int;
+  perform public.client_onboarding_save(e, '{"services_offered":"Prophylaxe, Füllungen, Implantologie"}', v);
+end $$;
+commit;
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; begin
+  -- the customer's unsent rework is a draft: not reviewable
+  begin perform public.owner_onboarding_review(e, jsonb_build_array(pg_temp.approve(e, 'services_offered')));
+    raise exception 'FAIL T11b: a draft under rework was approved';
+  exception when others then if sqlerrm not like '%noch nicht (erneut) übermittelt%' then raise; end if; end;
+  -- other submitted answers stay reviewable while the customer reworks one (partial review)
+  r := public.owner_onboarding_review(e, jsonb_build_array(pg_temp.approve(e, 'industry'), pg_temp.approve(e, 'faq')));
+  if (r->>'approved')::int <> 2 then raise exception 'FAIL T11b: partial review %', r; end if;
+  if r->>'intake_status' <> 'changes_requested' then raise exception 'FAIL T11b: partial review changed status to %', r->>'intake_status'; end if;
+end $$;
+commit;
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000905');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); v int; r jsonb; begin
+  v := (public.client_onboarding_get(e)->'intake'->>'version')::int;
+  r := public.client_onboarding_submit(e, v);
+  if r->>'status' <> 'submitted' then raise exception 'FAIL T11b: resubmit %', r; end if;
+  if public.client_onboarding_get(e)->'answers'->'faq'->>'status' <> 'approved' then
+    raise exception 'FAIL T11b: resubmission reset an approved answer';
+  end if;
+end $$;
+commit;
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; begin
+  r := public.owner_onboarding_review(e, jsonb_build_array(pg_temp.approve(e, 'services_offered')));
+  if (r->>'approved')::int <> 1 then raise exception 'FAIL T11b: resubmitted answer not reviewable'; end if;
+  raise notice 'PASS T11b: partial review, rework drafts refused, resubmission reviewable, stale values refused';
 end $$;
 commit;
 
@@ -473,6 +560,99 @@ do $$ declare inv uuid; e uuid := (select id from fx where k = 'eng_a'); r jsonb
   r := public.owner_onboarding_revoke_invitation(inv);
   if not (r->>'already')::boolean then raise exception 'FAIL T15b: revoke not idempotent'; end if;
   raise notice 'PASS T15b: revocation withdraws the pending portal invitation, idempotently';
+end $$;
+commit;
+
+-- ---------------------------------------------------------------------------------------------
+-- T13b. Fresh activation links: designated test mailbox via client contacts, repeated invitations
+--       reuse ONE portal invitation, account state drives the link type, link expiry is recorded
+--       separately from the 30-day invitation, and claiming never duplicates memberships.
+-- ---------------------------------------------------------------------------------------------
+update public.client_onboarding_messages set created_at = created_at - interval '2 days'
+ where engagement_id = (select id from fx where k = 'eng_a');
+insert into public.client_contacts (organization_id, name, email) values
+  ((select id from fx where k = 'org_a'), 'Cogniiq Testpostfach', 'Testpostfach@Cogniiq.test'),
+  ((select id from fx where k = 'org_b'), 'Fremder Kontakt', 'fremdkontakt@kunde-b.test');
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; r2 jsonb; begin
+  begin perform public.owner_onboarding_begin_send(e, 'invitation', 'fremdkontakt@kunde-b.test', null, 'de', 'Start', null, false, gen_random_uuid());
+    raise exception 'FAIL T13b: another organization''s contact accepted';
+  exception when others then if sqlerrm not like '%gehört nicht zu den Kontakten%' then raise; end if; end;
+  r := public.owner_onboarding_begin_send(e, 'invitation', 'testpostfach@cogniiq.test', 'Test', 'de', 'Start', null, false, gen_random_uuid());
+  if r->>'recipient_account' <> 'none' or not (r->>'portal_invitation_pending')::boolean then
+    raise exception 'FAIL T13b: new contact state %', r;
+  end if;
+  insert into fx values ('msg_act', (r->>'message_id')::uuid);
+  r2 := public.owner_onboarding_begin_send(e, 'invitation', 'testpostfach@cogniiq.test', 'Test', 'de', 'Start', null, false, gen_random_uuid());
+  if (select count(*) from public.client_invitations where email = 'testpostfach@cogniiq.test') <> 1 then
+    raise exception 'FAIL T13b: a repeated invitation duplicated the portal invitation';
+  end if;
+  if (select count(*) from jsonb_array_elements(public.owner_onboarding_detail(e)->'invitations') x
+      where x->>'recipient_email' = 'testpostfach@cogniiq.test' and x->>'status' = 'active') <> 1 then
+    raise exception 'FAIL T13b: more than one active onboarding invitation per address';
+  end if;
+  if not exists (select 1 from jsonb_array_elements(public.owner_onboarding_detail(e)->'contacts') x
+                 where x->>'email' = 'testpostfach@cogniiq.test' and x->>'source' = 'contact') then
+    raise exception 'FAIL T13b: client contact not offered as recipient';
+  end if;
+end $$;
+commit;
+-- the address now has an account that never signed in (activation link not used)
+insert into auth.users (id, email, email_confirmed_at) values ('00000000-0000-0000-0000-000000000910', 'testpostfach@cogniiq.test', null);
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; begin
+  r := public.owner_onboarding_begin_send(e, 'invitation', 'testpostfach@cogniiq.test', null, 'de', 'Neuer Link', null, false, gen_random_uuid());
+  if r->>'recipient_account' <> 'pending_activation' or not (r->>'portal_invitation_pending')::boolean then
+    raise exception 'FAIL T13b: unused account must get a fresh activation link: %', r;
+  end if;
+end $$;
+commit;
+update auth.users set email_confirmed_at = now(), last_sign_in_at = now() where id = '00000000-0000-0000-0000-000000000910';
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000910');
+do $$ begin
+  perform public.claim_my_client_invitations();
+  perform public.claim_my_client_invitations();
+  if (select count(*) from public.organization_members where user_id = '00000000-0000-0000-0000-000000000910') <> 1 then
+    raise exception 'FAIL T13b: claiming twice duplicated the membership';
+  end if;
+end $$;
+commit;
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); r jsonb; begin
+  r := public.owner_onboarding_begin_send(e, 'reminder', 'testpostfach@cogniiq.test', null, 'de', 'Erinnerung', null, false, gen_random_uuid());
+  if r->>'recipient_account' <> 'active' or (r->>'portal_invitation_pending')::boolean then
+    raise exception 'FAIL T13b: an activated member must get the login link: %', r;
+  end if;
+end $$;
+commit;
+begin;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+do $$ declare m uuid := (select id from fx where k = 'msg_act'); begin
+  begin perform public.service_onboarding_complete_send(m, true, 're_x', null, 'magic', now());
+    raise exception 'FAIL T13b: invalid link kind accepted';
+  exception when others then if sqlerrm not like '%invalid link kind%' then raise; end if; end;
+  perform public.service_onboarding_complete_send(m, true, 're_x', null, 'activation', now() + interval '1 hour');
+end $$;
+commit;
+begin;
+set local role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-000000000901');
+do $$ declare e uuid := (select id from fx where k = 'eng_a'); x jsonb; begin
+  select y into x from jsonb_array_elements(public.owner_onboarding_detail(e)->'messages') y where y->>'id' = (select id from fx where k = 'msg_act')::text;
+  if x->>'link_kind' <> 'activation' or x->>'link_expires_at' is null then raise exception 'FAIL T13b: link validity not recorded: %', x; end if;
+  if (select expires_at from public.client_invitations where email = 'testpostfach@cogniiq.test') < now() + interval '29 days' then
+    raise exception 'FAIL T13b: portal invitation validity tied to the short link lifetime';
+  end if;
+  raise notice 'PASS T13b: test mailbox via contacts, one portal invitation, link type by account state, link expiry recorded separately';
 end $$;
 commit;
 

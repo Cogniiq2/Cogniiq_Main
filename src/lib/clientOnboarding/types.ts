@@ -124,6 +124,10 @@ export interface OnboardingMessage {
   provider_message_id: string | null;
   created_at: string;
   completed_at: string | null;
+  /** Which entry link the email carried. Recorded only once the provider accepted it. */
+  link_kind: 'activation' | 'login' | 'portal' | null;
+  /** Expiry of the EMAIL LINK (activation only) — not of the portal invitation. */
+  link_expires_at: string | null;
 }
 
 export interface OwnerRequest {
@@ -138,7 +142,7 @@ export interface OwnerRequest {
   closed_at: string | null;
 }
 
-export interface OnboardingContact { email: string; name: string | null; source: 'customer' | 'member' | 'portal_invitation' }
+export interface OnboardingContact { email: string; name: string | null; source: 'customer' | 'member' | 'portal_invitation' | 'contact' }
 
 export interface SenderDetails { legal_name: string | null; email: string | null; phone: string | null }
 
@@ -164,4 +168,4 @@ export interface OwnerOnboardingDetail {
   milestones: Milestone[];
 }
 
-export interface ReviewDecision { code: string; action: 'approve' | 'request_changes'; comment?: string }
+export interface ReviewDecision { code: string; action: 'approve' | 'request_changes'; comment?: string; expected_value?: AnswerValue }

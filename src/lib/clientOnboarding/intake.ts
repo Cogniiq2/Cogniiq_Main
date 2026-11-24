@@ -2,7 +2,7 @@
 // Client-side checks are a convenience only; the server re-validates every value.
 
 import type {
-  AnswerValue, DayHours, DayKey, IntakeStage, IntakeStatus, MessageStatus, OnboardingInvitation, OpeningHours, Question,
+  AnswerValue, DayHours, DayKey, IntakeStage, IntakeStatus, MessageStatus, OnboardingInvitation, OnboardingMessage, OpeningHours, Question,
 } from '@/lib/clientOnboarding/types';
 
 export const STAGES: Array<{ key: IntakeStage; title: string; description: string }> = [
@@ -168,4 +168,30 @@ export function invitationState(inv: OnboardingInvitation, now = Date.now()): { 
   if (inv.expires_at && new Date(inv.expires_at).getTime() < now) return { label: 'Abgelaufen', tone: 'warning' };
   if (inv.portal_invitation_status === 'revoked') return { label: 'Portal-Einladung widerrufen', tone: 'danger' };
   return { label: 'Eingeladen – noch nicht angemeldet', tone: 'info' };
+}
+
+const timeFmt = new Intl.DateTimeFormat('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+
+/** The latest real (non-test) email the provider accepted for this address, if any. */
+export function latestLinkMessage(email: string, messages: OnboardingMessage[]): OnboardingMessage | null {
+  return messages
+    .filter((m) => !m.is_test && m.status === 'accepted' && m.recipient_email === email && m.link_kind)
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null;
+}
+
+/**
+ * Honest state of the LINK in the last email — separate from the portal invitation's validity.
+ * An activation link's expiry is the configured Supabase email-link lifetime recorded at send time.
+ */
+export function linkState(msg: OnboardingMessage | null, now: number = Date.now()):
+  { label: string; tone: 'info' | 'warning' | 'neutral'; expired: boolean } | null {
+  if (!msg) return null;
+  if (msg.link_kind === 'activation') {
+    if (msg.link_expires_at && new Date(msg.link_expires_at).getTime() > now) {
+      return { label: `Aktivierungslink gültig bis ca. ${timeFmt.format(new Date(msg.link_expires_at))}`, tone: 'info', expired: false };
+    }
+    return { label: 'Aktivierungslink abgelaufen', tone: 'warning', expired: true };
+  }
+  if (msg.link_kind === 'login') return { label: 'Anmeldelink gesendet (Konto besteht bereits)', tone: 'neutral', expired: false };
+  return null;
 }

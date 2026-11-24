@@ -15,7 +15,19 @@ const KIND_TITLE: Record<MessageKind, string> = {
   request: 'Rückfrage per E-Mail ankündigen',
 };
 
-const SOURCE_LABEL = { customer: 'Kundenkontakt', member: 'Portalzugang aktiv', portal_invitation: 'Portal-Einladung offen' } as const;
+const SOURCE_LABEL = {
+  customer: 'Kundenkontakt', member: 'Portalzugang aktiv', portal_invitation: 'Portal-Einladung offen', contact: 'Kontakt der Organisation',
+} as const;
+// One entry per address; the strongest access state wins.
+const SOURCE_RANK = { member: 0, portal_invitation: 1, customer: 2, contact: 3 } as const;
+function dedupeContacts(list: OwnerOnboardingDetail['contacts']): OwnerOnboardingDetail['contacts'] {
+  const best = new Map<string, OwnerOnboardingDetail['contacts'][number]>();
+  for (const c of list) {
+    const prev = best.get(c.email);
+    if (!prev || SOURCE_RANK[c.source] < SOURCE_RANK[prev.source]) best.set(c.email, { ...c, name: c.name ?? prev?.name ?? null });
+  }
+  return [...best.values()];
+}
 
 /**
  * Composer for every onboarding email. What the owner previews is rendered by the same template
@@ -39,7 +51,7 @@ export function OnboardingComposer({
 }) {
   const toast = useToast();
   const company = detail.organization?.name ?? detail.customer.company ?? '';
-  const contacts = detail.contacts;
+  const contacts = useMemo(() => dedupeContacts(detail.contacts), [detail.contacts]);
   const [recipient, setRecipient] = useState('');
   const [name, setName] = useState('');
   const [language, setLanguage] = useState<'de' | 'en'>('de');
@@ -124,7 +136,7 @@ export function OnboardingComposer({
   const footer = step === 'compose' ? (
     <div className="flex w-full flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
       <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
-      <div className="flex flex-col-reverse gap-2 sm:flex-row">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
         <Button variant="secondary" loading={busy === 'test'} disabled={!subjectOk || busy !== null} onClick={() => send(true)}>
           Test an mich senden
         </Button>
@@ -154,9 +166,12 @@ export function OnboardingComposer({
           <ConfirmRow label="Betreff" value={subject} />
           <ConfirmRow label="Sprache" value={language === 'de' ? 'Deutsch' : 'Englisch'} />
           <ConfirmRow label="Zugang" value={kind === 'invitation'
-            ? (isMember ? 'Hat bereits einen Portalzugang – Link führt zur Anmeldung.'
-              : 'Erhält eine persönliche Portal-Einladung (Rolle „Mitglied“, 30 Tage gültig). Ein bestehendes Konto wird weiterverwendet, nie neu angelegt.')
+            ? (isMember ? 'Hat bereits einen Portalzugang – der Link führt zur Anmeldung.'
+              : 'Portal-Einladung (Rolle „Mitglied“) gilt 30 Tage. Ein bestehendes Konto wird weiterverwendet, nie neu angelegt.')
             : 'Link zur Anmeldung im Kundenportal.'} />
+          {kind === 'invitation' && !isMember ? (
+            <ConfirmRow label="Link in der E-Mail" value="Der Aktivierungslink selbst ist nur kurz gültig (Supabase-Einstellung, die genaue Ablaufzeit sehen Sie nach dem Senden im Verlauf). Läuft er ab, bleibt die Einladung bestehen und Sie senden einfach einen neuen Link." />
+          ) : null}
           {requestQuestion ? <ConfirmRow label="Rückfrage" value={requestQuestion} /> : null}
           <p className={cn('pt-1', text.hint)}>
             Nach dem Senden sehen Sie nur, ob der E-Mail-Anbieter die Nachricht angenommen hat. Zustellung, Öffnen oder Lesen
@@ -212,6 +227,9 @@ export function OnboardingComposer({
             </div>
             <p className={cn('mt-2', text.hint)}>
               In der Vorschau führt die Schaltfläche zum Portal. Beim echten Versand erzeugt der Server einen persönlichen Zugangslink.
+              Die Test-E-Mail geht an Ihre Inhaber-Adresse und zeigt nur die Nachricht: Mit einem Cogniiq-Konto sehen Sie im Portal
+              nicht die Kundenansicht. Den echten Ablauf prüfen Sie mit einer eigenen Test-Adresse, die Sie beim Kunden als Kontakt
+              hinterlegen (Kunden → Kontakte), idealerweise bei einem Testkunden.
               Kein Tracking-Pixel, keine Klickverfolgung.
             </p>
           </div>

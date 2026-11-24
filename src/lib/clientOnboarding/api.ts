@@ -88,7 +88,9 @@ export interface SendOutcome {
   /** "accepted" = the email provider accepted the message. Never "delivered" or "opened". */
   status: 'accepted' | 'failed' | 'sending' | null;
   replay: boolean;
-  linkMode: 'activation' | 'login' | 'test' | null;
+  linkMode: 'activation' | 'login' | 'portal' | null;
+  /** When the activation link in the email stops working (null for login/portal links). */
+  linkExpiresAt: string | null;
   error: string | null;
   recordingWarning: string | null;
 }
@@ -110,7 +112,7 @@ export async function sendOnboardingEmail(input: SendInput): Promise<SendOutcome
       try { body = await error.context.clone().json(); } catch { body = null; }
     }
     if (!body) {
-      return { ok: false, messageId: null, status: null, replay: false, linkMode: null, recordingWarning: null,
+      return { ok: false, messageId: null, status: null, replay: false, linkMode: null, linkExpiresAt: null, recordingWarning: null,
         error: 'Der Versanddienst ist nicht erreichbar. Es ist unklar, ob die Nachricht versendet wurde — bitte prüfen Sie den Verlauf, bevor Sie erneut senden.' };
     }
   }
@@ -121,6 +123,7 @@ export async function sendOnboardingEmail(input: SendInput): Promise<SendOutcome
     status: (b.status as SendOutcome['status']) ?? null,
     replay: b.replay === true,
     linkMode: (b.linkMode as SendOutcome['linkMode']) ?? null,
+    linkExpiresAt: typeof b.linkExpiresAt === 'string' ? b.linkExpiresAt : null,
     error: typeof b.error === 'string' ? b.error : (b.ok === true ? null : 'Die Nachricht wurde nicht versendet.'),
     recordingWarning: typeof b.recordingWarning === 'string' ? b.recordingWarning : null,
   };

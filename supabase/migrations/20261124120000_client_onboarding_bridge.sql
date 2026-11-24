@@ -160,6 +160,11 @@ create table if not exists public.client_onboarding_messages (
   error_code text check (error_code is null or length(error_code) <= 120),
   idempotency_key uuid not null unique,
   sent_by uuid references auth.users(id) on delete set null,
+  -- Which entry link the email carried, and when THAT LINK expires. Independent of the portal
+  -- invitation's own validity (client_invitations.expires_at, 30 days): a Supabase activation
+  -- link expires after the project's email-OTP lifetime, which is far shorter.
+  link_kind text check (link_kind is null or link_kind in ('activation', 'login', 'portal')),
+  link_expires_at timestamptz,
   created_at timestamptz not null default now(),
   completed_at timestamptz
 );
@@ -681,6 +686,10 @@ begin
           select ci.email, null, 'portal_invitation'
             from public.client_invitations ci
            where ci.organization_id = c.organization_id and ci.status = 'pending'
+          union all
+          select lower(btrim(cc.email)), cc.name, 'contact'
+            from public.client_contacts cc
+           where cc.organization_id = c.organization_id and cc.email is not null and btrim(cc.email) <> ''
         ) x), '[]'::jsonb),
     'members', coalesce((
         select jsonb_agg(jsonb_build_object('email', lower(u.email), 'role', om.role, 'status', om.status,
@@ -706,7 +715,8 @@ begin
             'id', m.id, 'kind', m.kind, 'is_test', m.is_test, 'recipient_email', m.recipient_email,
             'subject', m.subject, 'status', m.status, 'error_code', m.error_code,
             'provider_message_id', m.provider_message_id, 'created_at', m.created_at,
-            'completed_at', m.completed_at) order by m.created_at desc)
+            'completed_at', m.completed_at, 'link_kind', m.link_kind, 'link_expires_at', m.link_expires_at)
+            order by m.created_at desc)
         from (select * from public.client_onboarding_messages
               where engagement_id = p_engagement_id order by created_at desc limit 50) m), '[]'::jsonb),
     'intake', case when i.id is null then null else jsonb_build_object(
@@ -755,6 +765,13 @@ begin
   end if;
   select * into i from public.client_onboarding_intakes where engagement_id = p_engagement_id for update;
   if i.id is null then raise exception 'Für diese Einrichtung liegen keine Kundenangaben vor.'; end if;
+  -- Lifecycle gate: nothing can be reviewed before the customer has submitted at least once.
+  -- 'changes_requested' stays reviewable so a partial review can continue on the answers that
+  -- were submitted and not sent back; 'approved' stays reviewable for idempotent re-approval
+  -- and for an owner correction.
+  if i.status not in ('submitted', 'changes_requested', 'approved') then
+    raise exception 'Die Kundenangaben wurden noch nicht übermittelt und können noch nicht geprüft werden.';
+  end if;
 
   for d in select * from jsonb_array_elements(p_decisions) loop
     v_action := d->>'action';
@@ -765,6 +782,11 @@ begin
      where intake_id = i.id and question_code = d->>'code' for update;
     if an.id is null then raise exception 'Antwort % nicht gefunden.', d->>'code'; end if;
     select * into q from public.client_onboarding_questions where code = an.question_code;
+    -- Only a SUBMITTED value (or an already approved one) can be decided on. A draft or an
+    -- answer the customer is currently reworking is not the customer's final word.
+    if an.status not in ('submitted', 'approved') then
+      raise exception '„%" wurde vom Kunden noch nicht (erneut) übermittelt und kann nicht geprüft werden.', q.label;
+    end if;
 
     if v_action = 'request_changes' then
       if v_comment is null then
@@ -777,6 +799,12 @@ begin
     end if;
 
     if an.value is null then raise exception '„%" ist leer und kann nicht bestätigt werden.', q.label; end if;
+    -- Approve exactly what the owner saw: a value changed after the review screen was loaded
+    -- (e.g. edited and resubmitted in between) must be looked at again, never approved blind.
+    if not (d ? 'expected_value') or (d->'expected_value') is distinct from an.value then
+      raise exception '„%" wurde zwischenzeitlich geändert. Bitte laden Sie die Prüfung neu.', q.label
+        using errcode = '40001';
+    end if;
     if an.status = 'approved' and an.approved_value is not distinct from an.value then
       continue; -- idempotent re-approval
     end if;
@@ -946,7 +974,11 @@ begin
       or exists (select 1 from public.organization_members om join auth.users u on u.id = om.user_id
                  where om.organization_id = c.organization_id and om.status = 'active' and lower(u.email) = v_email)
       or exists (select 1 from public.client_invitations ci
-                 where ci.organization_id = c.organization_id and ci.email = v_email and ci.status = 'pending');
+                 where ci.organization_id = c.organization_id and ci.email = v_email and ci.status = 'pending')
+      -- Owner-managed contacts of this organization (/admin/clients → Kontakte). This is also the
+      -- secure way to run the real customer flow with a designated test mailbox.
+      or exists (select 1 from public.client_contacts cc
+                 where cc.organization_id = c.organization_id and lower(btrim(cc.email)) = v_email);
     if not v_allowed then
       raise exception 'Diese E-Mail-Adresse gehört nicht zu den Kontakten dieses Kunden.';
     end if;
@@ -1009,6 +1041,11 @@ begin
     'recipient_email', v_email, 'is_test', p_is_test, 'kind', p_kind,
     'company', coalesce(v_org_name, c.company),
     'is_member', coalesce(v_member, false),
+    -- none: no auth account yet; pending_activation: account exists but has never signed in
+    -- (e.g. an earlier activation link was not used); active: has signed in before.
+    'recipient_account', case when p_is_test then null else (
+        select case when u.id is null then 'none' when u.last_sign_in_at is null then 'pending_activation' else 'active' end
+        from (select 1) one left join auth.users u on lower(u.email) = v_email limit 1) end,
     -- The Edge Function may mint a one-time activation link only while a pending portal
     -- invitation exists for this exact address; otherwise it links to the normal login.
     'portal_invitation_pending', (not p_is_test and c.organization_id is not null and exists (
@@ -1021,7 +1058,8 @@ $$;
 -- Step 2, SERVICE ROLE ONLY: the Edge Function records what the provider answered. The
 -- browser can never mark a message as sent.
 create or replace function public.service_onboarding_complete_send(
-  p_message_id uuid, p_accepted boolean, p_provider_message_id text, p_error_code text)
+  p_message_id uuid, p_accepted boolean, p_provider_message_id text, p_error_code text,
+  p_link_kind text default null, p_link_expires_at timestamptz default null)
 returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
 declare m record;
 begin
@@ -1031,10 +1069,15 @@ begin
   if m.status = 'accepted' then
     return jsonb_build_object('message_id', m.id, 'status', m.status, 'already', true);
   end if;
+  if p_link_kind is not null and p_link_kind not in ('activation', 'login', 'portal') then
+    raise exception 'invalid link kind';
+  end if;
   update public.client_onboarding_messages set
     status = case when p_accepted then 'accepted' else 'failed' end,
     provider_message_id = case when p_accepted then left(p_provider_message_id, 200) else provider_message_id end,
     error_code = case when p_accepted then null else left(coalesce(p_error_code, 'unknown'), 120) end,
+    link_kind = case when p_accepted then p_link_kind else link_kind end,
+    link_expires_at = case when p_accepted and p_link_kind = 'activation' then p_link_expires_at else null end,
     completed_at = now()
   where id = p_message_id;
   if not m.is_test then
@@ -1096,7 +1139,7 @@ begin
     'public.owner_onboarding_close_request(uuid, text)',
     'public.owner_onboarding_reopen(uuid, text)',
     'public.owner_onboarding_begin_send(uuid, text, text, text, text, text, text, boolean, uuid, uuid)',
-    'public.service_onboarding_complete_send(uuid, boolean, text, text)',
+    'public.service_onboarding_complete_send(uuid, boolean, text, text, text, timestamptz)',
     'public.owner_onboarding_revoke_invitation(uuid)'
   ] loop
     execute format('revoke all on function %s from public, anon, authenticated', fn);

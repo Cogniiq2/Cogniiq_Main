@@ -11,7 +11,9 @@ import {
   closeOnboardingRequest, createOnboardingRequest, linkCustomerOrganization, loadOwnerOnboarding,
   revokeOnboardingInvitation,
 } from '@/lib/clientOnboarding/api';
-import { INTAKE_STATUS_LABEL, invitationState, messageStatusLabel } from '@/lib/clientOnboarding/intake';
+import {
+  INTAKE_STATUS_LABEL, invitationState, latestLinkMessage, linkState, messageStatusLabel,
+} from '@/lib/clientOnboarding/intake';
 import type { MessageKind, OnboardingInvitation, OwnerOnboardingDetail, OwnerRequest } from '@/lib/clientOnboarding/types';
 import type { EngagementTask } from '@/lib/serviceOnboarding/types';
 
@@ -19,6 +21,7 @@ const dateFmt = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyl
 const fmt = (iso: string | null | undefined) => (iso ? dateFmt.format(new Date(iso)) : '—');
 
 const KIND_LABEL: Record<MessageKind, string> = { invitation: 'Einladung', reminder: 'Erinnerung', request: 'Rückfrage' };
+const LINK_LABEL = { activation: 'mit Aktivierungslink', login: 'mit Anmeldelink', portal: 'mit Portal-Link (Test)' } as const;
 
 const INTAKE_TONE = {
   not_started: 'neutral', in_progress: 'info', submitted: 'accent', changes_requested: 'warning', approved: 'success',
@@ -141,19 +144,38 @@ export function ClientOnboardingPanel({ engagementId, tasks, onEngagementChanged
         <div className="mt-5">
           <p className={cn('mb-2', text.sectionTitle)}>Einladungen</p>
           <ul className="divide-y divide-[var(--cq-border)] border-y border-[var(--cq-border)]">
-            {detail.invitations.map((inv) => {
+            {/* Superseded rows are history (see Kommunikationsverlauf); one row per address. */}
+            {detail.invitations.filter((inv) => inv.status !== 'superseded').map((inv) => {
               const st = invitationState(inv);
+              const link = linkState(latestLinkMessage(inv.recipient_email, detail.messages));
+              const pendingAccess = inv.status === 'active' && !inv.access_active && st.label !== 'Abgelaufen'
+                && inv.portal_invitation_status !== 'revoked';
               const canRevoke = inv.status === 'active' && !inv.access_active;
-              const canRenew = inv.status !== 'active' || st.label === 'Abgelaufen';
+              const canReinvite = !inv.access_active && !pendingAccess;
               return (
-                <li key={inv.id} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                <li key={inv.id} className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <p className={cn('truncate', text.bodyStrong)}>{inv.recipient_name ? `${inv.recipient_name} · ` : ''}{inv.recipient_email}</p>
-                    <p className={text.hint}>Gesendet {fmt(inv.created_at)}{inv.status === 'active' && !inv.access_active ? ` · gültig bis ${fmt(inv.expires_at)}` : ''}</p>
+                    <p className={text.hint}>
+                      Eingeladen {fmt(inv.created_at)}
+                      {pendingAccess ? ` · Portal-Einladung gültig bis ${fmt(inv.expires_at)}` : ''}
+                    </p>
+                    {pendingAccess && link ? (
+                      <p className={cn('mt-0.5', text.hint, link.expired && 'text-amber-700')}>
+                        {link.label}
+                        {link.expired ? ' – die Einladung gilt weiter, senden Sie einfach einen neuen Link.' : ''}
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge label={st.label} tone={st.tone} />
-                    {canRenew ? (
+                    {pendingAccess ? (
+                      <Button size="sm" variant={link?.expired ? 'secondary' : 'ghost'} icon={RotateCcw}
+                        onClick={() => setComposer({ kind: 'invitation', recipient: inv.recipient_email })}>
+                        Neuen Aktivierungslink senden
+                      </Button>
+                    ) : null}
+                    {canReinvite ? (
                       <Button size="sm" variant="ghost" icon={RotateCcw} onClick={() => setComposer({ kind: 'invitation', recipient: inv.recipient_email })}>Neu einladen</Button>
                     ) : null}
                     {canRevoke ? (
@@ -191,7 +213,10 @@ export function ClientOnboardingPanel({ engagementId, tasks, onEngagementChanged
                     <p className={cn('truncate', text.bodyStrong)}>
                       {m.is_test ? 'Test · ' : ''}{KIND_LABEL[m.kind]} · {m.subject}
                     </p>
-                    <p className={text.hint}>{fmt(m.created_at)} · an {m.recipient_email}</p>
+                    <p className={text.hint}>
+                      {fmt(m.created_at)} · an {m.recipient_email}
+                      {m.link_kind ? ` · ${LINK_LABEL[m.link_kind]}` : ''}
+                    </p>
                   </div>
                   <StatusBadge label={st.label} tone={st.tone} />
                 </li>

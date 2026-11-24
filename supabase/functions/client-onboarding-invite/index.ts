@@ -10,11 +10,16 @@
 //      owner's own address, per-engagement rate limits, the idempotency key, and — for a real
 //      invitation — the pending client_invitations row that the existing claim flow consumes.
 //      The browser therefore cannot choose a foreign recipient or bypass any limit.
-//   3. Build the entry link:
-//        * real send + pending portal invitation  -> one-time Supabase activation link
-//          (auth.admin.generateLink type=invite; nothing is emailed by Supabase itself);
-//        * the address already has an account     -> normal portal login, redirectTo=/app/setup;
-//        * test send                              -> plain portal URL, no auth link is minted.
+//   3. Build the entry link (Supabase itself emails nothing):
+//        * pending portal invitation, no account yet     -> generateLink type=invite (creates the
+//          one auth user for this address);
+//        * pending portal invitation, account exists but
+//          has never signed in (earlier link unused)    -> generateLink type=magiclink to the same
+//          set-password page; no second account, no new membership;
+//        * the address has signed in before              -> normal portal login, redirectTo=/app/setup;
+//        * test send                                     -> portal login; no auth link is minted.
+//      The link's own expiry (AUTH_LINK_TTL_SECONDS, which must equal the Supabase Auth
+//      "Email OTP expiration") is recorded separately from the 30-day portal invitation.
 //   4. Render the SAME template the owner previewed (src/lib/clientOnboarding/emailTemplate.ts).
 //   5. Send via Resend with Idempotency-Key "onboarding:<message_id>".
 //   6. Record the provider answer via service_onboarding_complete_send (service role only).
@@ -34,8 +39,9 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 import { getSupabasePublishableKey, getSupabaseSecretKey, getSupabaseUrl } from '../_shared/env.ts';
-import { renderOnboardingEmail, type OnboardingEmailKind, type OnboardingEmailLanguage } from '../../../src/lib/clientOnboarding/emailTemplate.ts';
-import { ownerFacingError } from '../../../src/lib/clientOnboarding/sendErrors.ts';
+import { renderOnboardingEmail, type OnboardingEmailKind, type OnboardingEmailLanguage } from '../_shared/clientOnboarding/emailTemplate.ts';
+import { ownerFacingError } from '../_shared/clientOnboarding/sendErrors.ts';
+import { decideLink, linkTtlSeconds } from '../_shared/clientOnboarding/linkPolicy.ts';
 
 const SUPABASE_URL = getSupabaseUrl();
 const ANON_KEY = getSupabasePublishableKey();
@@ -45,6 +51,9 @@ const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? '';
 const PUBLIC_APP_URL = (Deno.env.get('PUBLIC_APP_URL') ?? 'https://cogniiq.de').replace(/\/$/, '');
 const REPLY_TO = Deno.env.get('ONBOARDING_REPLY_TO') ?? '';
 const SETUP_PATH = '/app/setup';
+// Lifetime of a Supabase email link. MUST equal Auth → Email → "Email OTP expiration" of the
+// project. The conservative default (1 h) can only under-state validity, never over-state it.
+const AUTH_LINK_TTL_SECONDS = linkTtlSeconds(Deno.env.get('AUTH_LINK_TTL_SECONDS'));
 // The invite confirmation page sets the password, then continues into the portal.
 const INVITE_REDIRECT = Deno.env.get('CUSTOMER_PORTAL_INVITE_REDIRECT')
   ?? `${PUBLIC_APP_URL}/auth/confirmed?flow=invite`;
@@ -73,6 +82,7 @@ interface Reservation {
   kind?: OnboardingEmailKind; language?: OnboardingEmailLanguage; subject?: string; intro?: string | null;
   recipient_email?: string; recipient_name?: string | null; is_test?: boolean; company?: string | null;
   is_member?: boolean; portal_invitation_pending?: boolean; request_question?: string | null;
+  recipient_account?: 'none' | 'pending_activation' | 'active' | null;
   sender?: { legal_name?: string | null; email?: string | null; phone?: string | null } | null;
 }
 
@@ -80,23 +90,37 @@ function loginUrl(): string {
   return `${PUBLIC_APP_URL}/app/login?redirectTo=${encodeURIComponent(SETUP_PATH)}`;
 }
 
+type LinkKind = 'activation' | 'login' | 'portal';
+
 /** Returns the entry link. The activation link never leaves this function except inside the email. */
-async function entryLink(admin: ReturnType<typeof createClient>, r: Reservation): Promise<{ url: string; mode: 'activation' | 'login' | 'test' }> {
-  if (r.is_test) return { url: `${PUBLIC_APP_URL}${SETUP_PATH}`, mode: 'test' };
-  if (!r.is_member && r.portal_invitation_pending && r.recipient_email) {
-    try {
+async function entryLink(admin: ReturnType<typeof createClient>, r: Reservation)
+  : Promise<{ url: string; kind: LinkKind; expiresAt: string | null }> {
+  const decision = decideLink({
+    isTest: r.is_test === true, portalInvitationPending: r.portal_invitation_pending === true,
+    recipientAccount: r.recipient_account,
+  });
+  if (decision === 'portal') return { url: loginUrl(), kind: 'portal', expiresAt: null };
+  if ((decision === 'invite' || decision === 'magiclink') && r.recipient_email) {
+    const mint = async (type: 'invite' | 'magiclink') => {
       const { data, error } = await admin.auth.admin.generateLink({
-        type: 'invite', email: r.recipient_email, options: { redirectTo: INVITE_REDIRECT },
+        type, email: r.recipient_email as string, options: { redirectTo: INVITE_REDIRECT },
       });
       const link = (data as { properties?: { action_link?: string } } | null)?.properties?.action_link;
-      if (!error && link) return { url: link, mode: 'activation' };
-      // "already registered": the person has an account — the pending client_invitation is
-      // claimed by the existing claim flow on their next verified login. No new account.
+      return !error && link ? link : null;
+    };
+    try {
+      // An invite that fails because the account was created in the meantime falls back to a
+      // magic link for that same account. Never a second account.
+      let link = decision === 'invite' ? await mint('invite') : null;
+      if (!link) link = await mint('magiclink');
+      if (link) {
+        return { url: link, kind: 'activation', expiresAt: new Date(Date.now() + AUTH_LINK_TTL_SECONDS * 1000).toISOString() };
+      }
     } catch {
       // fall through to the login link; never fail the send over the link type
     }
   }
-  return { url: loginUrl(), mode: 'login' };
+  return { url: loginUrl(), kind: 'login', expiresAt: null };
 }
 
 async function sendViaResend(msg: { to: string; subject: string; html: string; text: string; replyTo: string | null }, key: string)
@@ -194,6 +218,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   // Step 2 — record the provider's answer (service role only; "accepted" is final).
   const { error: completeErr } = await admin.rpc('service_onboarding_complete_send', {
     p_message_id: r.message_id, p_accepted: sent.error === null, p_provider_message_id: sent.id, p_error_code: sent.error,
+    p_link_kind: link.kind, p_link_expires_at: link.expiresAt,
   });
 
   if (sent.error) {
@@ -203,7 +228,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         : 'Der E-Mail-Anbieter hat die Nachricht nicht angenommen. Bitte versuchen Sie es später erneut.' });
   }
   return json({
-    ok: true, messageId: r.message_id, status: 'accepted', linkMode: link.mode,
+    ok: true, messageId: r.message_id, status: 'accepted', linkMode: link.kind, linkExpiresAt: link.expiresAt,
     // The provider accepted the message; recording that fact failed. The owner sees it honestly.
     recordingWarning: completeErr ? 'Der Versand wurde vom Anbieter angenommen, konnte aber nicht vollständig protokolliert werden.' : null,
   });

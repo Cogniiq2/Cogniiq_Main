@@ -1,13 +1,15 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { defaultSubject, escapeHtml, renderOnboardingEmail, safeHref } from '@/lib/clientOnboarding/emailTemplate';
 import { describeOnboardingError } from '@/lib/clientOnboarding/errors';
 import { ownerFacingError } from '@/lib/clientOnboarding/sendErrors';
+import { decideLink, linkTtlSeconds } from '@/lib/clientOnboarding/linkPolicy';
 import {
-  defaultHours, formatAnswer, isLocked, messageStatusLabel, missingRequired, overallPercent, stageProgress,
+  defaultHours, formatAnswer, invitationState, isLocked, latestLinkMessage, linkState, messageStatusLabel, missingRequired, overallPercent, stageProgress,
   validateAnswer, validateHours,
 } from '@/lib/clientOnboarding/intake';
-import type { Question } from '@/lib/clientOnboarding/types';
+import type { OnboardingInvitation, OnboardingMessage, Question } from '@/lib/clientOnboarding/types';
 
 const base = {
   kind: 'invitation' as const, language: 'de' as const, company: 'Praxis Muster',
@@ -132,5 +134,85 @@ describe('intake logic', () => {
     for (const s of ['accepted', 'failed', 'sending'] as const) {
       expect(messageStatusLabel(s, '2026-11-24T11:59:00Z', now).label).not.toMatch(/zugestellt|geöffnet|gelesen/i);
     }
+  });
+});
+
+const msg = (over: Partial<OnboardingMessage>): OnboardingMessage => ({
+  id: 'm', kind: 'invitation', is_test: false, recipient_email: 'a@x.test', subject: 'S', status: 'accepted',
+  error_code: null, provider_message_id: 'p', created_at: '2026-11-24T10:00:00Z', completed_at: '2026-11-24T10:00:01Z',
+  link_kind: 'activation', link_expires_at: '2026-11-24T11:00:00Z', ...over,
+});
+
+describe('invitation validity vs email-link validity', () => {
+  const now = Date.parse('2026-11-24T12:00:00Z');
+  const inv: OnboardingInvitation = {
+    id: 'i', recipient_email: 'a@x.test', recipient_name: null, status: 'active', expires_at: '2026-12-24T10:00:00Z',
+    created_at: '2026-11-24T10:00:00Z', revoked_at: null, portal_invitation_status: 'pending', access_active: false,
+  };
+
+  it('keeps the invitation open while the activation link has expired', () => {
+    expect(invitationState(inv, now).label).toBe('Eingeladen – noch nicht angemeldet');
+    const link = linkState(latestLinkMessage('a@x.test', [msg({})]), now);
+    expect(link?.expired).toBe(true);
+    expect(link?.label).toBe('Aktivierungslink abgelaufen');
+  });
+
+  it('reports a still-valid activation link with its recorded expiry', () => {
+    const link = linkState(msg({ link_expires_at: '2026-11-24T13:00:00Z' }), now);
+    expect(link?.expired).toBe(false);
+    expect(link?.label).toMatch(/^Aktivierungslink gültig bis ca\./);
+  });
+
+  it('uses the newest real, accepted message and ignores tests and failures', () => {
+    const latest = latestLinkMessage('a@x.test', [
+      msg({ id: 'old', created_at: '2026-11-24T09:00:00Z' }),
+      msg({ id: 'new', created_at: '2026-11-24T11:30:00Z', link_kind: 'login', link_expires_at: null }),
+      msg({ id: 'test', is_test: true, created_at: '2026-11-24T11:50:00Z' }),
+      msg({ id: 'fail', status: 'failed', created_at: '2026-11-24T11:55:00Z' }),
+    ]);
+    expect(latest?.id).toBe('new');
+    expect(linkState(latest, now)?.label).toBe('Anmeldelink gesendet (Konto besteht bereits)');
+  });
+
+  it('treats a missing expiry on an activation link as expired, never as valid', () => {
+    expect(linkState(msg({ link_expires_at: null }), now)?.expired).toBe(true);
+  });
+
+  it('marks test emails with the staff-account caveat', () => {
+    const r = renderOnboardingEmail({ ...base, isTest: true });
+    expect(r.text).toContain('Cogniiq-Konto');
+  });
+});
+
+
+describe('entry-link policy (shared with the Edge Function)', () => {
+  it('never mints an auth link for a test send', () => {
+    expect(decideLink({ isTest: true, portalInvitationPending: true, recipientAccount: 'none' })).toBe('portal');
+  });
+  it('creates an account only when none exists and an invitation is pending', () => {
+    expect(decideLink({ isTest: false, portalInvitationPending: true, recipientAccount: 'none' })).toBe('invite');
+    expect(decideLink({ isTest: false, portalInvitationPending: false, recipientAccount: 'none' })).toBe('login');
+  });
+  it('re-activates an unused account with a magic link instead of a second account', () => {
+    expect(decideLink({ isTest: false, portalInvitationPending: true, recipientAccount: 'pending_activation' })).toBe('magiclink');
+  });
+  it('sends signed-in users to the normal login', () => {
+    expect(decideLink({ isTest: false, portalInvitationPending: true, recipientAccount: 'active' })).toBe('login');
+  });
+  it('bounds the configured link lifetime', () => {
+    expect(linkTtlSeconds(undefined)).toBe(3600);
+    expect(linkTtlSeconds('86400')).toBe(86400);
+    expect(linkTtlSeconds('999999')).toBe(3600);
+    expect(linkTtlSeconds('abc')).toBe(3600);
+  });
+});
+
+describe('Edge Function bundle boundary', () => {
+  it('imports only from supabase/functions or pinned URLs (no unproven cross-directory imports)', () => {
+    const src = readFileSync('supabase/functions/client-onboarding-invite/index.ts', 'utf8');
+    const specs = [...src.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]);
+    expect(specs.length).toBeGreaterThan(0);
+    for (const s of specs) expect(s.startsWith('https://') || s.startsWith('../_shared/')).toBe(true);
+    for (const s of specs.filter((x) => x.startsWith('https://'))) expect(s).toMatch(/@\d+\.\d+\.\d+/);
   });
 });

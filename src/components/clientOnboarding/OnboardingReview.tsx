@@ -32,7 +32,11 @@ export function OnboardingReview({ detail, onChanged }: { detail: OwnerOnboardin
   })).filter((g) => g.rows.length > 0), [detail]);
 
   const pendingCodes = detail.questions.filter((q) => detail.answers[q.code]?.status === 'submitted').map((q) => q.code);
-  const decisions: ReviewDecision[] = Object.entries(choices).map(([code, c]) => ({ code, action: c.action, comment: c.comment.trim() || undefined }));
+  // Approvals carry the exact value the owner is looking at; the server refuses if it changed since.
+  const decisions: ReviewDecision[] = Object.entries(choices).map(([code, c]) => ({
+    code, action: c.action, comment: c.comment.trim() || undefined,
+    ...(c.action === 'approve' ? { expected_value: detail.answers[code]?.value ?? null } : {}),
+  }));
   const missingComment = decisions.some((d) => d.action === 'request_changes' && !d.comment);
 
   function setChoice(code: string, action: Choice['action'] | null) {
@@ -48,7 +52,12 @@ export function OnboardingReview({ detail, onChanged }: { detail: OwnerOnboardin
     setBusy(true);
     const r = await reviewOnboarding(detail.engagement_id, decisions, note.trim() || null);
     setBusy(false);
-    if (r.error) { toast.error('Prüfung nicht gespeichert', r.error.message); return; }
+    if (r.error) {
+      toast.error('Prüfung nicht gespeichert', r.error.message);
+      // A changed or no-longer-submitted answer means the screen is stale: reload it.
+      if (r.error.kind === 'conflict' || r.error.kind === 'validation') { setChoices({}); onChanged(); }
+      return;
+    }
     toast.success('Prüfung gespeichert',
       `${r.data.approved} bestätigt · ${r.data.changes_requested} mit Änderungswunsch · ${r.data.applied_to_fields} in Einrichtungsfelder übernommen`);
     setChoices({}); setNote('');
@@ -95,7 +104,8 @@ export function OnboardingReview({ detail, onChanged }: { detail: OwnerOnboardin
               {g.rows.map((q) => {
                 const a = detail.answers[q.code];
                 const choice = choices[q.code];
-                const decidable = a.status === 'submitted' || a.status === 'approved' || a.status === 'changes_requested';
+                // Mirrors the server gate: only submitted (or already approved) values are decidable.
+                const decidable = a.status === 'submitted' || a.status === 'approved';
                 return (
                   <li key={q.code} className={cn('border p-3', radius.md,
                     choice?.action === 'approve' ? 'border-emerald-300' : choice?.action === 'request_changes' ? 'border-amber-300' : 'border-[var(--cq-border)]')}>

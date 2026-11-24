@@ -8,6 +8,7 @@ import {
 } from '@/components/app/CustomerAppPrimitives';
 import { IntakeWizard } from '@/components/app/setup/IntakeWizard';
 import { MilestoneTimeline } from '@/components/app/setup/MilestoneTimeline';
+import { useAuth } from '@/contexts/AuthContext';
 import { listMyOnboardings } from '@/lib/clientOnboarding/api';
 import { INTAKE_STATUS_LABEL } from '@/lib/clientOnboarding/intake';
 import type { CustomerIntakeSummary } from '@/lib/clientOnboarding/types';
@@ -26,6 +27,7 @@ export function SetupPage() {
 
 function SetupContent() {
   const { engagementId } = useParams<{ engagementId?: string }>();
+  const { isPlatformAdmin } = useAuth();
   const [items, setItems] = useState<CustomerIntakeSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,6 +48,17 @@ function SetupContent() {
   if (engagementId) return <>{header}<IntakeWizard engagementId={engagementId} /></>;
   if (error) return <>{header}<AppErrorState message={error} onRetry={() => void load()} /></>;
   if (!items) return <>{header}<AppSkeleton label="Ihre Einrichtung wird geladen" /></>;
+  if (items.length === 0 && isPlatformAdmin) {
+    // Cogniiq staff are not members of customer organizations, so the server shows them nothing
+    // here. Say so instead of implying the customer has no setup.
+    return (
+      <>
+        {header}
+        <AppEmptyState icon={ClipboardList} title="Sie sind mit einem Cogniiq-Konto angemeldet"
+          description="Die Einrichtung sehen nur Mitglieder der Kundenorganisation. Um den echten Ablauf zu prüfen, hinterlegen Sie eine eigene Test-Adresse als Kontakt des (Test-)Kunden, senden ihr die Einladung und melden sich in einem separaten Browserprofil mit diesem Testkonto an." />
+      </>
+    );
+  }
   if (items.length === 0) {
     return (
       <>
