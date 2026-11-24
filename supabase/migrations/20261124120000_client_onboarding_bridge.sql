@@ -735,6 +735,8 @@ begin
         'status', r.status, 'response', r.response, 'responded_at', r.responded_at,
         'created_at', r.created_at, 'closed_at', r.closed_at) order by r.created_at desc)
       from public.client_onboarding_requests r where r.engagement_id = p_engagement_id), '[]'::jsonb),
+    'sender', (select jsonb_build_object('legal_name', s.legal_name, 'email', s.business_email, 'phone', s.business_phone)
+               from public.owner_document_settings s where s.business_entity_id = se.business_entity_id),
     'milestones', public.client_onboarding_milestones(se.lifecycle_status, coalesce(i.status, 'not_started')));
 end;
 $$;
@@ -903,6 +905,8 @@ begin
   -- request can never produce a second email.
   select * into m from public.client_onboarding_messages where idempotency_key = p_idempotency_key;
   if m.id is not null then
+    -- Only the original sender may replay its own reservation.
+    if m.sent_by is distinct from auth.uid() then raise exception 'idempotency key already used'; end if;
     return jsonb_build_object('message_id', m.id, 'replay', true, 'status', m.status);
   end if;
 
@@ -996,6 +1000,9 @@ begin
 
   select name into v_org_name from public.organizations where id = c.organization_id;
   return jsonb_build_object('message_id', m.id, 'replay', false, 'status', m.status,
+    'sender', (select jsonb_build_object('legal_name', s.legal_name, 'email', s.business_email, 'phone', s.business_phone)
+               from public.owner_document_settings s where s.business_entity_id = se.business_entity_id),
+    'language', p_language, 'subject', m.subject, 'intro', m.intro, 'recipient_name', m.recipient_name,
     'recipient_email', v_email, 'is_test', p_is_test, 'kind', p_kind,
     'company', coalesce(v_org_name, c.company),
     'is_member', coalesce(v_member, false),
