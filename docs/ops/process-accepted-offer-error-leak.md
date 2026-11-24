@@ -31,3 +31,15 @@ supabase functions deploy process-accepted-offer --no-verify-jwt
 
 Verify afterwards with an invalid token (expect `{"ok":false,"error":"link is not valid"}`);
 do not use a real customer's link. Environment variables and secrets are unchanged.
+
+## Pre-deploy finding (2026-11-24): CORS allowlist regression on `main`
+
+Comparing deployed v20 with `main` (d756469) showed a second difference: v20 allows the request
+headers `authorization, x-client-info, apikey, content-type`; `main` allowed only
+`authorization, content-type`. The browser calls this function via `supabase.functions.invoke`
+(`src/lib/ownerFinance/offersApi.ts`), which always sends `apikey` and `x-client-info`. Deploying
+`main` as it was would have failed every browser preflight and silently downgraded acceptances
+to the anon RPC fallback (no private server-side signature storage). The deploy was stopped.
+
+Fix: `main` now allows the four headers; the build guard asserts it (it fails on the old line).
+Deploy the commit containing this fix, not d756469.

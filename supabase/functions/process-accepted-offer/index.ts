@@ -32,7 +32,9 @@ const MAX_SIGNATURE_BYTES = 400_000; // ~250–400 KB budget
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, content-type',
+  // supabase.functions.invoke() always sends apikey + x-client-info; without them the browser's
+  // CORS preflight fails and acceptance silently falls back to the RPC path (no private signature).
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
