@@ -385,8 +385,14 @@ do $$ declare e uuid := (select id from fx where k = 'eng_a'); v_key uuid := gen
     raise exception 'FAIL T13: portal invitation not prepared through client_invitations';
   end if;
   insert into fx values ('msg', (r->>'message_id')::uuid);
-  -- an already-active member gets no new portal invitation
+  if not (r->>'portal_invitation_pending')::boolean or (r->>'is_member')::boolean then
+    raise exception 'FAIL T13: non-member invitation must allow an activation link';
+  end if;
+  -- an already-active member gets no new portal invitation and no activation link
   r := public.owner_onboarding_begin_send(e, 'invitation', 'member-a@kunde-a.test', null, 'de', 'Ihr Projektstart', null, false, gen_random_uuid());
+  if (r->>'portal_invitation_pending')::boolean or not (r->>'is_member')::boolean then
+    raise exception 'FAIL T13: active member must get the login link, not an activation link';
+  end if;
   if exists (select 1 from public.client_invitations where email = 'member-a@kunde-a.test') then
     raise exception 'FAIL T13: active member got a duplicate portal invitation';
   end if;
@@ -401,6 +407,11 @@ do $$ declare e uuid := (select id from fx where k = 'eng_a'); v_key uuid := gen
   begin perform public.owner_onboarding_begin_send((select id from fx where k = 'eng_c'), 'invitation', 'kontakt@kunde-c.test', null, 'de', 'Start', null, false, gen_random_uuid());
     raise exception 'FAIL T13: unlinked customer invited';
   exception when others then if sqlerrm not like '%keiner Portal-Organisation%' then raise; end if; end;
+  -- test sends never mint activation links
+  if (public.owner_onboarding_begin_send(e, 'invitation', null, null, 'de', 'Test 2', null, true, gen_random_uuid())
+        ->>'portal_invitation_pending')::boolean then
+    raise exception 'FAIL T13: test send allowed an activation link';
+  end if;
   raise notice 'PASS T13: recipients validated server-side, idempotent, rate-limited; tests go to the owner';
 end $$;
 commit;

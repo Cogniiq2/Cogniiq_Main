@@ -964,9 +964,12 @@ begin
     raise exception 'Zu viele Testnachrichten. Bitte versuchen Sie es später erneut.';
   end if;
 
-  if not p_is_test and p_kind = 'invitation' then
+  if not p_is_test then
     v_member := exists (select 1 from public.organization_members om join auth.users u on u.id = om.user_id
                         where om.organization_id = c.organization_id and om.status = 'active' and lower(u.email) = v_email);
+  end if;
+
+  if not p_is_test and p_kind = 'invitation' then
     if not v_member then
       -- Reuse the existing portal invitation mechanism: one pending invitation per org+email.
       select id into v_ci from public.client_invitations
@@ -1006,6 +1009,11 @@ begin
     'recipient_email', v_email, 'is_test', p_is_test, 'kind', p_kind,
     'company', coalesce(v_org_name, c.company),
     'is_member', coalesce(v_member, false),
+    -- The Edge Function may mint a one-time activation link only while a pending portal
+    -- invitation exists for this exact address; otherwise it links to the normal login.
+    'portal_invitation_pending', (not p_is_test and c.organization_id is not null and exists (
+        select 1 from public.client_invitations ci where ci.organization_id = c.organization_id
+           and ci.email = v_email and ci.status = 'pending' and (ci.expires_at is null or ci.expires_at > now()))),
     'request_question', (select question from public.client_onboarding_requests where id = p_request_id));
 end;
 $$;

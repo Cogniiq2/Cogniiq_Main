@@ -14,6 +14,7 @@ import {
 import { EngagementFieldGroup } from '@/components/services/EngagementFieldGroup';
 import { EngagementTaskList } from '@/components/services/EngagementTaskList';
 import { AppointmentTypesPanel } from '@/components/services/AppointmentTypesPanel';
+import { ClientOnboardingPanel } from '@/components/clientOnboarding/ClientOnboardingPanel';
 import { PhaseSection } from '@/components/services/servicePrimitives';
 import {
   NAV_GROUP_ORDER, integrationModeDescription, integrationModeLabel,
@@ -246,6 +247,9 @@ export function ServiceEngagementPage() {
               onSelect={(action) => jumpToSection(action.sectionCode)}
             />
             <BlockerPanel id="blocker-panel" gate={gate} sections={detail.sections} onSelect={onBlockerSelected} />
+            {detail.engagement.service_key === 'ai_receptionist' ? (
+              <ClientOnboardingPanel engagementId={detail.engagement.id} tasks={detail.tasks} onEngagementChanged={refresh} />
+            ) : null}
             {sectionsInGroup.map((section) => (
               <PhaseSection
                 key={section.code}

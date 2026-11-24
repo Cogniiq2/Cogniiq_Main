@@ -530,6 +530,7 @@ const BillingPage = lazyNamed(() => import('./pages/app/BillingPage'), 'BillingP
 const SolutionPage = lazyNamed(() => import('./pages/app/SolutionPage'), 'SolutionPage');
 const SolutionsIndexPage = lazyNamed(() => import('./pages/app/SolutionsIndexPage'), 'SolutionsIndexPage');
 const SupportPage = lazyNamed(() => import('./pages/app/SupportPage'), 'SupportPage');
+const SetupPage = lazyNamed(() => import('./pages/app/SetupPage'), 'SetupPage');
 const LoginPage = lazyNamed(() => import('./pages/app/LoginPage'), 'LoginPage');
 const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage');
 const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
@@ -614,6 +615,8 @@ export function AppInner() {
         <Route path="/app/solutions" element={<ProtectedRoute><SolutionsIndexPage /></ProtectedRoute>} />
         <Route path="/app/solutions/:instanceKey/*" element={<ProtectedRoute><SolutionPage /></ProtectedRoute>} />
         <Route path="/app/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
+        <Route path="/app/setup" element={<ProtectedRoute><SetupPage /></ProtectedRoute>} />
+        <Route path="/app/setup/:engagementId" element={<ProtectedRoute><SetupPage /></ProtectedRoute>} />
         <Route path="/app/onboarding" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="onboarding" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
         <Route path="/app/receptionist" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="receptionist" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
         <Route path="/app/knowledge" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="knowledge" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
