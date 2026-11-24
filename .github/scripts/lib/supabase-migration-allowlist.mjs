@@ -261,6 +261,25 @@ export const ALLOWED_MIGRATIONS = [
     requires: [],
     description: 'P0 security hotfix — revoke client EXECUTE on internal purge/force-delete helpers',
   },
+  {
+    file: '20261124120000_client_onboarding_bridge.sql',
+    version: '20261124120000',
+    // Customer onboarding bridge: new intake/request/invitation/message tables (RPC-only, RLS on,
+    // no client grants) and SECURITY DEFINER RPCs. Real dependencies, each an object it references:
+    //  - 20260710120000: organizations, organization_members, profiles, is_platform_owner()
+    //  - 20260710133000: the hardened request_is_service_role() the service RPC gates on
+    //  - 20260711120000: businesses, receptionist_configs (read-only prefill source)
+    //  - 20260721120000: client_invitations + claim flow it reuses for portal access
+    //  - 20260723120000: owner_document_settings (configured sender details)
+    //  - 20260724120000: owner_customers incl. organization_id (the tenant link)
+    //  - 20260830120000: owner_service_engagements, owner_customer_services, engagement
+    //    fields/tasks, owner_set_engagement_field/_task, owner_record_engagement_activity,
+    //    owner_engagement_go_live_blockers
+    // It does not touch the P0 helpers of 20261123120000 (its own test asserts they stay closed).
+    requires: ['20260710120000', '20260710133000', '20260711120000', '20260721120000',
+      '20260723120000', '20260724120000', '20260830120000'],
+    description: 'Client onboarding bridge — customer intake, owner review, invitations (no auto-apply to fields)',
+  },
 ];
 
 /**

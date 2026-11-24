@@ -121,6 +121,22 @@ assert(inputs.source_ref.required === true, 'source_ref must remain required');
     'The existence gate must run before any Supabase connection is made',
   );
 
+  // Revision pinning: branches move, so apply must name the exact commit it acts on, and the
+  // workflow revision (whose allowlist gates the run) must hold byte-identical SQL.
+  assert(inputs.expected_source_sha, 'Workflow must expose the expected_source_sha input');
+  const pin = stepBlock('Pin and verify source revision');
+  assertIncludes(pin, 'git -C migration-source rev-parse HEAD', 'The source revision must be resolved from the checkout');
+  assertIncludes(pin, '"$resolved" != "$EXPECTED_SOURCE_SHA"', 'A mismatching source revision must fail');
+  assertIncludes(pin, 'elif [ "$MODE" = "apply" ]', 'Apply must require expected_source_sha');
+  assertIncludes(pin, '"$workflow_sql_sha" != "$source_sql_sha"', 'Workflow and source SQL must be byte-identical');
+  assertIncludes(pin, 'GITHUB_STEP_SUMMARY', 'The pinned revision must be printed for the operator');
+  assert(!/^\s+if:/m.test(pin), 'The pin gate must run in every mode');
+  assert(
+    workflowText.indexOf('- name: Pin and verify source revision') <
+      workflowText.indexOf('- name: Link Supabase project'),
+    'The pin gate must run before any Supabase connection is made',
+  );
+
   // Nothing downstream may branch on WHICH ref was selected: every gate applies to all refs.
   assertNotIncludes(workflowText, "inputs.source_ref == 'main'", 'No gate may be conditional on the selected ref');
   assertNotIncludes(workflowText, "inputs.source_ref != 'main'", 'No gate may be conditional on the selected ref');

@@ -29,6 +29,10 @@ on:
         # allowlist, the derived confirmation string, the dependency gate, the isolated-workspace
         # invariant, the dry run and the backup gates, all of which run regardless of the ref.
         default: main
+      expected_source_sha:
+        description: Full 40-char commit SHA that source_ref must resolve to. REQUIRED for apply; recommended for every mode (copy it from the dry-run summary).
+        required: false
+        default: ''
       target_migration:
         description: Which allowlisted production migration to act on
         required: true
@@ -48,6 +52,7 @@ on:
           - 20260903120000_owner_workspace_organization.sql
           - 20260904120000_owner_expense_bulk_import.sql
           - 20261123120000_revoke_client_execute_on_internal_purge_helpers.sql
+          - 20261124120000_client_onboarding_bridge.sql
         default: 20260826120000_owner_historical_paid_invoice.sql
       mode:
         description: Audit history, run a dry run, rehearse the backup chain only (backup-only, never writes), or apply the migration
@@ -128,6 +133,7 @@ jobs:
             20260903120000_owner_workspace_organization.sql) ;;
             20260904120000_owner_expense_bulk_import.sql) ;;
             20261123120000_revoke_client_execute_on_internal_purge_helpers.sql) ;;
+            20261124120000_client_onboarding_bridge.sql) ;;
             *)
               echo "Refusing to act on a migration that is not on the production allowlist: $SELECTED_MIGRATION"
               exit 1
@@ -153,6 +159,67 @@ jobs:
       # contain the selected migration file.
       - name: Verify expected migration exists
         run: test -f "migration-source/$TARGET_MIGRATION_PATH"
+
+      # Safety gate: pin the exact source revision. source_ref is a NAME and branches move, so
+      # the backup-only, dry-run and apply runs could otherwise act on three different commits.
+      # The operator copies the commit SHA printed by the dry run into expected_source_sha; apply
+      # refuses to run without it. Independently, the workflow's own revision (the "Use workflow
+      # from" branch, whose allowlist, bash case and dependency metadata gate this run) must hold
+      # byte-identical SQL for the target, so allowlist metadata can never describe other SQL
+      # than the one being applied.
+      - name: Pin and verify source revision
+        env:
+          MODE: ${{ inputs.mode }}
+          EXPECTED_SOURCE_SHA: ${{ inputs.expected_source_sha }}
+          SOURCE_REF: ${{ inputs.source_ref }}
+          WORKFLOW_REF: ${{ github.ref }}
+          WORKFLOW_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          resolved="$(git -C migration-source rev-parse HEAD)"
+          source_file="migration-source/$TARGET_MIGRATION_PATH"
+          source_sql_sha="$(sha256sum "$source_file" | awk '{print $1}')"
+
+          if [ -n "$EXPECTED_SOURCE_SHA" ]; then
+            if ! printf '%s' "$EXPECTED_SOURCE_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+              echo "expected_source_sha must be a full lowercase 40-character commit SHA."
+              exit 1
+            fi
+            if [ "$resolved" != "$EXPECTED_SOURCE_SHA" ]; then
+              echo "source_ref '$SOURCE_REF' resolved to $resolved, expected $EXPECTED_SOURCE_SHA. Refusing to act on a different revision."
+              exit 1
+            fi
+          elif [ "$MODE" = "apply" ]; then
+            echo "Apply mode requires expected_source_sha (copy the commit SHA from the dry-run summary)."
+            exit 1
+          fi
+
+          if [ ! -f "$TARGET_MIGRATION_PATH" ]; then
+            echo "The workflow revision ($WORKFLOW_REF @ $WORKFLOW_SHA) does not contain $TARGET_MIGRATION_PATH."
+            echo "Run the workflow FROM the branch or tag that contains this migration and its allowlist entry."
+            exit 1
+          fi
+          workflow_sql_sha="$(sha256sum "$TARGET_MIGRATION_PATH" | awk '{print $1}')"
+          if [ "$workflow_sql_sha" != "$source_sql_sha" ]; then
+            echo "The migration SQL differs between the workflow revision and source_ref. Refusing."
+            exit 1
+          fi
+
+          {
+            echo "### Source revision"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| mode | \`$MODE\` |"
+            echo "| workflow ref | \`$WORKFLOW_REF\` @ \`$WORKFLOW_SHA\` |"
+            echo "| source_ref | \`$SOURCE_REF\` |"
+            echo "| resolved source commit | \`$resolved\` |"
+            echo "| migration | \`$TARGET_MIGRATION\` |"
+            echo "| migration sha256 | \`$source_sql_sha\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "RESOLVED_SOURCE_SHA=$resolved" >> "$GITHUB_ENV"
+          echo "Source pinned: $SOURCE_REF -> $resolved (migration sha256 $source_sql_sha)"
 
       # The Node gates below (allowlist agreement, dependency gate, dry-run scope, backup
       # gate, ledger verification) import js-yaml, so dependencies must exist before the

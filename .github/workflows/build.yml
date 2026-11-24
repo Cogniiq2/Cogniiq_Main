@@ -507,3 +507,19 @@ jobs:
       # no unreviewed unguarded SECURITY DEFINER function is client-executable.
       - name: Internal helper privilege SQL tests (Supabase default grants)
         run: bash .github/scripts/run-internal-helper-privilege-sql-tests.sh
+
+  client-onboarding-bridge-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: PostgreSQL 17 server binaries (production major version)
+        uses: ./.github/actions/setup-postgresql-17
+
+      # Migration 20261124120000 under emulated Supabase default grants: tenant isolation,
+      # viewer read-only, owner review as the only path into engagement fields, invitation
+      # reuse through client_invitations, send idempotency/rate limits, service-role-only
+      # provider results, and the P0 invariant (no unguarded client-executable definer).
+      - name: Client onboarding bridge SQL tests
+        run: bash .github/scripts/run-client-onboarding-bridge-sql-tests.sh

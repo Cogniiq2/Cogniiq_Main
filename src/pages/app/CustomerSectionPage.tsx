@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { LegacyOnboardingNotice } from '@/components/app/setup/LegacyOnboardingNotice';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
@@ -352,6 +353,7 @@ function OnboardingExperience() {
       <div className="space-y-6">
         <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
           <div className="p-6 sm:p-8">
+          <LegacyOnboardingNotice />
           {!canEdit ? (
             <AppReadOnlyNotice>
               Sie sehen diese Angaben schreibgeschützt. Nur Owner und Admins Ihrer Organisation können

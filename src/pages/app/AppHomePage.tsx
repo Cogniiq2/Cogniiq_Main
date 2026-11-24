@@ -13,6 +13,7 @@ import {
 import { Link } from 'react-router-dom';
 
 import { CustomerAppShell } from '@/components/app/CustomerAppShell';
+import { SetupHomeCard } from '@/components/app/setup/SetupHomeCard';
 import {
   AppButton,
   AppCard,
@@ -168,6 +169,9 @@ function AppHomeContent() {
 
       {status === 'ready' && !workspaceLoading ? (
         <div className="space-y-10">
+          {/* ---- Guided setup: only when the server reports one for this person ---- */}
+          <SetupHomeCard />
+
           {/* ---- Ihre nächste Aktion: only when the customer actually owns one ---- */}
           {customerActions.length ? <NextActionCard projects={customerActions} /> : null}
 
