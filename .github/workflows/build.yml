@@ -33,6 +33,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # process-accepted-offer is public (no JWT). Its deployed build once returned raw Postgres
+      # error text to anonymous signers; this guard keeps the source on fixed strings only.
+      - name: Public Edge Function error-surface guard
+        run: node .github/scripts/test-public-edge-function-error-surface.mjs
+
       - name: Static receptionist migration convergence checks
         run: node .github/scripts/test-receptionist-migration-convergence.mjs
 
