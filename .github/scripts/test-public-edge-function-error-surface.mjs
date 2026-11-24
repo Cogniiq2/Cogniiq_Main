@@ -59,5 +59,15 @@ for (const file of PUBLIC_FUNCTIONS) {
   }
   for (const l of leaks) { failed = true; console.error(`${file}:${l.line} may expose raw error text: ${l.text}`); }
 }
+// CORS: the browser client (supabase.functions.invoke) always sends these request headers. A
+// public function that omits one from Access-Control-Allow-Headers fails its preflight.
+const BROWSER_HEADERS = ['authorization', 'x-client-info', 'apikey', 'content-type'];
+for (const file of PUBLIC_FUNCTIONS) {
+  const m = /'Access-Control-Allow-Headers':\s*'([^']*)'/.exec(readFileSync(file, 'utf8'));
+  const allowed = (m?.[1] ?? '').split(',').map((h) => h.trim().toLowerCase());
+  for (const h of BROWSER_HEADERS) {
+    if (!allowed.includes(h)) { failed = true; console.error(`${file}: CORS does not allow the '${h}' header sent by supabase.functions.invoke`); }
+  }
+}
 if (failed) process.exit(1);
-console.log(`public edge function error surface: ${PUBLIC_FUNCTIONS.length} function(s) clean`);
+console.log(`public edge function error surface + CORS: ${PUBLIC_FUNCTIONS.length} function(s) clean`);
