@@ -1,0 +1,113 @@
+name: Diagnose Supabase DB password authentication (read-only)
+# Read-only diagnostic for the production backup failure
+# ("pg_dumpall: FATAL: password authentication failed for user postgres").
+#
+# It answers exactly one question: does the GitHub secret SUPABASE_DB_PASSWORD authenticate
+# as postgres.<project_ref> on the Supavisor session pooler?
+#   A. it does not  -> the secret value itself is wrong (or carries stray whitespace);
+#   B. it does      -> Supabase CLI `db dump --linked` builds or handles the connection
+#                      differently, and the backup command needs fixing instead.
+#
+# Safety:
+#   * The only statement ever sent is `SELECT 1`. No schema, data, role or migration access.
+#   * The password reaches psql only through the PGPASSWORD environment variable of a single
+#     command. It is never echoed, hashed, written to disk or uploaded; `set -x` is never used.
+#     GitHub additionally masks secret values in logs.
+#   * Output is limited to PASS/FAIL per check, Postgres' own error text (which never contains
+#     the password) and yes/no facts about the secret's shape that explain a failure
+#     (surrounding whitespace, characters that need percent-encoding in a connection URL).
+#   * No artifacts, no caches, no outputs.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/diagnose-db-password-auth
+    paths:
+      - .github/workflows/diagnose-supabase-db-auth.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: diagnose-supabase-db-auth
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      POOLER_HOST: aws-1-eu-central-1.pooler.supabase.com
+      POOLER_PORT: '5432'
+    steps:
+      - name: Ensure psql is available
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install --yes postgresql-client >/dev/null
+          fi
+          psql --version
+
+      - name: Authenticate with SELECT 1 (read-only)
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          DB_SECRET: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_PROJECT_ID" || { echo "SUPABASE_PROJECT_ID secret is empty"; exit 1; }
+          test -n "$DB_SECRET" || { echo "SUPABASE_DB_PASSWORD secret is empty"; exit 1; }
+          user="postgres.${SUPABASE_PROJECT_ID}"
+          conninfo="host=$POOLER_HOST port=$POOLER_PORT dbname=postgres user=$user sslmode=require connect_timeout=15"
+          echo "Target: $POOLER_HOST:$POOLER_PORT, user postgres.<project_ref> (session pooler), sslmode=require"
+
+          check() {  # $1 label; password in $2 is passed via PGPASSWORD for this one command only
+            local label="$1" err
+            if out="$(PGPASSWORD="$2" psql "$conninfo" -X -q -t -A -v ON_ERROR_STOP=1 -c 'select 1' 2>"$RUNNER_TEMP/psql.err")" \
+               && [ "$out" = "1" ]; then
+              echo "RESULT[$label]: PASS (SELECT 1 returned 1)"
+              rm -f "$RUNNER_TEMP/psql.err"
+              return 0
+            fi
+            err="$(sed -e 's/[[:cntrl:]]//g' "$RUNNER_TEMP/psql.err" | head -3)"
+            rm -f "$RUNNER_TEMP/psql.err"
+            echo "RESULT[$label]: FAIL — ${err:-no error text}"
+            last_err="$err"
+            return 1
+          }
+
+          # Facts about the secret's shape (yes/no only), computed without printing it.
+          trimmed="$(printf '%s' "$DB_SECRET" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          if [ "$trimmed" = "$DB_SECRET" ]; then ws=no; else ws=yes; fi
+          if printf '%s' "$DB_SECRET" | LC_ALL=C grep -q '[^A-Za-z0-9._~-]'; then special=yes; else special=no; fi
+          echo "Secret has leading/trailing whitespace or newline: $ws"
+          echo "Secret contains characters that must be percent-encoded in a connection URL: $special"
+
+          last_err=""
+          raw=fail
+          check "secret as stored" "$DB_SECRET" && raw=pass || true
+          raw_err="$last_err"
+          trim=n/a
+          if [ "$ws" = yes ]; then
+            trim=fail
+            check "secret with surrounding whitespace removed" "$trimmed" && trim=pass || true
+          fi
+          unset DB_SECRET trimmed
+
+          echo
+          if [ "$raw" = pass ]; then
+            echo "CONCLUSION: B — the GitHub secret authenticates. The failure is in how the backup"
+            echo "command (supabase db dump --linked / pg_dumpall) builds or handles the connection."
+          elif [ "$trim" = pass ]; then
+            echo "CONCLUSION: A — the secret only works once surrounding whitespace is removed."
+            echo "Re-save SUPABASE_DB_PASSWORD without the trailing newline/space."
+            exit 1
+          elif printf '%s' "$raw_err" | grep -q 'password authentication failed'; then
+            echo "CONCLUSION: A — the GitHub secret itself is rejected by the pooler."
+            echo "Re-save SUPABASE_DB_PASSWORD with the password that works locally."
+            exit 1
+          else
+            echo "CONCLUSION: INCONCLUSIVE — the connection failed before password verification"
+            echo "(network, TLS, tenant or pooler error above); the secret was not evaluated."
+            exit 1
+          fi
